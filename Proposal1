@@ -1,10 +1,10 @@
 import Core;
 
+alias string = let(char)[] // string is just array of immutable chars
 
 func add(a: int, b: int) -> int {
     return a + b
 }
-
 
 private nothrow func sub(a: int, b: int) -> int {
     return a - b
@@ -163,3 +163,60 @@ func mmVars2(name: string?, age: int?, number: ulong?, data: (int, int, string, 
 func callmmVars2() {
     mmVars2(data: (5, 10, "test", 42.0)) // maybe monad vars should be ommited
 }
+
+
+
+
+
+
+
+
+struct TimeInterval {
+    long timestamp // hnsec = secs * 1000 (ms) * 100 (hnsecs)
+}
+
+
+func seconds(secs: int) -> TimeInterval {
+    return secs * 1000 * 100
+}
+// OR maybe like this?
+extend int {
+    TimeInterval seconds() {
+        get {
+            return self.value * 1000 * 100
+        }
+    }
+}
+
+func sleep(for: TimeInterval) {
+    // Do some stuff here
+}
+
+unittest {
+    sleep(for: TimeInterval(5000000))
+    sleep(TimeInterval(500)) // without function name
+    sleep(5.seconds) // UFCS
+    
+    TimeInterval(5000).sleep // UFCS
+    5.seconds.sleep // UFCS, () should be ommited
+}
+
+
+
+func overload(window: int) {
+
+}
+
+func overload(view: int) {
+
+}
+
+unittest {
+    overload(window: 42) // OK
+    overload(view: 42) // OK
+    
+    overload(42) // ERROR, which method will be called?
+    42.overload() // ERROR same
+}
+
+
