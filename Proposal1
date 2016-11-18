@@ -165,6 +165,14 @@ func callmmVars2() {
 }
 
 
+func returnmmVar() -> string? {
+    // return is not needed
+}
+
+func returnmmVar2() -> (stirng, int, int, double[string]) {
+    // same
+}
+
 
 
 
