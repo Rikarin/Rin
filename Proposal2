@@ -1,0 +1,25 @@
+func sleep(interval: TimeInterval) [
+    if (Task.current !is null) {
+        // wait for timer
+    } else {
+        .stdc.posix.usleep(interval.total!"usecs")
+    }
+}
+
+task runMe() -> Task!int { // same as func but calling them perform internal __rin_runTask() conversion
+    sleep(5.seconds) // Sleep just yield in tasks
+    yield
+    writeln("test")
+    // This will run in another task
+}
+
+
+func main() {
+    runMe()
+    runMe()
+    runMe()
+    
+    while (true) {
+        writeln("not suspended")
+    }
+}
