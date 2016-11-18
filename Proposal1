@@ -134,3 +134,32 @@ class List(T) if (is(T : TestClass)) {
         return self
     }
 }
+
+
+
+
+
+func maybeMonadVars(name: string, age: int?) {
+    let a = age.value // Error if age is not set
+
+    if (age) {
+        let b = age.value // correct way, or maybe monad with ?.
+    }
+    
+    let c = age?.value // Correct way too, but c will be uninitialized(set to default value) if age is false
+}
+
+func callMaybeMonadVars() {
+    maybeMonadVars(name: "test", age: 42)
+    maybeMonadVars(name: "withoutAge") // correct way, becasue age is maybe monad var, so will be setted to false
+}
+
+
+func mmVars2(name: string?, age: int?, number: ulong?, data: (int, int, string, double) -> ucent {
+    return 42
+}
+
+
+func callmmVars2() {
+    mmVars2(data: (5, 10, "test", 42.0)) // maybe monad vars should be ommited
+}
