@@ -177,13 +177,13 @@ struct TimeInterval {
 
 
 func seconds(secs: int) -> TimeInterval {
-    return secs * 1000 * 100
+    return TimeInterval(secs * 1000 * 100)
 }
 // OR maybe like this?
 extend int {
     TimeInterval seconds() {
         get {
-            return self.value * 1000 * 100
+            return TimeInterval(self.value * 1000 * 100)
         }
     }
 }
