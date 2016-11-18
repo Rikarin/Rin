@@ -1,0 +1,136 @@
+import Core;
+
+
+func add(a: int, b: int) -> int {
+    return a + b
+}
+
+
+private nothrow func sub(a: int, b: int) -> int {
+    return a - b
+}
+
+
+class BaseClass {
+    final func dup(this R)() -> R {
+        var ret = typeid(self).create()
+        ret.__self()
+
+        return ret
+    }
+}
+
+class TestClass {
+    private enum m_compilerMacroWuthoutAddress = "TestEnum"
+    private ushort m_typedVar = 100
+    private var m_number      = 42 // default long?
+    private let m_constVar    = 50
+
+
+    self(number: int) {
+        m_number = number
+    }
+
+    ~self() {
+
+    }
+
+    func toString() -> string {
+        return "TestClass"
+    }
+
+    class func makeInstance() -> TestClass {
+        return TestClass()
+    }
+}
+
+
+extend TestClass {
+    private ubyte m_flag;
+
+    ulong id() {
+        get
+        set
+
+        set(TestClass value) {
+            _value = value.toInt()
+        }
+    }
+
+    func toInt() -> int {
+        return 42
+    }
+}
+
+enum TestEnum {
+    First,
+    Second,
+    Third
+}
+
+func ifExample(aVar: TestEnum) {
+    if (aVar == .First) {
+
+    } else {
+
+    }
+
+    final switch (aVar) {
+        case .First {
+
+        }
+
+        case .Second {
+
+        }
+
+        case .Third {
+
+        }
+    }
+}
+
+
+func varExample(arrayVar: int[], arrayVar2: int[42], arrayVar3: ref int[], delegateVar: (int, string) -> bool, tupleVar: (int, string, ushort, TestClass)) -> (string, string, typeof(arrayVar)) {
+
+    var createArray = int[arrayVar?[30]]; // maybe monad. If arrayVar doesn;t have 30 idx, don;t create array
+
+    delegateVar?() // call delegate if is not null
+
+    var testClass = TestClass()
+    var otherClass = testClass as OtherClass
+
+    otherClass?.toInt()
+
+    if (createArray !is null) {
+        unsafe {
+            memset(createArray.ptr, 0, createArray.length)
+        }
+    }
+
+    int num
+    mixin("num++")
+
+    return ("test", "test2", [5, 6, 7, 8])
+}
+
+
+func takeMap(map: int[string]) -> (int, string) {
+    var list = List!int
+    list.add(1).add(2).add(3)
+
+    return (map.first.value, map.first.key)
+}
+
+
+
+
+
+class List(T) if (is(T : TestClass)) {
+    private T[] m_array
+
+    func add(self R)(T value) -> R {
+        m_array ~= value
+        return self
+    }
+}
