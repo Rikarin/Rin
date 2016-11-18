@@ -19,7 +19,5 @@ func main() {
     runMe()
     runMe()
     
-    while (true) {
-        writeln("not suspended")
-    }
+    Task.runLoop()
 }
