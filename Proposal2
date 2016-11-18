@@ -14,10 +14,10 @@ task runMe() -> Task!int { // same as func but calling them perform internal __r
 }
 
 
-func main() {
+func main() -> int {
     runMe()
     runMe()
     runMe()
     
-    Task.runLoop()
+    return Task.runLoop()
 }
