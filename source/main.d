@@ -7,6 +7,7 @@ import Lexer;
 import Parser;
 import Tokens;
 
+// TODO: create symbol table for all symbols
 
 int main(string[] args) @safe {
     /*if (args.length < 2) {

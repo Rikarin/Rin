@@ -37,7 +37,7 @@ class Parser : Lexer {
                 case Token.Eof:
                     return;
 
-                case Token.Func:
+                case Token.Func, Token.Final:
                     writeln("parsing function");
                     handleFunction();
                     break;
@@ -137,6 +137,16 @@ class Parser : Lexer {
     }
 
     private FunctionAST parseFunction() {
+        bool isFinal;
+
+        if (currToken == Token.Final) {
+            isFinal = true;
+            nextToken(2); // eat final + space
+
+            if (currToken != Token.Func) {
+                logError("expected 'func' keyword");
+            }
+        }
         nextToken(2); // eat func + space
 
         auto proto = parsePrototype();
@@ -151,7 +161,7 @@ class Parser : Lexer {
                 logError("expression '%s' is not valid return type!", currToken);
             }
 
-            writeln("return val = ", currToken);
+            writeln("return val = ", currToken == Token.Identifier ? identifier : currToken.to!string);
             nextToken();
             needSpace();            
         }
@@ -162,7 +172,7 @@ class Parser : Lexer {
         }
 
         auto scope_ = parseScope();
-        return new FunctionAST(null, scope_);
+        return new FunctionAST(proto, scope_);
     }
 
     private TupleAST parseTuple() {
@@ -182,6 +192,29 @@ class Parser : Lexer {
         writeln("end scope");
 
         return new ScopeAST();
+    }
+
+
+    private ExprAST parseExpression() {
+        assert(false);
+    }
+
+    private NumberExprAST parseNumber() {
+        auto ret = new NumberExprAST(currToken, numeric);
+        nextToken();
+
+        return ret;
+    }
+
+    private ExprAST parseBrackets() {
+        nextToken(); // eat (
+        auto ret = parseExpression();
+
+        if (currToken != Token.CloseBracket) {
+            logError("expected ')'");
+        }
+        nextToken();
+        return ret;
     }
 
 

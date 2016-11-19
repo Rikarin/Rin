@@ -98,10 +98,18 @@ class Lexer {
             case "true":    return Token.True;
             case "false":   return Token.False;
             case "null":    return Token.Null;
+            case "assert":  return Token.Assert;
+            case "enforce": return Token.Enforce;
+            case "asm":     return Token.Asm;
+
             // Vars
             case "var":     return Token.Var;
             case "let":     return Token.Let;
+            case "void":    return Token.Void;
             case "bool":    return Token.Bool;
+            case "char":    return Token.Char;
+            case "wchar":   return Token.WChar;
+            case "dchar":   return Token.DChar;
             case "byte":    return Token.Byte;
             case "ubyte":   return Token.UByte;
             case "short":   return Token.Short;
@@ -115,12 +123,28 @@ class Lexer {
             case "real":    return Token.Real;
 
             case "is":      return Token.Is;
+            case "if":      return Token.If;
+            case "else":    return Token.Else;
+            case "while":   return Token.While;
+            case "repeat":  return Token.Repeat;
+            case "for":     return Token.For;
+            case "switch":  return Token.Switch;
+            case "case":    return Token.Case;
+            case "default": return Token.Default;
+            case "break":   return Token.Break;
+            case "continue": return Token.Continue;
+            case "lock":    return Token.Lock;
 
             // classes, etc
             case "import":  return Token.Import;
+            case "module":  return Token.Module;
             case "alias":   return Token.Alias;
             case "class":   return Token.Class;
             case "struct":  return Token.Struct;
+            case "Protocol": return Token.Protocol;
+            case "Extend":  return Token.Extend;
+            case "Enum":    return Token.Enum;
+            case "Union":   return Token.Union;
         
             // Funcs, etc
             case "func":    return Token.Func;
@@ -128,6 +152,23 @@ class Lexer {
             case "return":  return Token.Return;
             case "throws":  return Token.Throws;
             case "final":   return Token.Final;
+            case "self":    return Token.Self;
+            case "as":      return Token.As;
+            case "in":      return Token.In;
+            case "throw":   return Token.Throw;
+            case "try":     return Token.Try;
+            case "catch":   return Token.Catch;
+            case "finally": return Token.Finally;
+            case "override": return Token.Override;
+            case "abstract": return Token.Abstract;
+            case "deprecated": return Token.Deprecated;
+            case "debug":   return Token.Debug;
+            case "version": return Token.Version;
+
+            case "ref":     return Token.Ref;
+            case "const":   return Token.Const;
+            case "weak":    return Token.Weak;
+            case "lazy":    return Token.Lazy;
 
             default:
                 return Token.Identifier;
