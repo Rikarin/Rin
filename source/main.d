@@ -9,7 +9,7 @@ import Tokens;
 
 // TODO: create symbol table for all symbols
 
-int main(string[] args) @safe {
+void main(string[] args) @safe {
     /*if (args.length < 2) {
         writeln("Specify file to compile!");
         return -1;
@@ -17,20 +17,19 @@ int main(string[] args) @safe {
     
     writeln("Rin compiler starting up");
 
-    auto parser = new Parser((() @trusted => stdin)());
+//    auto buffer = "func test(name: string?, age: int) -> (bool?, int, int) { }";
+    auto buffer = "var test = 42
+let abc
+byte aa = 'test'";
 
-    while (true) {
-       /* auto tok = parser.nextToken();
 
-        write(tok);
-        if (tok == Token.Identifier) {
-            writeln(" = ", parser.identifier);
-        } else if (tok == Token.Double) {
-            writeln(" = ", parser.numeric);
-        } else {
-            write("\n");
-        }*/
+    auto parser = new Parser(buffer);
+    parser.nextToken();
+    parser.parse();
 
-        parser.parse();
-    }
+/*    auto lexer = new Lexer(buffer);
+    while (lexer.token.type != TokenType.Eof) {
+        writeln(*lexer.token);
+        lexer.nextToken();
+    }*/
 }

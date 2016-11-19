@@ -1,7 +1,7 @@
 module Tokens;
 
 
-enum Token {
+enum TokenType {
     None,
     Eof,
     Space,          // because we dont want to let the people to format code like !@#$
@@ -105,32 +105,46 @@ enum Token {
     Lazy,           // lazy
 }
 
+struct Token {
+    TokenType type;
+    Token*    next;
+
+    union {
+        long  value;
+        ulong uvalue;
+        real  rvalue;
+    }
+
+    string str;
+    char   postfix;
+}
 
 
+// TODO: this should be removed??
 immutable BasicTypes = [
-    Token.Void,
-    Token.Bool,
-    Token.Byte,
-    Token.Char,
-    Token.WChar,
-    Token.DChar,
-    Token.UByte,
-    Token.Short,
-    Token.UShort,
-    Token.Int,
-    Token.UInt,
-    Token.Long,
-    Token.ULong,
-    Token.Float,
-    Token.Double,
-    Token.Real,
+    TokenType.Void,
+    TokenType.Bool,
+    TokenType.Byte,
+    TokenType.Char,
+    TokenType.WChar,
+    TokenType.DChar,
+    TokenType.UByte,
+    TokenType.Short,
+    TokenType.UShort,
+    TokenType.Int,
+    TokenType.UInt,
+    TokenType.Long,
+    TokenType.ULong,
+    TokenType.Float,
+    TokenType.Double,
+    TokenType.Real,
 ];
 
-immutable ArgAttrib = [
-    Token.Ref,
-    Token.Const,
-    Token.Weak,
-    Token.Lazy,
+immutable Attribs = [
+    TokenType.Ref,
+    TokenType.Const,
+    TokenType.Weak,
+    TokenType.Lazy,
 ];
 
 

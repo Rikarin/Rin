@@ -10,37 +10,28 @@ import std.algorithm.searching;
 import Tokens;
 
 @safe:
+abstract class Symbol {
+    protected Symbol m_parent; // Parent scope
 
-struct Arg {
-    TypeSymbol type;
-    string     name;
-    Token      attrib; // Just one attrib for now
-    //Token[] attribs;
-}
+    string name() {
+        return null;
+    }
 
-
-
-
-interface Symbol {
-    string name();
     string generate(); // Generate my own pseudo code until we don't get working frontend, then port it to LLVM
 }
 
-class NumericSymbol : Symbol {
-    private Token  m_token;
-    private double m_value;
 
-    this(Token token, double value) {
+class NumericSymbol : Symbol {
+    private TokenType m_token;
+    private double    m_value;
+
+    this(TokenType token, double value) {
         m_token = token;
         m_value = value;
     }
 
-    override string name() {
-        return m_value.to!string;
-    }
-
     override string generate() {
-        return format("@number(%s) %s", m_token, m_value);
+        return format("(%s)%s", m_token, m_value);
     }
 }
 
@@ -52,20 +43,29 @@ class StringSymbol : Symbol {
         m_value = value;
     }
 
-    override string name() {
-        return m_value;
-    }
-
     override string generate() {
         return m_value;
     }
 }
 
 
-class TypeSymbol : Symbol { // Basic types + aliases
-    private string m_name;
-    private Symbol m_as;
-    private Token  m_attrib;
+class TupleSymbol : Symbol {
+    private string[] m_vars;
+
+    this(in string[] vars...) {
+    //    m_vars = vars;
+    }
+
+    override string generate() {
+        return "tuple";
+    }
+}
+
+/*
+class TypeSymbol : Symbol { 
+    private string  m_name;
+    private Symbol  m_as;
+    private Token[] m_attribs;
 
     this(string name, Token attrib = Token.None) {
         m_name   = name;
@@ -79,18 +79,20 @@ class TypeSymbol : Symbol { // Basic types + aliases
     override string generate() {
         return m_name;
     }
-}
+}*/
 
 
 class VariableSymbol : Symbol {
-    private TypeSymbol m_type;
-    private string     m_name;
-    private Symbol     m_value;
+    private string   m_type;
+    private string   m_name;
+    private string[] m_attribs;
+    private Symbol   m_value;
 
-    this(TypeSymbol type, string name, Symbol value = null) {
-        m_type  = type;
-        m_name  = name;
-        m_value = value;
+    this(string type, string name, string[] attribs, Symbol value = null) {
+        m_type    = type;
+        m_name    = name;
+        m_attribs = attribs;
+        m_value   = value;
     }
 
     override string name() {
@@ -98,22 +100,24 @@ class VariableSymbol : Symbol {
     }
 
     override string generate() {
-        return format("@var(%s) %s = %s", m_type.name, m_name, (m_value ? m_value.name : ""));
+        return format("@var(%s) %s%s", m_type, m_name, (m_value ? " = " ~ m_value.generate : ""));
     }
 }
 
 
 class PrototypeSymbol : Symbol {
-    private string m_name;
-    private Arg[]  m_args;
+    private string  m_name;
+    private Token[] m_attribs;
+    private VariableSymbol[] m_args;
 
-    this(string name, Arg[] args) {
-        m_name = name;
-        m_args = args;
+    this(string name, Token[] attribs, VariableSymbol[] args) {
+        m_name    = name;
+        m_attribs = attribs;
+        m_args    = args;
     }
 
     override string name() {
-        return m_name;
+        return m_name; // TODO: make name from name + args:  func test(name: string, age: int) -> bool     === test:name:age
     }
 
     override string generate() {
@@ -155,27 +159,27 @@ class ScopeSymbol : Symbol {
     override string generate() {
         return "Scope";
     }
-}
 
-
-class TupleSymbol : Symbol {
-    private VariableSymbol[] m_vars;
-
-    this(VariableSymbol[] vars) {
-        m_vars = vars;
+    void insert(Symbol symbol) {
+        m_symbols ~= symbol;
     }
 
-    override string name() {
-        return "tuple";
-    }
+    Symbol lookup(string name) {
+        foreach (x; m_symbols) {
+            if (x.name == name) {
+                return x;
+            }
+        }
 
-    override string generate() {
-        return "tuple";
+        return null;
     }
 }
 
 
 
+
+
+/*
 
 class SymbolTable {
     private Symbol[] m_symbols;
@@ -220,4 +224,4 @@ class SymbolTable {
 
         return ret;
     }
-}
+}*/

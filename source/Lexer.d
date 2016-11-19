@@ -12,23 +12,14 @@ import Tokens;
 class Lexer {
 @safe:
     private File m_file;
-    private bool m_empty;
-    private char m_buffer;
-    private Appender!(char[]) m_identifier;
-    private double m_numeric;
+    private const(char)* m_ptr;
+
+    private Token m_token;
 
     private int m_row;
     private int m_col;
 
     @property {
-        string identifier() const @trusted {
-            return cast(string)m_identifier.data;
-        }
-
-        double numeric() const {
-            return m_numeric;
-        }
-
         int row() const {
             return m_row;
         }
@@ -36,267 +27,397 @@ class Lexer {
         int col() const {
             return m_col;
         }
-    }
 
-    this(File file) {
-        m_empty = true;
-        m_file  = file;
-    }
-
-    // This must return Token + ident/number
-    Token getToken() {
-        if (m_empty) {
-            readToken();
-            m_empty = false;
+        private char nextChar() @trusted {
+            assert(*m_ptr != '\0', "End of the line reached!");
+            return *m_ptr++;
         }
-
-        // Space
-        if (m_buffer.isSpace) {
-            return emptyByReturn(Token.Space);
-        }
-
-        // End of Line
-        if (m_buffer.isEOL) {
-            m_col = 0;
-            m_row++;
-            return emptyByReturn(Token.EndLine);
-        }
-
-        // Parse string tokens
-        if (m_buffer.isAlpha) {
-            return parseString();
-        }
-
-        // Parse numeric tokens
-        if (m_buffer.isDigit || m_buffer == '.') { // For .42 doubles
-            return parseNumeric();
-        }
-
-        // Parse string expressions
-        if (m_buffer == '"') {
-            readToken();
-            m_identifier.clear();
-            
-            while (m_buffer != '"') {
-                m_identifier.put(m_buffer);
-                readToken();
-            }
-
-            return emptyByReturn(Token.StringExpr);
-        }
-
-        // Parse other types of tokens like brackets, etc.
-        auto tok = parseOtherTokens();
-        if (tok != Token.None) {
-            return tok;
-        }
-
-        // Look for EOF
-        if (m_buffer.isEOF) {
-            return emptyByReturn(Token.Eof);
-        }
-
-        assert(false, "Unexpected token!");
-    }
-
-    private Token parseString() {
-        m_identifier.clear();
-
-        do {
-            m_identifier.put(m_buffer);
-            readToken();
-        } while (m_buffer.isAlphaNum);
-
-        switch (m_identifier.data) {
-            case "true":    return Token.True;
-            case "false":   return Token.False;
-            case "null":    return Token.Null;
-            case "assert":  return Token.Assert;
-            case "enforce": return Token.Enforce;
-            case "asm":     return Token.Asm;
-
-            // Vars
-            case "var":     return Token.Var;
-            case "let":     return Token.Let;
-            case "void":    return Token.Void;
-            case "bool":    return Token.Bool;
-            case "char":    return Token.Char;
-            case "wchar":   return Token.WChar;
-            case "dchar":   return Token.DChar;
-            case "byte":    return Token.Byte;
-            case "ubyte":   return Token.UByte;
-            case "short":   return Token.Short;
-            case "ushort":  return Token.UShort;
-            case "int":     return Token.Int;
-            case "uint":    return Token.UInt;
-            case "long":    return Token.Long;
-            case "ulong":   return Token.ULong;
-            case "float":   return Token.Float;
-            case "double":  return Token.Double;
-            case "real":    return Token.Real;
-
-            case "is":      return Token.Is;
-            case "if":      return Token.If;
-            case "else":    return Token.Else;
-            case "while":   return Token.While;
-            case "repeat":  return Token.Repeat;
-            case "for":     return Token.For;
-            case "switch":  return Token.Switch;
-            case "case":    return Token.Case;
-            case "default": return Token.Default;
-            case "break":   return Token.Break;
-            case "continue": return Token.Continue;
-            case "lock":    return Token.Lock;
-
-            // classes, etc
-            case "import":  return Token.Import;
-            case "module":  return Token.Module;
-            case "alias":   return Token.Alias;
-            case "class":   return Token.Class;
-            case "struct":  return Token.Struct;
-            case "Protocol": return Token.Protocol;
-            case "Extend":  return Token.Extend;
-            case "Enum":    return Token.Enum;
-            case "Union":   return Token.Union;
         
-            // Funcs, etc
-            case "func":    return Token.Func;
-            case "task":    return Token.Task;
-            case "return":  return Token.Return;
-            case "throws":  return Token.Throws;
-            case "final":   return Token.Final;
-            case "self":    return Token.Self;
-            case "as":      return Token.As;
-            case "in":      return Token.In;
-            case "throw":   return Token.Throw;
-            case "try":     return Token.Try;
-            case "catch":   return Token.Catch;
-            case "finally": return Token.Finally;
-            case "override": return Token.Override;
-            case "abstract": return Token.Abstract;
-            case "deprecated": return Token.Deprecated;
-            case "debug":   return Token.Debug;
-            case "version": return Token.Version;
+        private char peekChar(int offset = 0) @trusted {
+            return m_ptr[offset];
+        }
 
-            case "ref":     return Token.Ref;
-            case "const":   return Token.Const;
-            case "weak":    return Token.Weak;
-            case "lazy":    return Token.Lazy;
+        private char currChar() @trusted {
+            return *m_ptr;
+        }
 
-            default:
-                return Token.Identifier;
+        Token* token() {
+            return &m_token;
         }
     }
 
-    private Token parseNumeric() {
-        Appender!(char[]) numStr;
-        Token specific = Token.Int;
+    this(const(char)[] buffer) {
+        m_ptr = &buffer[0];
+    }
 
-        do {
-            numStr.put(m_buffer);
-            readToken();
-        } while (m_buffer.isDigit || m_buffer == '.');
+    TokenType nextToken() {
+        import core.stdc.string: memcpy;
+        import core.stdc.stdlib: free;
 
-        if (numStr.data.countUntil('.') != -1) {
-            specific = Token.Double;
-        }
-
-             if (m_buffer == 'f') specific = emptyByReturn(Token.Float);
-        else if (m_buffer == 'd') specific = emptyByReturn(Token.Double);
-        else if (m_buffer == 'r') specific = emptyByReturn(Token.Real);
-        else if (m_buffer == 'L') specific = emptyByReturn(Token.Long);
-        else if (m_buffer == 'U') {
-            readToken();
-
-            if (m_buffer == 'L') {
-                specific = emptyByReturn(Token.ULong);
-            } else if (m_buffer.isWhiteChar) {
-                specific = Token.UInt;
-            } else {
-                writeln("Error undefined numeric type `", m_buffer, "`");
-            }
-        } else if (m_buffer.isWhiteChar) {
-            // White char ignore
+        if (m_token.next) {
+            auto t = m_token.next;
+            () @trusted {
+                memcpy(&m_token, t, Token.sizeof);
+                t.free();
+            }();
         } else {
-            writeln("Error undefined numeric type `", m_buffer, "`");
+            scan(&m_token);
         }
 
-        m_numeric = numStr.data.to!double;
-        return specific;
+        return m_token.type;
     }
 
-    private Token parseOtherTokens() {
-        switch (m_buffer) {
-            case ':': return emptyByReturn(Token.Colon);
-            case ',': return emptyByReturn(Token.Comma);
-            
+    // Always end this function with new token in the buffer
+    void scan(Token* tok) @trusted {
+        *tok = Token.init;
+
+        switch (currChar) {
+            case 0:
+            case 0x1A:
+                tok.type = TokenType.Eof;
+                break;
+
+            case ' ':
+                nextChar();
+                tok.type = TokenType.Space;
+                break;
+
+            case '\t':
+                nextChar();
+                tok.type                = TokenType.Space;
+                tok.next                = new Token(TokenType.Space);
+                tok.next.next           = new Token(TokenType.Space);
+                tok.next.next.next      = new Token(TokenType.Space);
+                break; 
+
+            case '\n', '\r':
+                m_col = 0;
+                m_row++;
+                nextChar();
+                tok.type = TokenType.EndLine;
+                break;
+
+            case '0': .. case '9':
+                tok.type = parseNumeric(tok);
+                break;
+
+            case 'A': .. case 'Z':
+            case 'a': .. case 'z':
+            case '_':
+                parseIdentifier(tok);
+                break;
+
+            case '"':
+            case '\'':
+            case '`':
+                parseString(tok);
+                break;
+
+            case '(': nextChar(); tok.type = TokenType.OpenBracket;  break;
+            case ')': nextChar(); tok.type = TokenType.CloseBracket; break;
+            case '{': nextChar(); tok.type = TokenType.OpenScope;    break;
+            case '}': nextChar(); tok.type = TokenType.CloseScope;   break;
+            case '[': nextChar(); tok.type = TokenType.OpenArray;    break;
+            case ']': nextChar(); tok.type = TokenType.CloseArray;   break;
+
+            case ':': nextChar(); tok.type = TokenType.Colon;        break;
+            case ',': nextChar(); tok.type = TokenType.Comma;        break;
+
             case '.':
-                readToken();
-                if (m_buffer == '.') {
-                    return emptyByReturn(Token.Slice);
+                if (peekChar(1).isDigit) {
+                    tok.type = parseNumeric(tok);
+                    break;
                 }
-                return Token.Dot;
+
+                nextChar();
+                if (currChar == '.') {
+                    nextChar();
+                    tok.type = TokenType.Slice; // ..
+                } else {
+                    tok.type = TokenType.Dot;
+                }
+                break;
 
             case '-':
-                readToken();
-                if (m_buffer == '>') {
-                    return emptyByReturn(Token.ReturnType);
+                nextChar();
+                if (currChar == '>') {
+                    nextChar();
+                    tok.type = TokenType.ReturnType;
+                } else {
+                    tok.type = TokenType.Minus;
                 }
-                return Token.Minus;
+                break;
 
             case '?':
-                readToken();
-                if (m_buffer == '.') {
-                    return emptyByReturn(Token.MonadDeref);
+                nextChar();
+                if (currChar == '.') {
+                    nextChar();
+                    tok.type = TokenType.MonadDeref;
+                } else {
+                    tok.type = TokenType.Monad;
                 }
-                return Token.Monad;
-
-            case '{': return emptyByReturn(Token.OpenScope);
-            case '}': return emptyByReturn(Token.CloseScope);
-            case '[': return emptyByReturn(Token.OpenArray);
-            case ']': return emptyByReturn(Token.CloseArray);
-            case '(': return emptyByReturn(Token.OpenBracket);
-            case ')': return emptyByReturn(Token.CloseBracket);
-            case '+': return emptyByReturn(Token.CloseBracket);
+                break;
 
             case '=':
-                readToken();
-                if (m_buffer == '=') {
-                    return emptyByReturn(Token.Equal);
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.Equal;
+                } else {
+                    tok.type = TokenType.Blyat;
                 }
-                return Token.Blyat;
+                break;
 
             case '!':
-                readToken();
-                if (m_buffer == '=') {
-                    return emptyByReturn(Token.NotEqual);
-                } else if (m_buffer == 'i' && peekToken() == 's') {
-                    readToken();
-                    return emptyByReturn(Token.NotIs);
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.NotEqual;
+                } else if (currChar == 'i' && peekChar(1) == 's') {
+                    nextChar();
+                    nextChar();
+                    tok.type = TokenType.NotIs;
+                } else {
+                    tok.type = TokenType.Not;
                 }
-                return Token.Not;
-                
+                break;
+
             default:
-                return Token.None;
+                assert(false, "Unexpected character " ~ cast(int)currChar);
         }
     }
 
-    private Token emptyByReturn(Token tok) {
-        m_empty = true;
-        return tok;
+    private void parseString(Token* tok) {
+        Appender!(char[]) buf;
+        auto c = currChar; // can be ' " `
+        nextChar();
+
+        while (currChar != c) {
+            buf.put(currChar);
+            nextChar();
+        }
+
+        nextChar();
+        if (currChar == 'w' || currChar == 'd') {
+            tok.postfix = currChar;
+            nextChar();
+        }
+        
+        () @trusted {
+            tok.type = TokenType.StringExpr;
+            tok.str  = buf.data.to!string;
+        }();
     }
 
-    private void readToken() @trusted {
-        m_file.rawRead((&m_buffer)[0 .. 1]);
-        m_col++;
+    private void parseIdentifier(Token* tok) {
+        Appender!(char[]) buf;
+
+        do {
+            buf.put(nextChar);
+        } while (currChar.isAlphaNum || currChar == '_');
+
+        switch (buf.data) {
+            case "true":    tok.type = TokenType.True;      break;
+            case "false":   tok.type = TokenType.False;     break;
+            case "null":    tok.type = TokenType.Null;      break;
+            case "assert":  tok.type = TokenType.Assert;    break;
+            case "enforce": tok.type = TokenType.Enforce;   break;
+            case "asm":     tok.type = TokenType.Asm;       break;
+
+            // Vars
+            case "var":     tok.type = TokenType.Var;       break;
+            case "let":     tok.type = TokenType.Let;       break;
+            case "void":    tok.type = TokenType.Void;      break;
+            case "bool":    tok.type = TokenType.Bool;      break;
+            case "char":    tok.type = TokenType.Char;      break;
+            case "wchar":   tok.type = TokenType.WChar;     break;
+            case "dchar":   tok.type = TokenType.DChar;     break;
+            case "byte":    tok.type = TokenType.Byte;      break;
+            case "ubyte":   tok.type = TokenType.UByte;     break;
+            case "short":   tok.type = TokenType.Short;     break;
+            case "ushort":  tok.type = TokenType.UShort;    break;
+            case "int":     tok.type = TokenType.Int;       break;
+            case "uint":    tok.type = TokenType.UInt;      break;
+            case "long":    tok.type = TokenType.Long;      break;
+            case "ulong":   tok.type = TokenType.ULong;     break;
+            case "float":   tok.type = TokenType.Float;     break;
+            case "double":  tok.type = TokenType.Double;    break;
+            case "real":    tok.type = TokenType.Real;      break;
+
+            case "is":      tok.type = TokenType.Is;        break;
+            case "if":      tok.type = TokenType.If;        break;
+            case "else":    tok.type = TokenType.Else;      break;
+            case "while":   tok.type = TokenType.While;     break;
+            case "repeat":  tok.type = TokenType.Repeat;    break;
+            case "for":     tok.type = TokenType.For;       break;
+            case "switch":  tok.type = TokenType.Switch;    break;
+            case "case":    tok.type = TokenType.Case;      break;
+            case "default": tok.type = TokenType.Default;   break;
+            case "break":   tok.type = TokenType.Break;     break;
+            case "continue": tok.type = TokenType.Continue; break;
+            case "lock":    tok.type = TokenType.Lock;      break;
+
+            // classes, etc
+            case "import":  tok.type = TokenType.Import;    break;
+            case "module":  tok.type = TokenType.Module;    break;
+            case "alias":   tok.type = TokenType.Alias;     break;
+            case "class":   tok.type = TokenType.Class;     break;
+            case "struct":  tok.type = TokenType.Struct;    break;
+            case "Protocol": tok.type = TokenType.Protocol; break;
+            case "Extend":  tok.type = TokenType.Extend;    break;
+            case "Enum":    tok.type = TokenType.Enum;      break;
+            case "Union":   tok.type = TokenType.Union;     break;
+        
+            // Funcs, etc
+            case "func":    tok.type = TokenType.Func;      break;
+            case "task":    tok.type = TokenType.Task;      break;
+            case "return":  tok.type = TokenType.Return;    break;
+            case "throws":  tok.type = TokenType.Throws;    break;
+            case "final":   tok.type = TokenType.Final;     break;
+            case "self":    tok.type = TokenType.Self;      break;
+            case "as":      tok.type = TokenType.As;        break;
+            case "in":      tok.type = TokenType.In;        break;
+            case "throw":   tok.type = TokenType.Throw;     break;
+            case "try":     tok.type = TokenType.Try;       break;
+            case "catch":   tok.type = TokenType.Catch;     break;
+            case "finally": tok.type = TokenType.Finally;   break;
+            case "override": tok.type = TokenType.Override; break;
+            case "abstract": tok.type = TokenType.Abstract; break;
+            case "deprecated": tok.type = TokenType.Deprecated; break;
+            case "debug":   tok.type = TokenType.Debug;     break;
+            case "version": tok.type = TokenType.Version;   break;
+
+            case "ref":     tok.type = TokenType.Ref;       break;
+            case "const":   tok.type = TokenType.Const;     break;
+            case "weak":    tok.type = TokenType.Weak;      break;
+            case "lazy":    tok.type = TokenType.Lazy;      break;
+
+            default:
+                () @trusted {
+                    tok.type = TokenType.Identifier;
+                    tok.str  = buf.data.to!string;
+                }();
+        }
     }
 
-    private char peekToken() @trusted {
-        char c;
-        m_file.rawRead((&c)[0 .. 1]);
-        m_file.seek(-1, SEEK_CUR);
+    private TokenType parseNumeric(Token* tok) {
+        int base = 10;
+        Appender!(char[]) buf;
 
-        return c;
+        if (currChar == '0') {
+            nextChar();
+            switch (currChar) {
+                case '0': .. case '7':
+                    buf.put(nextChar);
+                    base = 8;
+                    break;
+
+                case 'x':
+                    base = 16;
+                    nextChar();
+                    break;
+
+                case 'b':
+                    base = 2;
+                    nextChar();
+                    break;
+
+                case '.':
+                    if (peekChar(1).isAlpha || peekChar(1) == '_') {
+                        // dont go to next char, dot is not our. ex. 123.seconds
+                        goto SizeVar;
+                    }
+
+                    buf.put(nextChar);
+                    break;
+                
+                default:
+            }
+        }
+
+        while (true) {
+            switch (currChar) {
+                case '0':
+                case '1':
+                    buf.put(nextChar);
+                    break;
+
+                case '2': .. case '7':
+                    if (base == 2) {
+                        throw new Exception("binary digit expected!");
+                    }
+
+                    buf.put(nextChar);
+                    break;
+
+                case '8':
+                case '9':
+                    if (base < 10) {
+                        throw new Exception("octal digit expected!");
+                    }
+
+                    buf.put(nextChar);
+                    break;
+
+                case 'A': .. case 'F':
+                    if (base < 16) {
+                        throw new Exception("hex digit expected!");
+                    }
+
+                    buf.put(nextChar);
+                    break;
+
+                case '.':
+                    if (peekChar(1).isAlpha || peekChar(1) == '_') {
+                        // dont go to next char, dot is not our. ex. 123.seconds
+                        goto SizeVar;
+                    }
+
+                    buf.put(nextChar);
+                    break;
+
+                case '_':
+                    nextChar();
+                    break;
+
+                default:
+                    goto SizeVar;
+            }
+        }
+
+    SizeVar:
+        TokenType type = TokenType.Int;
+        // TODO: do fit by checking length of num
+
+             if (currChar == 'f') type = TokenType.Float;
+        else if (currChar == 'd') type = TokenType.Double;
+        else if (currChar == 'r') type = TokenType.Real;
+        else if (currChar == 'L') type = TokenType.Long;
+        else if (currChar == 'U') {
+            nextChar();
+            type = currChar == 'L' ? TokenType.ULong : TokenType.UInt;
+        } else if (currChar.isWhiteChar) {
+            // White char ignore
+        } else {
+            writeln("undefined numeric type");
+        }
+
+        switch (type) with (TokenType) {
+            case Float, Double, Real:
+                tok.rvalue = buf.data.to!real;
+                break;
+
+            case Int, Long:
+                tok.value = buf.data.to!long;
+                break;
+
+            case UInt, ULong:
+                tok.uvalue = buf.data.to!ulong;
+
+            default:
+        }
+
+        return type;
     }
 }
 
