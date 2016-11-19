@@ -1,0 +1,9 @@
+{
+	"name": "rin",
+	"authors": [
+		"satos"
+	],
+	"description": "A minimal D application.",
+	"copyright": "Copyright © 2016, satos",
+	"license": "proprietary"
+}
