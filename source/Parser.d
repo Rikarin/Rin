@@ -42,6 +42,12 @@ class Parser : Lexer {
                     handleFunction();
                     break;
 
+                case Token.For: // Testing
+                    writeln("parsing for");
+                    try parseFor();
+                    catch (Exception e) writeln(e.msg);                    
+                    break;
+
                 default:
                     writeln("Error! tok ", currToken);
                     nextToken();
@@ -168,7 +174,7 @@ class Parser : Lexer {
 
         // Here start parsing ScopeAST
         if (currToken != Token.OpenScope) {
-            throw new Exception("expected at end of the function {");
+            throw new Exception("expected { at end of the function");
         }
 
         auto scope_ = parseScope();
@@ -217,12 +223,64 @@ class Parser : Lexer {
         return ret;
     }
 
+    // for val in vals { ... }
+    // for i in 0 .. 10 { ... }
+    private ExprAST parseFor() {
+        nextToken(); // eat for
+        needSpace();
+
+        if (currToken != Token.Identifier) {
+            logError("variable name expected, not %s", currToken);
+        }
+        string var = identifier;
+        nextToken(2); // eat identifier + space
+
+        if (currToken != Token.In) {
+            logError("expected `in`");
+        }
+        nextToken(2); // eat in + space
+
+        if (currToken == Token.Identifier) {
+            // currToken is var
+            nextToken();
+            needSpace();
+
+            if (currToken == Token.Slice) {
+                nextToken();
+                needSpace();
+
+                // currToken is var or constant
+            }
+        } else if (currToken == Token.Int) { // TODO: all numeric types
+            double start = currToken;
+            nextToken();
+            needSpace();
+
+            if (currToken != Token.Slice) {
+                logError("expected `..`");
+            }
+            nextToken();
+            needSpace();
+
+            double end = currToken;
+        } else {
+            logError("Expected identifier or constant value not %s", currToken);
+        }
+
+        if (currToken != Token.OpenScope) {
+            throw new Exception("expected { at end of the function");
+        }
+        auto scope_ = parseScope();
+
+        return null;
+    }
+
 
 
 
     private void needSpace() {
         if (currToken != Token.Space) {
-            logError("expected space!");
+            logError("expected space not %s!", currToken);
         }
         nextToken();
     }

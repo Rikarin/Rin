@@ -38,6 +38,7 @@ enum Token {
     Colon,          // :
     Comma,          // ,
     Dot,            // .
+    Slice,          // ..
     ReturnType,     // ->
     MonadDeref,     // ?.
     Monad,          // ?

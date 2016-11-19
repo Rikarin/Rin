@@ -216,7 +216,13 @@ class Lexer {
         switch (m_buffer) {
             case ':': return emptyByReturn(Token.Colon);
             case ',': return emptyByReturn(Token.Comma);
-            case '.': return emptyByReturn(Token.Dot);
+            
+            case '.':
+                readToken();
+                if (m_buffer == '.') {
+                    return emptyByReturn(Token.Slice);
+                }
+                return Token.Dot;
 
             case '-':
                 readToken();
