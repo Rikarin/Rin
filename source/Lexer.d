@@ -98,6 +98,12 @@ class Lexer {
                 break;
 
             case '0': .. case '9':
+                if (!peekChar(1).isDigit) {
+                    tok.uvalue = currChar;
+                    tok.type   = TokenType.IntValue;
+                    nextToken();
+                    break;
+                }
                 tok.type = parseNumeric(tok);
                 break;
 
@@ -386,32 +392,28 @@ class Lexer {
         }
 
     SizeVar:
-        TokenType type = TokenType.Int;
+        TokenType type = TokenType.IntValue;
         // TODO: do fit by checking length of num
 
-             if (currChar == 'f') type = TokenType.Float;
-        else if (currChar == 'd') type = TokenType.Double;
-        else if (currChar == 'r') type = TokenType.Real;
-        else if (currChar == 'L') type = TokenType.Long;
+             if (currChar == 'f') type = TokenType.FloatValue;
+        else if (currChar == 'd') type = TokenType.DoubleValue;
+        else if (currChar == 'r') type = TokenType.RealValue;
+        else if (currChar == 'L') type = TokenType.LongValue;
         else if (currChar == 'U') {
             nextChar();
-            type = currChar == 'L' ? TokenType.ULong : TokenType.UInt;
-        } else if (currChar.isWhiteChar) {
-            // White char ignore
-        } else {
-            writeln("undefined numeric type");
+            type = currChar == 'L' ? TokenType.ULongValue : TokenType.UIntValue;
         }
 
         switch (type) with (TokenType) {
-            case Float, Double, Real:
+            case FloatValue, DoubleValue, RealValue:
                 tok.rvalue = buf.data.to!real;
                 break;
 
-            case Int, Long:
+            case IntValue, LongValue:
                 tok.value = buf.data.to!long;
                 break;
 
-            case UInt, ULong:
+            case UIntValue, ULongValue:
                 tok.uvalue = buf.data.to!ulong;
 
             default:

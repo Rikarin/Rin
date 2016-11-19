@@ -20,7 +20,8 @@ void main(string[] args) @safe {
 //    auto buffer = "func test(name: string?, age: int) -> (bool?, int, int) { }";
     auto buffer = "var test = 42
 let abc
-byte aa = 'test'";
+byte aa = 'test'
+let tupl = (\"str\", 42, false)";
 
 
     auto parser = new Parser(buffer);

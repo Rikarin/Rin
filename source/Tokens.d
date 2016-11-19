@@ -36,6 +36,21 @@ enum TokenType {
     Double,
     Real,
 
+    CharValue,      // char
+    WCharValue,     // wchar
+    DCharValue,     // dchar
+    ByteValue,      // byte
+    UByteValue,     // ubyte
+    ShortValue,
+    UShortValue,
+    IntValue,
+    UIntValue,
+    LongValue,
+    ULongValue,
+    FloatValue,
+    DoubleValue,
+    RealValue,
+
     Colon,          // :
     Comma,          // ,
     Dot,            // .
@@ -138,6 +153,25 @@ immutable BasicTypes = [
     TokenType.Float,
     TokenType.Double,
     TokenType.Real,
+];
+
+immutable BasicTypeValues = [
+    TokenType.True,
+    TokenType.False,
+    TokenType.ByteValue,
+    TokenType.CharValue,
+    TokenType.WCharValue,
+    TokenType.DCharValue,
+    TokenType.UByteValue,
+    TokenType.ShortValue,
+    TokenType.UShortValue,
+    TokenType.IntValue,
+    TokenType.UIntValue,
+    TokenType.LongValue,
+    TokenType.ULongValue,
+    TokenType.FloatValue,
+    TokenType.DoubleValue,
+    TokenType.RealValue,
 ];
 
 immutable Attribs = [

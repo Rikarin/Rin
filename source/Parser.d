@@ -325,10 +325,9 @@ class Parser : Lexer {
                 value = parseBoolean();
             } else if (token.type == TokenType.StringExpr) {
                 value = parseString();
-            } else if (BasicTypes.contains(token.type)) {
+            } else if (BasicTypeValues.contains(token.type)) {
                 value = parseNumber();
             } else if (token.type == TokenType.OpenBracket) {
-                // TODO: get tuple type by value
                 value = parseTuple();
             } else { // Add support for delegates
                 logError("Unknow variable value %s", token.type);
@@ -365,11 +364,26 @@ class Parser : Lexer {
 
     private TupleSymbol parseTuple() {
         nextToken();
-        while (nextToken != TokenType.CloseBracket) {
+        Token[] types;
+        
+        while (token.type != TokenType.CloseBracket) {
+            if (BasicTypeValues.contains(token.type) || 
+                token.type == TokenType.Identifier   || 
+                token.type == TokenType.StringExpr) {
+                types ~= *token;
+            }
 
+            nextToken();
+            if (token.type == TokenType.Comma) {
+                nextToken();
+                needSpace();
+            } else if (token.type != TokenType.CloseBracket) {
+                logError("comma required");
+            }
         }
 
-        return null;//new TupleSymbol(null);
+        nextToken();
+        return new TupleSymbol(types);
     }
 
 

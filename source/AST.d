@@ -50,14 +50,36 @@ class StringSymbol : Symbol {
 
 
 class TupleSymbol : Symbol {
-    private string[] m_vars;
+    private Token[] m_vars;
 
-    this(in string[] vars...) {
-    //    m_vars = vars;
+    this(Token[] vars...) {
+        m_vars = vars;
     }
 
     override string generate() {
-        return "tuple";
+        Appender!(char[]) buf;
+
+        buf.put("(");
+        foreach (x; m_vars) {
+            if (x.type == TokenType.True) {
+                buf.put("true");
+            } else if (x.type == TokenType.False) {
+                buf.put("false");
+            } else if (BasicTypeValues.contains(x.type)) {
+                buf.put(x.uvalue.to!(char[]));
+            } else if (x.type == TokenType.Identifier) {
+                buf.put(x.str);
+            } else if (x.type == TokenType.StringExpr) {
+                buf.put("\"");
+                buf.put(x.str);
+                buf.put("\"");
+            }
+            
+            buf.put(", ");
+        }
+
+        buf.put(")");
+        return buf.data.to!string;
     }
 }
 
