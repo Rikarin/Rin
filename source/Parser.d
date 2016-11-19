@@ -14,8 +14,7 @@ import Tokens;
 
 class Parser : Lexer {
 @safe:
-    private Token  m_currentToken;
-    private Type[] m_types;
+    private Token m_currentToken;
     
     @property {
         Token currToken() const {
@@ -49,8 +48,12 @@ class Parser : Lexer {
                     break;
 
                 default:
-                    writeln("Error! tok ", currToken);
-                    nextToken();
+                    writeln("parsing variable");
+                    try {
+                        auto ret = parseVariable();
+                        writeln(ret.generate);
+                    }
+                    catch (Exception e) writeln(e.msg);
             }
         }
     }
@@ -73,7 +76,7 @@ class Parser : Lexer {
     }
 
 
-    private PrototypeAST parsePrototype() {
+    private PrototypeSymbol parsePrototype() {
         if (currToken != Token.Identifier) {
             logError("expected function identifier");
         }
@@ -88,7 +91,7 @@ class Parser : Lexer {
         nextToken(); // eat (
 
         while (currToken == Token.Identifier) {
-            Arg arg = Arg(Type.init, identifier);
+            Arg arg = Arg(null, identifier);
             nextToken(); // eat name
 
             if (currToken != Token.Colon) {
@@ -139,10 +142,10 @@ class Parser : Lexer {
         }
         nextToken(); // eat )
 
-        return new PrototypeAST(name, args);
+        return new PrototypeSymbol(name, args);
     }
 
-    private FunctionAST parseFunction() {
+    private FunctionSymbol parseFunction() {
         bool isFinal;
 
         if (currToken == Token.Final) {
@@ -163,7 +166,7 @@ class Parser : Lexer {
             nextToken(); // eat ->
             needSpace();
             
-            if (!checkType(currToken, identifier)) {
+            if (!SymbolTable.current.findOrAddType(currToken, identifier)) {
                 logError("expression '%s' is not valid return type!", currToken);
             }
 
@@ -172,21 +175,21 @@ class Parser : Lexer {
             needSpace();            
         }
 
-        // Here start parsing ScopeAST
+        // Here start parsing ScopeSymbol
         if (currToken != Token.OpenScope) {
             throw new Exception("expected { at end of the function");
         }
 
         auto scope_ = parseScope();
-        return new FunctionAST(proto, scope_);
+        return new FunctionSymbol(proto, scope_);
     }
 
-    private TupleAST parseTuple() {
+    private TupleSymbol parseTuple() {
         // TODO
-        return new TupleAST();
+        return new TupleSymbol(null);
     }
 
-    private ScopeAST parseScope() {
+    private ScopeSymbol parseScope() {
         nextToken();
 
         writeln("begin scope");
@@ -197,22 +200,36 @@ class Parser : Lexer {
         nextToken();
         writeln("end scope");
 
-        return new ScopeAST();
+        return new ScopeSymbol();
     }
 
 
-    private ExprAST parseExpression() {
+    private Symbol parseExpression() {
         assert(false);
     }
 
-    private NumberExprAST parseNumber() {
-        auto ret = new NumberExprAST(currToken, numeric);
+    private NumericSymbol parseNumber() {
+        auto ret = new NumericSymbol(currToken, numeric);
         nextToken();
 
         return ret;
     }
 
-    private ExprAST parseBrackets() {
+    private StringSymbol parseString() {
+        auto ret = new StringSymbol(identifier);
+        nextToken();
+
+        return ret;
+    }
+
+    private NumericSymbol parseBoolean() {
+        auto sym = currToken;
+        nextToken();
+
+        return sym == Token.True ? new NumericSymbol(Token.Bool, 1) : new NumericSymbol(Token.Bool, 0); 
+    }
+
+    private Symbol parseBrackets() {
         nextToken(); // eat (
         auto ret = parseExpression();
 
@@ -225,7 +242,7 @@ class Parser : Lexer {
 
     // for val in vals { ... }
     // for i in 0 .. 10 { ... }
-    private ExprAST parseFor() {
+    private Symbol parseFor() {
         nextToken(); // eat for
         needSpace();
 
@@ -275,6 +292,78 @@ class Parser : Lexer {
         return null;
     }
 
+    // <type> <name>[ = <bool|numeric|string|object|tuple|delegate>]
+    private VariableSymbol parseVariable() {
+        auto st = SymbolTable.current;
+        TypeSymbol type;
+
+        if (currToken != Token.Var && currToken != Token.Let) {
+            type = cast(TypeSymbol)st.findOrAddType(currToken, identifier);
+
+            if (!type) {
+                nextToken(); // eat wrong type identifier
+                logError("%s is not valid type identifier", identifier);
+            }
+        }
+
+        nextToken(2); // eat type + space
+        if (currToken != Token.Identifier) {
+            logError("expected variable identifier not %s", currToken);
+        }
+        auto name = identifier;
+        Symbol value;
+        nextToken();
+
+        bool spaceAtEnd;
+        if (currToken == Token.Space) {
+            spaceAtEnd = true;
+            nextToken(); // eat space
+        }
+        
+
+        if (currToken == Token.EndLine && spaceAtEnd) {
+            logError("redundant space at end of variable declaration");
+        }
+
+        if (currToken == Token.Blyat) {
+            if (!spaceAtEnd) {
+                logError("space needed between name identifier and assignment operator");
+            }
+
+            nextToken();
+            needSpace();
+            
+            auto saveType = type;
+            if (currToken == Token.True || currToken == Token.False) {
+                type  = cast(TypeSymbol)st.findOrAddType(Token.Bool, null);
+                value = parseBoolean();
+            } else if (currToken == Token.StringExpr) {
+                type  = cast(TypeSymbol)st.findOrAddType(Token.Char, "string"); //"let(char)[]"
+                value = parseString();
+            } else if (BasicTypes.contains(currToken)) {
+                type  = cast(TypeSymbol)st.findOrAddType(currToken, identifier);
+                value = parseNumber();
+            } else if (currToken == Token.OpenBracket) {
+                // TODO: get tuple type by value
+                value = parseTuple();
+            } else { // Add support for delegates
+                logError("Unknow variable value %s", identifier);
+            }
+
+            if (saveType && saveType !is type) {
+                logError("declaration type and initialization value mismatch %s != %s", saveType.name, type.name);
+            }
+        } else if (currToken != Token.EndLine) {
+            logError("Undefined symbol %s", currToken);
+        }
+
+        if (!type) {
+            logError("var or let needs initialization value");
+        }
+
+        return new VariableSymbol(type, name, value);
+    }
+
 
 
 
@@ -285,21 +374,6 @@ class Parser : Lexer {
         nextToken();
     }
     // TODO: add methods like needOpenScope, etc??
-
-    private bool checkType(Token token, string identifier) {
-        if (token == Token.Identifier) {
-            foreach (x; m_types) {
-                if (x.name == identifier) {
-                    return true;
-                }
-            }
-
-            m_types ~= Type(identifier, null); // Add symbol for lazy resolve
-            return true;
-        }
-        
-        return BasicTypes.contains(token);
-    }
 
     private void logError(Args...)(string form, lazy Args args) {
         throw new Exception(format("Error(%s, %s): %s", row, col, format(form, args)));

@@ -8,6 +8,7 @@ enum Token {
     EndLine,        // We don't use ; at end of statement, statement end at the end of the line
 
     Identifier,     // any other unparserable token like name of function, etc
+    StringExpr,     // string in " "
 
     True,           // true
     False,          // false

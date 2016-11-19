@@ -72,6 +72,19 @@ class Lexer {
             return parseNumeric();
         }
 
+        // Parse string expressions
+        if (m_buffer == '"') {
+            readToken();
+            m_identifier.clear();
+            
+            while (m_buffer != '"') {
+                m_identifier.put(m_buffer);
+                readToken();
+            }
+
+            return emptyByReturn(Token.StringExpr);
+        }
+
         // Parse other types of tokens like brackets, etc.
         auto tok = parseOtherTokens();
         if (tok != Token.None) {
