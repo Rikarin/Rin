@@ -237,7 +237,7 @@ class VariableSymbol : Symbol {
     }
 
     override string generate() {
-        return format("@var(%s) %s%s", m_type.generate, m_name, (m_value ? " = " ~ m_value.generate : ""));
+        return format("@var(%s) %s%s", (m_type ? m_type.generate : ""), m_name, (m_value ? " = " ~ m_value.generate : ""));
     }
 }
 
@@ -299,7 +299,7 @@ class ScopeSymbol : Symbol {
 
 string tokenToString(ref Token tok) {
     import std.string;
-    
+
     if (tok.type == TokenType.Identifier) {
         return tok.str;
     }

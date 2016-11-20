@@ -53,13 +53,11 @@ class Parser : Lexer {
                     writeln("parsing function");
                     handleFunction();
                     break;
-
-                case TokenType.For: // Testing
-                    writeln("parsing for");
-                    try parseFor();
-                    catch (Exception e) writeln(e.msg);                    
-                    break;
 */
+                case TokenType.For:
+                    parseFor();                    
+                    break;
+
                 case TokenType.Identifier:
                     if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket) { // method call test.foo(), foo()
                         writeln("method call with ", token.str, " tok ", token.type);
@@ -101,6 +99,31 @@ class Parser : Lexer {
         writeln("import ", stages);
         // TODO make AST and ret
     }
+
+
+
+    // assert, enforce, asm
+    // if else
+    // continue break
+    // while repeat
+    // for in
+    // switch case default
+    // lock define as __rin_lock? explained in Proposal4
+
+    // module
+    // alias
+    // class
+    // struct
+    // protocol
+    // extend
+    // enum
+    // union
+
+    // Func,           // func
+    // Task,           // task
+    // Try catch finally
+    // Debug,          // debug
+    // Version,        // version
 
 
 
@@ -292,6 +315,7 @@ class Parser : Lexer {
         nextToken();
         return ret;
     }
+*/
 
     // for val in vals { ... }
     // for i in 0 .. 10 { ... }
@@ -302,49 +326,26 @@ class Parser : Lexer {
         if (token.type != TokenType.Identifier) {
             logError("variable name expected, not %s", token.type);
         }
-        string var = token.str;
-        nextToken(2); // eat identifier + space
+
+        auto sym1 = parsePrimary();
+        needSpace();
 
         if (token.type != TokenType.In) {
             logError("expected `in`");
         }
-        nextToken(2); // eat in + space
-
-        if (token.type == TokenType.Identifier) {
-            // currToken is var
-            nextToken();
-            needSpace();
-
-            if (token.type == TokenType.Slice) {
-                nextToken();
-                needSpace();
-
-                // currToken is var or constant
-            }
-        } else if (token.type == TokenType.Int) { // TODO: all numeric types
-            double start = token.type;
-            nextToken();
-            needSpace();
-
-            if (token.type != TokenType.Slice) {
-                logError("expected `..`");
-            }
-            nextToken();
-            needSpace();
-
-            double end = token.type;
-        } else {
-            logError("Expected identifier or constant value not %s", token.type);
-        }
+        nextToken(); // eat in
+        needSpace();
+        auto sym2 = parsePrimary();
+        needSpace();
 
         if (token.type != TokenType.OpenScope) {
             throw new Exception("expected { at end of the function");
         }
-        auto scope_ = parseScope();
+        //auto scope_ = parseScope();
 
+        writeln("for " ~ sym1.generate ~ " in " ~ (sym2 ? sym2.generate : ""));
         return null;
     }
-*/
 
 
     //[<attribs|@identifier[<tuple>]>... ]<basic_type|var|let|identifier> <identifier>[ = <bool|numeric|string|object|tuple|delegate>]
@@ -386,7 +387,7 @@ class Parser : Lexer {
         return new VariableSymbol(type, name, value);
     }
 
-    //const shared int == const(shared(int))
+
     private Symbol parseType() {
         Symbol parseArrayOrPtr(Symbol s) {
             Symbol ret = s;
@@ -430,9 +431,9 @@ class Parser : Lexer {
 
                 attrib = *token;
                 // TODO: parse tuple for @identifier("Test", 42)
+                // or deprecated("foo bar")
             }
             nextToken(); // eat attrib
-            
             
             if (token.type == TokenType.OpenBracket) {
                 nextToken(); // eat (
@@ -463,6 +464,7 @@ class Parser : Lexer {
     }
 
     private NumericSymbol parseNumber() {
+        // TODO: peekNext2 == .. its numeric range
         auto ret = new NumericSymbol(token.type, token.rvalue);
         nextToken();
 
@@ -522,6 +524,17 @@ class Parser : Lexer {
         return names.length ? new NamedTupleSymbol(names, types) : new TupleSymbol(types);
     }
 
+    private Symbol parseIdentifier() {
+        // TODO: return call/var identifier
+
+        // if peek == ( its call
+        // there can be classname.variable.call()
+
+        auto ret = new VariableSymbol(null, token.str);
+        nextToken();
+        return ret;
+    }
+
     private Symbol parsePrimary() {
         switch (token.type) with (TokenType) {
             case True, False:
@@ -536,8 +549,11 @@ class Parser : Lexer {
             case OpenBracket:
                 return parseTuple();
 
+            case Identifier:
+                return parseIdentifier();                
+
             default:
-                logError("Unknow variable value %s", token.type);
+                logError("Unknown variable value %s", tokenToString(*token));
                 return null;
         }
     }

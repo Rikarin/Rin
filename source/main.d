@@ -27,8 +27,13 @@ const char cc
 let tupl = (method: \"str\", number: 42, randomType: false)";
 */
 
-    auto buffer = "@my(const(char)) test";
+/*    auto buffer = "
+import core.stdc.test
+@my(const(char)) test
+";
+*/
 
+    auto buffer = "for x in array {";
 
     auto parser = new Parser(buffer);
     parser.nextToken();
