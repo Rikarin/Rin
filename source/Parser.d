@@ -34,7 +34,10 @@ class Parser : Lexer {
     }
 
     void parse() {
-        while (true) {
+        auto sc = parseScope();
+        writeln(sc.generate());
+
+       /+ while (true) {
             switch (token.type) {
                 case TokenType.None:
                 case TokenType.EndLine:
@@ -78,11 +81,11 @@ class Parser : Lexer {
                     writeln("Undefined token ", token.type);
                     nextToken();
             }
-        }
+        }+/
     }
 
 
-    private void parseImport() {
+    private ImportSymbol parseImport() {
         nextToken(); // eat import
         needSpace();
         string[] stages;
@@ -96,8 +99,7 @@ class Parser : Lexer {
             nextToken();
         }
 
-        writeln("import ", stages);
-        // TODO make AST and ret
+        return new ImportSymbol(stages);
     }
 
 
@@ -248,30 +250,36 @@ class Parser : Lexer {
     */
 
     private ScopeSymbol parseScope() {
-        nextToken();
+        if (token.type == TokenType.OpenScope) { // This can be called from global scope where is no { }
+            nextToken();
+        }
 
-        writeln("begin scope");
-        while (token.type != TokenType.CloseScope) {
+        auto ret = new ScopeSymbol;
+        while (true) {
             switch (token.type) {
-                case TokenType.None, TokenType.EndLine:
+                case TokenType.None:
+                case TokenType.EndLine:
+                case TokenType.Space:
                     nextToken();
                     break;
 
                 case TokenType.Eof:
-                    logError("symbol expected not EOF");
+                case TokenType.CloseScope:
+                    goto NRet;
+
+                case TokenType.Import:
+                    ret.add(parseImport());
                     break;
 
            /*     case TokenType.Func, TokenType.Final:
                     writeln("parsing function");
                     handleFunction();
                     break;
-
-                case TokenType.For: // Testing
-                    writeln("parsing for");
-                    try parseFor();
-                    catch (Exception e) writeln(e.msg);                    
-                    break;
 */
+                case TokenType.For:
+                    ret.add(parseFor());                    
+                    break;
+
                 case TokenType.Identifier:
                     if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket) { // method call test.foo(), foo()
                         writeln("method call with ", token.str, " tok ", token.type);
@@ -282,9 +290,9 @@ class Parser : Lexer {
                     break;
 
                 case TokenType.At:
+                case TokenType.Ref: .. case TokenType.Lazy:
                 case TokenType.Var: .. case TokenType.Real:
-                    auto ret = parseVariable();
-                    writeln(ret.generate);
+                    ret.add(parseVariable());
                     break;
 
                 default:
@@ -293,10 +301,8 @@ class Parser : Lexer {
             }
         }
 
-        nextToken();
-        writeln("end scope");
-
-        return new ScopeSymbol();
+    NRet:
+        return ret;
     }
 
 /*
@@ -341,10 +347,11 @@ class Parser : Lexer {
         if (token.type != TokenType.OpenScope) {
             throw new Exception("expected { at end of the function");
         }
-        //auto scope_ = parseScope();
+        
+        auto scope_ = parseScope();
 
-        writeln("for " ~ sym1.generate ~ " in " ~ (sym2 ? sym2.generate : ""));
-        return null;
+        //writeln("for " ~ sym1.generate ~ " in " ~ (sym2 ? sym2.generate : ""));
+        return new ForSymbol(sym1, sym2, scope_);
     }
 
 

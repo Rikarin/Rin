@@ -122,8 +122,7 @@ class NamedTupleSymbol : TupleSymbol {
     }
 }
 
-// how to parse something like const(int[])[]* ??
-// or const(shared(int)[])[]*
+
 class TypeSymbol : Symbol { // int, bool, customType, etc.
     private Token m_type;
 
@@ -242,6 +241,19 @@ class VariableSymbol : Symbol {
 }
 
 
+class ImportSymbol : Symbol {
+    private string [] m_stages;
+
+    this(string[] stages...) {
+        m_stages = stages;
+    }
+
+    override string generate() {
+        return "import ";
+    }
+}
+
+
 class FunctionSymbol : Symbol {
     private string           m_name;
     private Token[]          m_attribs;
@@ -265,8 +277,26 @@ class FunctionSymbol : Symbol {
 }
 
 
+class ForSymbol : Symbol {
+    private Symbol m_primary;
+    private Symbol m_secondary;
+    private Symbol m_scope;
+
+    this(Symbol primary, Symbol secondary, Symbol scope_) {
+        m_primary   = primary;
+        m_secondary = secondary;
+        m_scope     = scope_;
+    }
+
+    override string generate() {
+        return "for " ~ m_primary.generate ~ " in " ~ m_secondary.generate ~ " " ~ m_scope.generate;
+    }
+}
+
+
 class ScopeSymbol : Symbol {
     private Symbol[] m_symbols;
+    // TODO: symbol table for vars, funcs, classes, structs, enums, etc.
 
     this() {
 
@@ -277,8 +307,22 @@ class ScopeSymbol : Symbol {
     }
 
     override string generate() {
-        return "Scope";
+        Appender!(char[]) buf;
+
+        buf.put("{\n");
+        foreach (x; m_symbols) {
+            buf.put(x.generate);
+            buf.put("\n");
+        }
+
+        buf.put("}\n");
+        return buf.data.to!string;
     }
+
+    void add(Symbol symbol) {
+        m_symbols ~= symbol;
+    }
+
 
     void insert(Symbol symbol) {
         m_symbols ~= symbol;
