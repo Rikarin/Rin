@@ -66,6 +66,7 @@ enum TokenType {
     CloseBracket,   // )
     Plus,           // +
     Minus,          // -
+    At,             // @
 
     Blyat,          // = 
     Equal,          // ==

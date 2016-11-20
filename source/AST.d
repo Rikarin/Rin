@@ -74,7 +74,7 @@ class TupleSymbol : Symbol {
                 buf.put(x.str);
                 buf.put("\"");
             }
-            
+
             buf.put(", ");
         }
 
@@ -105,12 +105,12 @@ class TypeSymbol : Symbol {
 
 
 class VariableSymbol : Symbol {
-    private string   m_type;
-    private string   m_name;
-    private string[] m_attribs;
-    private Symbol   m_value;
+    private Token   m_type;
+    private string  m_name;
+    private Token[] m_attribs;
+    private Symbol  m_value;
 
-    this(string type, string name, string[] attribs, Symbol value = null) {
+    this(Token type, string name, Token[] attribs, Symbol value = null) {
         m_type    = type;
         m_name    = name;
         m_attribs = attribs;
@@ -122,39 +122,22 @@ class VariableSymbol : Symbol {
     }
 
     override string generate() {
-        return format("@var(%s) %s%s", m_type, m_name, (m_value ? " = " ~ m_value.generate : ""));
-    }
-}
-
-
-class PrototypeSymbol : Symbol {
-    private string  m_name;
-    private Token[] m_attribs;
-    private VariableSymbol[] m_args;
-
-    this(string name, Token[] attribs, VariableSymbol[] args) {
-        m_name    = name;
-        m_attribs = attribs;
-        m_args    = args;
-    }
-
-    override string name() {
-        return m_name; // TODO: make name from name + args:  func test(name: string, age: int) -> bool     === test:name:age
-    }
-
-    override string generate() {
-        return "prototype";
+        return format("@var(%s) %s%s", m_type.str, m_name, (m_value ? " = " ~ m_value.generate : ""));
     }
 }
 
 
 class FunctionSymbol : Symbol {
-    private PrototypeSymbol m_proto;
-    private ScopeSymbol     m_scope;
+    private string           m_name;
+    private Token[]          m_attribs;
+    private VariableSymbol[] m_args;
+    private ScopeSymbol      m_scope;
 
-    this(PrototypeSymbol proto, ScopeSymbol scope_) {
-        m_proto = proto;
-        m_scope = scope_;
+    this(string name, Token[] attribs, VariableSymbol[] args, ScopeSymbol scope_) {
+        m_name    = name;
+        m_attribs = attribs;
+        m_args    = args;
+        m_scope   = scope_;
     }
 
     override string name() {

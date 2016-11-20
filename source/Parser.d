@@ -271,26 +271,30 @@ class Parser : Lexer {
 */
 
 
-    //[<attribs|@identifier>... ]<basic_type|var|let|identifier> <identifier>[ = <bool|numeric|string|object|tuple|delegate>]
+    //[<attribs|@identifier[<tuple>]>... ]<basic_type|var|let|identifier> <identifier>[ = <bool|numeric|string|object|tuple|delegate>]
     private VariableSymbol parseVariable() {
-        string[] attribs;
+        Token[] attribs;
 
         // Parse attribs
-         while (Attribs.contains(token.type) || (token.type == TokenType.Identifier && token.str[0] == '@')) {
-             if (token.type == TokenType.Identifier) {
-                 attribs ~= token.str[1 .. $];
-             } else {
-                 attribs ~= token.type.to!string().toLower();
-             }
-            
-             nextToken();
-         }
+        while (Attribs.contains(token.type) || token.type == TokenType.At) {
+            if (token.type == TokenType.At) {
+                nextToken();
+
+                if (token.type != TokenType.Identifier) {
+                    logError("identifier expected");
+                }
+
+                // TODO: parse tuple for @identifier
+            }
+            attribs ~= *token;
+            nextToken();
+        }
         
         // Parse data type (TODO: accept tuple as data type)
         if (!BasicTypes.contains(token.type) && !token.type.among(TokenType.Identifier, TokenType.Var, TokenType.Let)) {
             logError("Type expected, not '%s'", token.type);
         }
-        string type = token.str;
+        Token type = *token;
         nextToken(); // eat type
         nextToken(); // eat space
 
@@ -359,9 +363,10 @@ class Parser : Lexer {
         auto sym = token.type;
         nextToken();
 
-        return sym == TokenType.True ? new NumericSymbol(TokenType.Bool, 1) : new NumericSymbol(TokenType.Bool, 0); 
+        return sym == TokenType.True ? new NumericSymbol(TokenType.True, 1) : new NumericSymbol(TokenType.False, 0); 
     }
 
+    // ... = ([[<identifier>: ]... <identifier|string|bool|numeric|delegate|tuple>])
     private TupleSymbol parseTuple() {
         nextToken();
         Token[] types;
@@ -383,7 +388,7 @@ class Parser : Lexer {
         }
 
         nextToken();
-        return new TupleSymbol(types);
+        return new TupleSymbol(types); // or NamedTupleSymbol for (name: 42) tuple
     }
 
 
