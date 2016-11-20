@@ -1,0 +1,21 @@
+
+
+// let users to define their own block scopes?
+
+
+func test(num: int) {
+    myBlock(num) {
+
+    }
+
+    // should be same as
+    myBlock(() -> (), num)
+    // where myBlock can be func, task, class, struct
+
+
+    let test = myBlock(num) {
+
+    }
+
+    test.callFunc()
+}
