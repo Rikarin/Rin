@@ -254,17 +254,16 @@ class ImportSymbol : Symbol {
 }
 
 
-class FunctionSymbol : Symbol {
-    private string           m_name;
-    private Token[]          m_attribs;
+// We need prototype for extern(C) funcs & protos in import headers
+class PrototypeSymbol : Symbol {
+    private string m_name;
+    private Symbol m_returnType;
     private VariableSymbol[] m_args;
-    private ScopeSymbol      m_scope;
 
-    this(string name, Token[] attribs, VariableSymbol[] args, ScopeSymbol scope_) {
-        m_name    = name;
-        m_attribs = attribs;
-        m_args    = args;
-        m_scope   = scope_;
+    this(string name, VariableSymbol[] args, Symbol returnType) {
+        m_name       = name;
+        m_args       = args;
+        m_returnType = returnType;
     }
 
     override string name() {
@@ -272,17 +271,36 @@ class FunctionSymbol : Symbol {
     }
 
     override string generate() {
-        return "function";
+        return "func " ~ m_name ~ "()" ~ (m_returnType ? " -> " ~ m_returnType.generate : "");
+    }
+}
+
+
+class FunctionSymbol : Symbol {
+    private PrototypeSymbol m_proto;
+    private ScopeSymbol     m_scope;
+
+    this(PrototypeSymbol proto, ScopeSymbol scope_) {
+        m_proto = proto;
+        m_scope = scope_;
+    }
+
+    override string name() {
+        return m_proto.name;
+    }
+
+    override string generate() {
+        return m_proto.generate ~ m_scope.generate;
     }
 }
 
 
 class ForSymbol : Symbol {
-    private Symbol m_primary;
-    private Symbol m_secondary;
-    private Symbol m_scope;
+    private Symbol      m_primary;
+    private Symbol      m_secondary;
+    private ScopeSymbol m_scope;
 
-    this(Symbol primary, Symbol secondary, Symbol scope_) {
+    this(Symbol primary, Symbol secondary, ScopeSymbol scope_) {
         m_primary   = primary;
         m_secondary = secondary;
         m_scope     = scope_;

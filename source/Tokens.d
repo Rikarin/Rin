@@ -96,7 +96,6 @@ enum TokenType {
     Import,         // import
     Module,         // module
     Alias,          // alias
-    Class,          // class
     Struct,         // struct
     Protocol,       // protocol
     Extend,         // extend
@@ -107,7 +106,6 @@ enum TokenType {
     Task,           // task
     Return,         // return
     Throws,         // throws
-    Final,          // final
     Self,           // self
     As,             // as
     In,             // in
@@ -115,11 +113,18 @@ enum TokenType {
     Try,            // try
     Catch,          // catch
     Finally,        // finally
+
+    // Common attributes. Can be applied to single statement like func, task, class, etc. or to scope
+    // ============================
+    Class,          // class
+    Final,          // final
     Override,       // override
     Abstract,       // abstract
+    Global,         // global
     Deprecated,     // deprecated
     Debug,          // debug
     Version,        // version
+    // ============================
 
     // Type attributes
     // ============================
@@ -155,4 +160,8 @@ bool isBasicTypeValue(TokenType type) {
 
 bool isAttribute(TokenType type) {
     return type >= TokenType.Ref && type <= TokenType.Lazy;
+}
+
+bool isFuncAttribute(TokenType type) {
+    return type >= TokenType.Final && type <= TokenType.Const;
 }

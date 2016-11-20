@@ -241,80 +241,81 @@ class Lexer {
         } while (currChar.isAlphaNum || currChar == '_');
 
         switch (buf.data) {
-            case "true":    tok.type = TokenType.True;      break;
-            case "false":   tok.type = TokenType.False;     break;
-            case "null":    tok.type = TokenType.Null;      break;
-            case "assert":  tok.type = TokenType.Assert;    break;
-            case "enforce": tok.type = TokenType.Enforce;   break;
-            case "asm":     tok.type = TokenType.Asm;       break;
+            case "true":       tok.type = TokenType.True;       break;
+            case "false":      tok.type = TokenType.False;      break;
+            case "null":       tok.type = TokenType.Null;       break;
+            case "assert":     tok.type = TokenType.Assert;     break;
+            case "enforce":    tok.type = TokenType.Enforce;    break;
+            case "asm":        tok.type = TokenType.Asm;        break;
 
             // Vars
-            case "var":     tok.type = TokenType.Var;       break;
-            case "let":     tok.type = TokenType.Let;       break;
-            case "void":    tok.type = TokenType.Void;      break;
-            case "bool":    tok.type = TokenType.Bool;      break;
-            case "char":    tok.type = TokenType.Char;      break;
-            case "wchar":   tok.type = TokenType.WChar;     break;
-            case "dchar":   tok.type = TokenType.DChar;     break;
-            case "byte":    tok.type = TokenType.Byte;      break;
-            case "ubyte":   tok.type = TokenType.UByte;     break;
-            case "short":   tok.type = TokenType.Short;     break;
-            case "ushort":  tok.type = TokenType.UShort;    break;
-            case "int":     tok.type = TokenType.Int;       break;
-            case "uint":    tok.type = TokenType.UInt;      break;
-            case "long":    tok.type = TokenType.Long;      break;
-            case "ulong":   tok.type = TokenType.ULong;     break;
-            case "float":   tok.type = TokenType.Float;     break;
-            case "double":  tok.type = TokenType.Double;    break;
-            case "real":    tok.type = TokenType.Real;      break;
+            case "var":        tok.type = TokenType.Var;        break;
+            case "let":        tok.type = TokenType.Let;        break;
+            case "void":       tok.type = TokenType.Void;       break;
+            case "bool":       tok.type = TokenType.Bool;       break;
+            case "char":       tok.type = TokenType.Char;       break;
+            case "wchar":      tok.type = TokenType.WChar;      break;
+            case "dchar":      tok.type = TokenType.DChar;      break;
+            case "byte":       tok.type = TokenType.Byte;       break;
+            case "ubyte":      tok.type = TokenType.UByte;      break;
+            case "short":      tok.type = TokenType.Short;      break;
+            case "ushort":     tok.type = TokenType.UShort;     break;
+            case "int":        tok.type = TokenType.Int;        break;
+            case "uint":       tok.type = TokenType.UInt;       break;
+            case "long":       tok.type = TokenType.Long;       break;
+            case "ulong":      tok.type = TokenType.ULong;      break;
+            case "float":      tok.type = TokenType.Float;      break;
+            case "double":     tok.type = TokenType.Double;     break;
+            case "real":       tok.type = TokenType.Real;       break;
 
-            case "is":      tok.type = TokenType.Is;        break;
-            case "if":      tok.type = TokenType.If;        break;
-            case "else":    tok.type = TokenType.Else;      break;
-            case "while":   tok.type = TokenType.While;     break;
-            case "repeat":  tok.type = TokenType.Repeat;    break;
-            case "for":     tok.type = TokenType.For;       break;
-            case "switch":  tok.type = TokenType.Switch;    break;
-            case "case":    tok.type = TokenType.Case;      break;
-            case "default": tok.type = TokenType.Default;   break;
-            case "break":   tok.type = TokenType.Break;     break;
-            case "continue": tok.type = TokenType.Continue; break;
-            case "lock":    tok.type = TokenType.Lock;      break;
+            case "is":         tok.type = TokenType.Is;         break;
+            case "if":         tok.type = TokenType.If;         break;
+            case "else":       tok.type = TokenType.Else;       break;
+            case "while":      tok.type = TokenType.While;      break;
+            case "repeat":     tok.type = TokenType.Repeat;     break;
+            case "for":        tok.type = TokenType.For;        break;
+            case "switch":     tok.type = TokenType.Switch;     break;
+            case "case":       tok.type = TokenType.Case;       break;
+            case "default":    tok.type = TokenType.Default;    break;
+            case "break":      tok.type = TokenType.Break;      break;
+            case "continue":   tok.type = TokenType.Continue;   break;
+            case "lock":       tok.type = TokenType.Lock;       break;
 
             // classes, etc
-            case "import":  tok.type = TokenType.Import;    break;
-            case "module":  tok.type = TokenType.Module;    break;
-            case "alias":   tok.type = TokenType.Alias;     break;
-            case "class":   tok.type = TokenType.Class;     break;
-            case "struct":  tok.type = TokenType.Struct;    break;
-            case "Protocol": tok.type = TokenType.Protocol; break;
-            case "Extend":  tok.type = TokenType.Extend;    break;
-            case "Enum":    tok.type = TokenType.Enum;      break;
-            case "Union":   tok.type = TokenType.Union;     break;
+            case "import":     tok.type = TokenType.Import;     break;
+            case "module":     tok.type = TokenType.Module;     break;
+            case "alias":      tok.type = TokenType.Alias;      break;
+            case "class":      tok.type = TokenType.Class;      break;
+            case "struct":     tok.type = TokenType.Struct;     break;
+            case "Protocol":   tok.type = TokenType.Protocol;   break;
+            case "Extend":     tok.type = TokenType.Extend;     break;
+            case "Enum":       tok.type = TokenType.Enum;       break;
+            case "Union":      tok.type = TokenType.Union;      break;
         
             // Funcs, etc
-            case "func":    tok.type = TokenType.Func;      break;
-            case "task":    tok.type = TokenType.Task;      break;
-            case "return":  tok.type = TokenType.Return;    break;
-            case "throws":  tok.type = TokenType.Throws;    break;
-            case "final":   tok.type = TokenType.Final;     break;
-            case "self":    tok.type = TokenType.Self;      break;
-            case "as":      tok.type = TokenType.As;        break;
-            case "in":      tok.type = TokenType.In;        break;
-            case "throw":   tok.type = TokenType.Throw;     break;
-            case "try":     tok.type = TokenType.Try;       break;
-            case "catch":   tok.type = TokenType.Catch;     break;
-            case "finally": tok.type = TokenType.Finally;   break;
-            case "override": tok.type = TokenType.Override; break;
-            case "abstract": tok.type = TokenType.Abstract; break;
+            case "func":       tok.type = TokenType.Func;       break;
+            case "task":       tok.type = TokenType.Task;       break;
+            case "return":     tok.type = TokenType.Return;     break;
+            case "throws":     tok.type = TokenType.Throws;     break;
+            case "final":      tok.type = TokenType.Final;      break;
+            case "self":       tok.type = TokenType.Self;       break;
+            case "as":         tok.type = TokenType.As;         break;
+            case "in":         tok.type = TokenType.In;         break;
+            case "throw":      tok.type = TokenType.Throw;      break;
+            case "try":        tok.type = TokenType.Try;        break;
+            case "catch":      tok.type = TokenType.Catch;      break;
+            case "finally":    tok.type = TokenType.Finally;    break;
+            case "override":   tok.type = TokenType.Override;   break;
+            case "abstract":   tok.type = TokenType.Abstract;   break;
+            case "global":     tok.type = TokenType.Global;     break;
             case "deprecated": tok.type = TokenType.Deprecated; break;
-            case "debug":   tok.type = TokenType.Debug;     break;
-            case "version": tok.type = TokenType.Version;   break;
+            case "debug":      tok.type = TokenType.Debug;      break;
+            case "version":    tok.type = TokenType.Version;    break;
 
-            case "ref":     tok.type = TokenType.Ref;       break;
-            case "const":   tok.type = TokenType.Const;     break;
-            case "weak":    tok.type = TokenType.Weak;      break;
-            case "lazy":    tok.type = TokenType.Lazy;      break;
+            case "ref":        tok.type = TokenType.Ref;        break;
+            case "const":      tok.type = TokenType.Const;      break;
+            case "weak":       tok.type = TokenType.Weak;       break;
+            case "lazy":       tok.type = TokenType.Lazy;       break;
 
             default:
                 () @trusted {

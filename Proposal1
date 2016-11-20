@@ -177,6 +177,43 @@ func returnmmVar2() -> (stirng, int, int, double[string]) {
 
 
 
+override deprecated("don't use it") {
+    func test() const throws -> const Object {
+
+    }
+}
+
+
+class func test() {
+
+}
+
+class { // this seems ...
+    func test() {
+
+    }
+}
+
+{
+class:
+deprecated("test"):
+...
+
+}
+
+
+func test() {
+    let x = 42
+
+    func local() {
+        let y = x
+    }
+
+    global func glob() {
+        let y = x // no context pointer to test() scope
+    }
+}
+
 
 
 struct TimeInterval {

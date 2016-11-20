@@ -1,6 +1,7 @@
 module main;
 
 import std.stdio;
+import std.file;
 
 import AST;
 import Lexer;
@@ -33,13 +34,21 @@ import core.stdc.test
 ";
 */
 
-    auto buffer = "for x in array {";
+//    auto buffer = "for x in array {";
 
-    auto parser = new Parser(buffer);
-    parser.nextToken();
+    () @trusted {
+        foreach (x; dirEntries("tests", SpanMode.shallow)) {
+            writeln("Running test: ", x.name);
+            auto parser = new Parser(x.readText);
+            parser.nextToken();
 
-    try parser.parse();
-    catch (Exception e) writeln(e.msg);
+            try parser.parse();
+            catch (Exception e) writeln(e.msg);
+            writeln("--------------");
+        }
+    }();
+    
+    
 
 /*    auto lexer = new Lexer(buffer);
     while (lexer.token.type != TokenType.Eof) {

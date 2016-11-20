@@ -36,8 +36,18 @@ class Parser : Lexer {
     void parse() {
         auto sc = parseScope();
         writeln(sc.generate());
+    }
 
-       /+ while (true) {
+    private ScopeSymbol parseScope(bool brackets = true) {
+        // This can be called from global scope where is no { }
+        bool wasOpened;
+        if (token.type == TokenType.OpenScope) {
+            nextToken();
+            wasOpened = true;
+        }
+
+        auto ret = new ScopeSymbol;
+        while (brackets) {
             switch (token.type) {
                 case TokenType.None:
                 case TokenType.EndLine:
@@ -46,19 +56,33 @@ class Parser : Lexer {
                     break;
 
                 case TokenType.Eof:
-                    return;
+                    if (wasOpened) {
+                        logError("expected } at the end of line");
+                    }
+                    goto NRet;
+
+                case TokenType.CloseScope:
+                    goto NRet;
 
                 case TokenType.Import:
-                    parseImport();
+                    ret.add(parseImport());
                     break;
 
-           /*     case TokenType.Func, TokenType.Final:
-                    writeln("parsing function");
-                    handleFunction();
+                    // parse attribs for class, structs, etc. like this. e.g. const { ... }, override { ... }
+          /*      case TokenType.Final: .. case TokenType.Const:
+                    auto tok = *token;
+                    nextToken();
+                    needSpace();
+                    parseScope(token.type == TokenType.OpenBracket);
                     break;
-*/
+                    */
+
+                case TokenType.Func:
+                    ret.add(parseFunction());
+                    break;
+
                 case TokenType.For:
-                    parseFor();                    
+                    ret.add(parseFor());                    
                     break;
 
                 case TokenType.Identifier:
@@ -73,15 +97,17 @@ class Parser : Lexer {
                 case TokenType.At:
                 case TokenType.Ref: .. case TokenType.Lazy:
                 case TokenType.Var: .. case TokenType.Real:
-                    auto ret = parseVariable();
-                    writeln(ret.generate);
+                    ret.add(parseVariable());
                     break;
 
                 default:
                     writeln("Undefined token ", token.type);
                     nextToken();
             }
-        }+/
+        }
+
+    NRet:
+        return ret;
     }
 
 
@@ -128,182 +154,86 @@ class Parser : Lexer {
     // Version,        // version
 
 
-
-/*
-    private void handleFunction() {
-        try {
-            auto func = parseFunction();
-        } catch (Exception e) {
-            writeln(e.msg);
-        }
-    }
-
-
     private PrototypeSymbol parsePrototype() {
-        if (token.type != TokenType.Identifier) {
-            logError("expected function identifier");
+        if (token.type != TokenType.Func && token.type != TokenType.Task) {
+            logError("expected 'func' or `task` keyword not '%s'", tokenToString(*token));
         }
 
-        Arg[] args;
+        Token type = *token;
+        nextToken(); // eat func
+        needSpace();
+
+        if (token.type != TokenType.Identifier) {
+            logError("expected function identifier not '%s'", tokenToString(*token));
+        }
+        
+        VariableSymbol[] args;
         string name = token.str;
         nextToken(); // eat identifier
 
         if (token.type != TokenType.OpenBracket) {
-            logError("expected '(' not '%s'", token.type);
+            logError("expected '(' not '%s'", tokenToString(*token));
         }
         nextToken(); // eat (
 
         while (token.type == TokenType.Identifier) {
-            Arg arg = Arg(null, identifier);
+            string argName = token.str;
             nextToken(); // eat name
 
             if (token.type != TokenType.Colon) {
-                logError("expected `:` after name declaration!");
+                logError("expected `:` after name declaration not '%s'", tokenToString(*token));
             }
-            nextToken(2); // eat colon + space
+            nextToken(); // eat colon
+            needSpace();
 
-            // Looks for attrib like ref, const, etc.
-            if (ArgAttrib.contains(token.type)) {
-                writeln("found attrib ", token.type);
-                arg.attrib = token.type;
-                nextToken(2); // eat token + space after
-            }
-
-            if (token.type == TokenType.Identifier) {
-                // We found an custom data type
-                writeln("found custom type ", token.str);
-                nextToken();
-            } else if (BasicTypes.contains(token.type)) {
-                // We found basic data type
-                writeln("found basic type ", token.type);
-                nextToken();
-            } else if (token.type == TokenType.OpenBracket) {
-                // we found tuple
-                auto tuple = parseTuple();
-                writeln("found tuple ");
-                nextToken();
-            } else {
-                logError("Expected data type");
-            }
-            
-            if (token.type == TokenType.OpenArray) {
-                // We found an array of items
-                // TODO: parse array: int[], int[42], int[string], int[][], etc.
-                writeln("found array ");
-                nextToken(2); // HACK: for arrays like []
-            }
-
-            args ~= arg;
+            args ~= new VariableSymbol(parseType(), argName);
             if (token.type == TokenType.Comma) {
-                nextToken();
+                nextToken(); // eat ,
                 needSpace();
             }
         }
             
         if (token.type != TokenType.CloseBracket) {
-            logError("expected ')' not '%s'", token.type);
+            logError("expected ')' not '%s'", tokenToString(*token));
         }
         nextToken(); // eat )
 
-        return new PrototypeSymbol(name, args);
+        // Parse attribs
+        Token[] attribs;
+        while (peekNext == TokenType.Throws) {
+            needSpace();
+            attribs ~= *token;
+            nextToken();
+        }
+
+        // Parse return type
+        Symbol retType;
+        if (peekNext == TokenType.ReturnType) {
+            needSpace();
+            nextToken(); // eat ->
+            needSpace();
+            retType = parseType();
+        }
+
+        return new PrototypeSymbol(name, args, retType);
     }
 
-    private FunctionSymbol parseFunction() {
-        bool isFinal;
-
-        if (token.type == TokenType.Final) {
-            isFinal = true;
-            nextToken(2); // eat final + space
-
-            if (token.type != TokenType.Func) {
-                logError("expected 'func' keyword");
-            }
-        }
-        nextToken(2); // eat func + space
-
+    private Symbol parseFunction() {
         auto proto = parsePrototype();
         needSpace();
 
-        // ReturnType
-        if (token.type == TokenType.ReturnType) {
-            nextToken(); // eat ->
-            needSpace();
-            
-            if (!SymbolTable.current.findOrAddType(token.type, token.str)) {
-                logError("expression '%s' is not valid return type!", token.type);
-            }
-
-            writeln("return val = ", token.type == TokenType.Identifier ? token.str : token.type.to!string);
-            nextToken();
-            needSpace();            
-        }
-
-        // Here start parsing ScopeSymbol
+        // Scope
         if (token.type != TokenType.OpenScope) {
-            throw new Exception("expected { at end of the function");
+            return proto;
         }
 
         auto scope_ = parseScope();
         return new FunctionSymbol(proto, scope_);
     }
 
-    */
 
-    private ScopeSymbol parseScope() {
-        if (token.type == TokenType.OpenScope) { // This can be called from global scope where is no { }
-            nextToken();
-        }
 
-        auto ret = new ScopeSymbol;
-        while (true) {
-            switch (token.type) {
-                case TokenType.None:
-                case TokenType.EndLine:
-                case TokenType.Space:
-                    nextToken();
-                    break;
 
-                case TokenType.Eof:
-                case TokenType.CloseScope:
-                    goto NRet;
-
-                case TokenType.Import:
-                    ret.add(parseImport());
-                    break;
-
-           /*     case TokenType.Func, TokenType.Final:
-                    writeln("parsing function");
-                    handleFunction();
-                    break;
-*/
-                case TokenType.For:
-                    ret.add(parseFor());                    
-                    break;
-
-                case TokenType.Identifier:
-                    if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket) { // method call test.foo(), foo()
-                        writeln("method call with ", token.str, " tok ", token.type);
-                        nextToken();
-                    } else {
-                        goto case TokenType.At;
-                    }
-                    break;
-
-                case TokenType.At:
-                case TokenType.Ref: .. case TokenType.Lazy:
-                case TokenType.Var: .. case TokenType.Real:
-                    ret.add(parseVariable());
-                    break;
-
-                default:
-                    writeln("Undefined token ", token.type);
-                    nextToken();
-            }
-        }
-
-    NRet:
-        return ret;
-    }
 
 /*
     private Symbol parseExpression() {
@@ -323,8 +253,7 @@ class Parser : Lexer {
     }
 */
 
-    // for val in vals { ... }
-    // for i in 0 .. 10 { ... }
+    // for <identifier> in <identifier|number|object>[ .. <identifier|number|object>] {
     private Symbol parseFor() {
         nextToken(); // eat for
         needSpace();
@@ -349,8 +278,6 @@ class Parser : Lexer {
         }
         
         auto scope_ = parseScope();
-
-        //writeln("for " ~ sym1.generate ~ " in " ~ (sym2 ? sym2.generate : ""));
         return new ForSymbol(sym1, sym2, scope_);
     }
 
@@ -369,9 +296,9 @@ class Parser : Lexer {
 
         // Check fore redundant space at the end of declaration
         bool spaceAtEnd;
-        if (token.type == TokenType.Space) {
+        while (token.type == TokenType.Space) {
+            nextToken(); // eat all spaces between <identifier> and =
             spaceAtEnd = true;
-            nextToken(); // eat space
         }
         
         if (token.type == TokenType.EndLine && spaceAtEnd) {
@@ -384,6 +311,7 @@ class Parser : Lexer {
             if (!spaceAtEnd) {
                 logError("space needed between name identifier and assignment operator");
             }
+            
             nextToken();
             needSpace();
             value = parsePrimary();
@@ -460,7 +388,7 @@ class Parser : Lexer {
         }
         
         // Parse data type (TODO: accept tuple as data type)
-        if (!token.type.isBasicType && !token.type != TokenType.Identifier) {
+        if (!token.type.isBasicType && token.type != TokenType.Identifier) {
             logError("Type expected, not '%s'", token.type);
         }
         Token type = *token;
