@@ -36,12 +36,18 @@ class Parser : Lexer {
     void parse() {
         while (true) {
             switch (token.type) {
-                case TokenType.None, TokenType.EndLine:
+                case TokenType.None:
+                case TokenType.EndLine:
+                case TokenType.Space:
                     nextToken();
                     break;
 
                 case TokenType.Eof:
                     return;
+
+                case TokenType.Import:
+                    parseImport();
+                    break;
 
            /*     case TokenType.Func, TokenType.Final:
                     writeln("parsing function");
@@ -75,6 +81,25 @@ class Parser : Lexer {
                     nextToken();
             }
         }
+    }
+
+
+    private void parseImport() {
+        nextToken(); // eat import
+        needSpace();
+        string[] stages;
+
+        while (token.type != TokenType.EndLine) {
+            if (token.type == TokenType.Identifier) {
+                stages ~= token.str;
+            } else if (token.type != TokenType.Dot) {
+                logError("expected identifier separated by dots not %s", tokenToString(*token));
+            }
+            nextToken();
+        }
+
+        writeln("import ", stages);
+        // TODO make AST and ret
     }
 
 
@@ -478,8 +503,8 @@ class Parser : Lexer {
                 logError("tuple parameter name expected");
             }
 
-            if (token.type.isBasicTypeValue          || 
-                token.type == TokenType.Identifier   || 
+            if (token.type.isBasicTypeValue        || 
+                token.type == TokenType.Identifier || 
                 token.type == TokenType.StringExpr) {
                 types ~= *token;
             }
