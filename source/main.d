@@ -18,11 +18,16 @@ void main(string[] args) @safe {
     writeln("Rin compiler starting up");
 
 //    auto buffer = "func test(name: string?, age: int) -> (bool?, int, int) { }";
-    auto buffer = "var test = 42
+   /* auto buffer = "var test = 42
 test.call()
 let abc
 byte aa = 'test'
+const(char) abc
+const char cc
 let tupl = (method: \"str\", number: 42, randomType: false)";
+*/
+
+    auto buffer = "@my(const(char)) test";
 
 
     auto parser = new Parser(buffer);

@@ -65,7 +65,7 @@ class TupleSymbol : Symbol {
                 buf.put("true");
             } else if (x.type == TokenType.False) {
                 buf.put("false");
-            } else if (BasicTypeValues.contains(x.type)) {
+            } else if (x.type.isBasicTypeValue) {
                 buf.put(x.uvalue.to!(char[]));
             } else if (x.type == TokenType.Identifier) {
                 buf.put(x.str);
@@ -104,7 +104,7 @@ class NamedTupleSymbol : TupleSymbol {
                 buf.put("true");
             } else if (x.type == TokenType.False) {
                 buf.put("false");
-            } else if (BasicTypeValues.contains(x.type)) {
+            } else if (x.type.isBasicTypeValue) {
                 buf.put(x.uvalue.to!(char[]));
             } else if (x.type == TokenType.Identifier) {
                 buf.put(x.str);
@@ -119,6 +119,72 @@ class NamedTupleSymbol : TupleSymbol {
 
         buf.put(")");
         return buf.data.to!string;
+    }
+}
+
+// how to parse something like const(int[])[]* ??
+// or const(shared(int)[])[]*
+class TypeSymbol : Symbol { // int, bool, customType, etc.
+    private Token m_type;
+
+    this(Token type) {
+        m_type = type;
+    }
+
+    override string generate() {
+        return m_type.tokenToString;
+    }
+}
+
+class ArrayTypeSymbol : Symbol {
+    private Symbol m_child;
+    private Token  m_assocType;
+
+    this(Symbol child, Token assocType) {
+        m_child     = child;
+        m_assocType = assocType;
+    }
+
+    void setChild(Symbol child) {
+        m_child = child;
+    }
+
+    override string generate() {
+        return m_child.generate ~ "[]";
+    }
+}
+
+class AttribTypeSymbol : Symbol {
+    private Symbol m_child;
+    private Token  m_attrib;
+
+    this(Symbol child, Token attrib) {
+        m_child  = child;
+        m_attrib = attrib;
+    }
+
+    void setChild(Symbol child) {
+        m_child = child;
+    }
+
+    override string generate() {
+        return m_attrib.tokenToString ~ "(" ~ m_child.generate ~ ")";
+    }
+}
+
+class PointerTypeSymbol : Symbol {
+    private Symbol m_child;
+
+    this(Symbol child) {
+        m_child  = child;
+    }
+
+    void setChild(Symbol child) {
+        m_child = child;
+    }
+
+    override string generate() {
+        return m_child.generate ~ "*";
     }
 }
 
@@ -154,38 +220,16 @@ class CallExprSymbol : Symbol {
     }
 }
 
-/*
-class TypeSymbol : Symbol { 
-    private string  m_name;
-    private Symbol  m_as;
-    private Token[] m_attribs;
-
-    this(string name, Token attrib = Token.None) {
-        m_name   = name;
-        m_attrib = attrib;
-    }
-
-    override string name() {
-        return m_name;
-    }
-
-    override string generate() {
-        return m_name;
-    }
-}*/
-
 
 class VariableSymbol : Symbol {
-    private Token   m_type;
-    private string  m_name;
-    private Token[] m_attribs;
-    private Symbol  m_value;
+    private Symbol m_type;
+    private string m_name;
+    private Symbol m_value;
 
-    this(Token type, string name, Token[] attribs, Symbol value = null) {
-        m_type    = type;
-        m_name    = name;
-        m_attribs = attribs;
-        m_value   = value;
+    this(Symbol type, string name, Symbol value = null) {
+        m_type  = type;
+        m_name  = name;
+        m_value = value;
     }
 
     override string name() {
@@ -193,7 +237,7 @@ class VariableSymbol : Symbol {
     }
 
     override string generate() {
-        return format("@var(%s) %s%s", m_type.str, m_name, (m_value ? " = " ~ m_value.generate : ""));
+        return format("@var(%s) %s%s", m_type.generate, m_name, (m_value ? " = " ~ m_value.generate : ""));
     }
 }
 
@@ -252,6 +296,24 @@ class ScopeSymbol : Symbol {
 }
 
 
+
+string tokenToString(ref Token tok) {
+    import std.string;
+    
+    if (tok.type == TokenType.Identifier) {
+        return tok.str;
+    }
+
+    if (tok.type == TokenType.StringExpr) {
+        return "\"" ~ tok.str ~ "\"";
+    }
+
+    if (tok.type.isBasicTypeValue) {
+        return tok.uvalue.to!string;
+    }
+
+    return tok.type.to!string.toLower;
+}
 
 
 

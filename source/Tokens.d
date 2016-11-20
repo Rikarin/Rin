@@ -9,15 +9,12 @@ enum TokenType {
 
     Identifier,     // any other unparserable token like name of function, etc
     StringExpr,     // string in " "
-
-    True,           // true
-    False,          // false
-    Null,           // null
     Assert,         // assert
     Enforce,        // enforce
     Asm,            // asm
 
     // Must be grouped together, used in case range
+    // ============================
     Var,            // var
     Let,            // let
     Void,           // void
@@ -36,7 +33,13 @@ enum TokenType {
     Float,
     Double,
     Real,
+    // ============================
 
+    // constant value types
+    // ============================
+    Null,           // null
+    True,           // true
+    False,          // false
     CharValue,      // char
     WCharValue,     // wchar
     DCharValue,     // dchar
@@ -51,6 +54,7 @@ enum TokenType {
     FloatValue,
     DoubleValue,
     RealValue,
+    // ============================
 
     Colon,          // :
     Comma,          // ,
@@ -68,6 +72,7 @@ enum TokenType {
     Plus,           // +
     Minus,          // -
     At,             // @
+    Asterisk,       // *
 
     Blyat,          // = 
     Equal,          // ==
@@ -116,10 +121,13 @@ enum TokenType {
     Debug,          // debug
     Version,        // version
 
+    // Type attributes
+    // ============================
     Ref,            // ref
     Const,          // const
     Weak,           // weak
     Lazy,           // lazy
+    // ============================
 }
 
 struct Token {
@@ -136,55 +144,15 @@ struct Token {
     char   postfix;
 }
 
+@safe:
+bool isBasicType(TokenType type) {
+    return type >= TokenType.Var && type <= TokenType.Real;
+}
 
-// TODO: this should be removed??
-immutable BasicTypes = [
-    TokenType.Void,
-    TokenType.Bool,
-    TokenType.Byte,
-    TokenType.Char,
-    TokenType.WChar,
-    TokenType.DChar,
-    TokenType.UByte,
-    TokenType.Short,
-    TokenType.UShort,
-    TokenType.Int,
-    TokenType.UInt,
-    TokenType.Long,
-    TokenType.ULong,
-    TokenType.Float,
-    TokenType.Double,
-    TokenType.Real,
-];
+bool isBasicTypeValue(TokenType type) {
+    return type >= TokenType.Null && type <= TokenType.RealValue;
+}
 
-immutable BasicTypeValues = [
-    TokenType.True,
-    TokenType.False,
-    TokenType.ByteValue,
-    TokenType.CharValue,
-    TokenType.WCharValue,
-    TokenType.DCharValue,
-    TokenType.UByteValue,
-    TokenType.ShortValue,
-    TokenType.UShortValue,
-    TokenType.IntValue,
-    TokenType.UIntValue,
-    TokenType.LongValue,
-    TokenType.ULongValue,
-    TokenType.FloatValue,
-    TokenType.DoubleValue,
-    TokenType.RealValue,
-];
-
-immutable Attribs = [
-    TokenType.Ref,
-    TokenType.Const,
-    TokenType.Weak,
-    TokenType.Lazy,
-];
-
-
-bool contains(T)(T[] array, T value) {
-    import std.algorithm.searching;
-    return array.countUntil(value) != -1;
+bool isAttribute(TokenType type) {
+    return type >= TokenType.Ref && type <= TokenType.Lazy;
 }

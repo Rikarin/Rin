@@ -145,6 +145,7 @@ class Lexer {
             case ':': nextChar(); tok.type = TokenType.Colon;        break;
             case ',': nextChar(); tok.type = TokenType.Comma;        break;
             case '@': nextChar(); tok.type = TokenType.At;           break;
+            case '*': nextChar(); tok.type = TokenType.Asterisk;     break;
 
             case '.':
                 if (peekChar(1).isDigit) {

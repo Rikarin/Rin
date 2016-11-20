@@ -54,15 +54,20 @@ class Parser : Lexer {
                     catch (Exception e) writeln(e.msg);                    
                     break;
 */
-                case TokenType.Var: .. case TokenType.Real:
                 case TokenType.Identifier:
                     if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket) { // method call test.foo(), foo()
-                        writeln("method call with ", token.str);
+                        writeln("method call with ", token.str, " tok ", token.type);
                         nextToken();
                     } else {
-                        auto ret = parseVariable();
-                        writeln(ret.generate);
+                        goto case TokenType.At;
                     }
+                    break;
+
+                case TokenType.At:
+                case TokenType.Ref: .. case TokenType.Lazy:
+                case TokenType.Var: .. case TokenType.Real:
+                    auto ret = parseVariable();
+                    writeln(ret.generate);
                     break;
 
                 default:
@@ -219,15 +224,19 @@ class Parser : Lexer {
                     catch (Exception e) writeln(e.msg);                    
                     break;
 */
-                case TokenType.Var: .. case TokenType.Real:
                 case TokenType.Identifier:
                     if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket) { // method call test.foo(), foo()
-                        writeln("method call with ", token.str);
+                        writeln("method call with ", token.str, " tok ", token.type);
                         nextToken();
                     } else {
-                        auto ret = parseVariable();
-                        writeln(ret.generate);
+                        goto case TokenType.At;
                     }
+                    break;
+
+                case TokenType.At:
+                case TokenType.Var: .. case TokenType.Real:
+                    auto ret = parseVariable();
+                    writeln(ret.generate);
                     break;
 
                 default:
@@ -315,31 +324,8 @@ class Parser : Lexer {
 
     //[<attribs|@identifier[<tuple>]>... ]<basic_type|var|let|identifier> <identifier>[ = <bool|numeric|string|object|tuple|delegate>]
     private VariableSymbol parseVariable() {
-        Token[] attribs;
-
-        // Parse attribs
-        while (Attribs.contains(token.type) || token.type == TokenType.At) {
-            if (token.type == TokenType.At) {
-                nextToken();
-
-                if (token.type != TokenType.Identifier) {
-                    logError("identifier expected");
-                }
-
-                // TODO: parse tuple for @identifier
-            }
-            attribs ~= *token;
-            nextToken(); // eat attrib
-            needSpace(); // eat space
-        }
-        
-        // Parse data type (TODO: accept tuple as data type)
-        if (!BasicTypes.contains(token.type) && !token.type.among(TokenType.Identifier, TokenType.Var, TokenType.Let)) {
-            logError("Type expected, not '%s'", token.type);
-        }
-        Token type = *token;
-        nextToken(); // eat type
-        needSpace(); // eat space
+        auto type = parseType();
+        needSpace();
 
         // Parse name      
         if (token.type != TokenType.Identifier) {
@@ -368,14 +354,88 @@ class Parser : Lexer {
             nextToken();
             needSpace();
             value = parsePrimary();
-        } else if (token.type != TokenType.EndLine) {
+        } else if (token.type != TokenType.EndLine && token.type != TokenType.Eof) {
             logError("Undefined symbol %s", token.type);
         }
 
-        return new VariableSymbol(type, name, attribs, value);
+        return new VariableSymbol(type, name, value);
     }
 
+    //const shared int == const(shared(int))
+    private Symbol parseType() {
+        Symbol parseArrayOrPtr(Symbol s) {
+            Symbol ret = s;
 
+            while (token.type == TokenType.OpenArray || token.type == TokenType.Asterisk) {
+                if (token.type == TokenType.OpenArray) {
+                    nextToken(); // eat [
+                    
+                    Token assoc;
+                    if (token.type != TokenType.CloseArray) {
+                        assoc = *token;
+                        nextToken(); // eat value inside []
+                    }
+
+                    if (token.type != TokenType.CloseArray) {
+                        logError("expected ]");
+                    }
+
+                    nextToken(); // eat ]
+                    ret = new ArrayTypeSymbol(ret, assoc);
+                } else if (token.type == TokenType.Asterisk) {
+                    nextToken(); // eat *
+                    ret = new PointerTypeSymbol(ret);
+                }
+            }
+
+            return ret;
+        }
+
+        // Parse attribs
+        if (token.type.isAttribute || token.type == TokenType.At) {
+            Symbol child;
+            Token  attrib = *token;
+
+            if (token.type == TokenType.At) {
+                nextToken(); // eat @
+
+                if (token.type != TokenType.Identifier) {
+                    logError("identifier expected");
+                }
+
+                attrib = *token;
+                // TODO: parse tuple for @identifier("Test", 42)
+            }
+            nextToken(); // eat attrib
+            
+            
+            if (token.type == TokenType.OpenBracket) {
+                nextToken(); // eat (
+                child = parseType();
+
+                if (token.type != TokenType.CloseBracket) {
+                    logError(") expected");
+                }
+                nextToken(); // eat )
+            } else if (token.type == TokenType.Space) {
+                nextToken(); // eat space
+                child = parseType();
+            }
+
+            auto ret = new AttribTypeSymbol(child, attrib);
+            return parseArrayOrPtr(ret);
+        }
+        
+        // Parse data type (TODO: accept tuple as data type)
+        if (!token.type.isBasicType && !token.type != TokenType.Identifier) {
+            logError("Type expected, not '%s'", token.type);
+        }
+        Token type = *token;
+        nextToken(); // eat type
+
+        auto ret = new TypeSymbol(type);
+        return parseArrayOrPtr(ret);
+    }
 
     private NumericSymbol parseNumber() {
         auto ret = new NumericSymbol(token.type, token.rvalue);
@@ -400,7 +460,7 @@ class Parser : Lexer {
 
     // ... = ([[<identifier>: ]... <identifier|string|bool|numeric|delegate|tuple>])
     private TupleSymbol parseTuple() {
-        nextToken();
+        nextToken(); // eat (
         string[] names;
         Token[]  types;
         
@@ -418,7 +478,7 @@ class Parser : Lexer {
                 logError("tuple parameter name expected");
             }
 
-            if (BasicTypeValues.contains(token.type) || 
+            if (token.type.isBasicTypeValue          || 
                 token.type == TokenType.Identifier   || 
                 token.type == TokenType.StringExpr) {
                 types ~= *token;
@@ -433,7 +493,7 @@ class Parser : Lexer {
             }
         }
 
-        nextToken();
+        nextToken(); // eat )
         return names.length ? new NamedTupleSymbol(names, types) : new TupleSymbol(types);
     }
 
@@ -472,21 +532,5 @@ class Parser : Lexer {
         auto str = format("Error(%s, %s): %s", row, col, format(form, args));
         nextToken(); // eat last token for error handling
         throw new Exception(str);
-    }
-
-    string currTokenString() {
-        if (token.type == TokenType.Identifier) {
-            return token.str;
-        }
-
-        if (token.type == TokenType.StringExpr) {
-            return "\"" ~ token.str ~ "\"";
-        }
-
-        if (BasicTypes.contains(token.type)) {
-            return token.uvalue.to!string;
-        }
-
-        return token.type.to!string;
     }
 }
