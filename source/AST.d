@@ -83,6 +83,77 @@ class TupleSymbol : Symbol {
     }
 }
 
+
+class NamedTupleSymbol : TupleSymbol {
+    private string[] m_names;
+
+    this(string[] names, Token[] vars) {
+        m_names ~= names;
+        super(vars);
+    }
+
+    override string generate() {
+        Appender!(char[]) buf;
+
+        buf.put("(");
+        foreach (i, x; m_vars) {
+            buf.put(m_names[i]);
+            buf.put(": ");
+
+            if (x.type == TokenType.True) {
+                buf.put("true");
+            } else if (x.type == TokenType.False) {
+                buf.put("false");
+            } else if (BasicTypeValues.contains(x.type)) {
+                buf.put(x.uvalue.to!(char[]));
+            } else if (x.type == TokenType.Identifier) {
+                buf.put(x.str);
+            } else if (x.type == TokenType.StringExpr) {
+                buf.put("\"");
+                buf.put(x.str);
+                buf.put("\"");
+            }
+
+            buf.put(", ");
+        }
+
+        buf.put(")");
+        return buf.data.to!string;
+    }
+}
+
+
+class BinaryExprSymbol : Symbol {
+    private Token  m_op;
+    private Symbol m_lhs;
+    private Symbol m_rhs;
+
+    this(Token operator, Symbol lhs, Symbol rhs) {
+        m_op  = operator;
+        m_lhs = lhs;
+        m_rhs = rhs;
+    }
+
+    override string generate() {
+        return "binary expr";
+    }
+}
+
+
+class CallExprSymbol : Symbol {
+    private string   m_name;
+    private Symbol[] m_args;
+
+    this(string name, Symbol[] args) {
+        m_name = name;
+        m_args = args;
+    }
+
+    override string generate() {
+        return "call expr";
+    }
+}
+
 /*
 class TypeSymbol : Symbol { 
     private string  m_name;
@@ -141,7 +212,7 @@ class FunctionSymbol : Symbol {
     }
 
     override string name() {
-        return m_proto.name;
+        return m_name;
     }
 
     override string generate() {

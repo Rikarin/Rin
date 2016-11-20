@@ -19,14 +19,17 @@ void main(string[] args) @safe {
 
 //    auto buffer = "func test(name: string?, age: int) -> (bool?, int, int) { }";
     auto buffer = "var test = 42
+test.call()
 let abc
 byte aa = 'test'
-let tupl = (\"str\", 42, false)";
+let tupl = (method: \"str\", number: 42, randomType: false)";
 
 
     auto parser = new Parser(buffer);
     parser.nextToken();
-    parser.parse();
+
+    try parser.parse();
+    catch (Exception e) writeln(e.msg);
 
 /*    auto lexer = new Lexer(buffer);
     while (lexer.token.type != TokenType.Eof) {

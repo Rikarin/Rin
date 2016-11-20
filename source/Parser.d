@@ -54,12 +54,20 @@ class Parser : Lexer {
                     catch (Exception e) writeln(e.msg);                    
                     break;
 */
-                default:
-                    try {
+                case TokenType.Var: .. case TokenType.Real:
+                case TokenType.Identifier:
+                    if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket) { // method call test.foo(), foo()
+                        writeln("method call with ", token.str);
+                        nextToken();
+                    } else {
                         auto ret = parseVariable();
                         writeln(ret.generate);
                     }
-                    catch (Exception e) writeln(e.msg);
+                    break;
+
+                default:
+                    writeln("Undefined token ", token.type);
+                    nextToken();
             }
         }
     }
@@ -184,14 +192,48 @@ class Parser : Lexer {
         return new FunctionSymbol(proto, scope_);
     }
 
-    
+    */
 
     private ScopeSymbol parseScope() {
         nextToken();
 
         writeln("begin scope");
         while (token.type != TokenType.CloseScope) {
-            nextToken();
+            switch (token.type) {
+                case TokenType.None, TokenType.EndLine:
+                    nextToken();
+                    break;
+
+                case TokenType.Eof:
+                    logError("symbol expected not EOF");
+                    break;
+
+           /*     case TokenType.Func, TokenType.Final:
+                    writeln("parsing function");
+                    handleFunction();
+                    break;
+
+                case TokenType.For: // Testing
+                    writeln("parsing for");
+                    try parseFor();
+                    catch (Exception e) writeln(e.msg);                    
+                    break;
+*/
+                case TokenType.Var: .. case TokenType.Real:
+                case TokenType.Identifier:
+                    if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket) { // method call test.foo(), foo()
+                        writeln("method call with ", token.str);
+                        nextToken();
+                    } else {
+                        auto ret = parseVariable();
+                        writeln(ret.generate);
+                    }
+                    break;
+
+                default:
+                    writeln("Undefined token ", token.type);
+                    nextToken();
+            }
         }
 
         nextToken();
@@ -200,7 +242,7 @@ class Parser : Lexer {
         return new ScopeSymbol();
     }
 
-
+/*
     private Symbol parseExpression() {
         assert(false);
     }
@@ -287,7 +329,8 @@ class Parser : Lexer {
                 // TODO: parse tuple for @identifier
             }
             attribs ~= *token;
-            nextToken();
+            nextToken(); // eat attrib
+            needSpace(); // eat space
         }
         
         // Parse data type (TODO: accept tuple as data type)
@@ -296,7 +339,7 @@ class Parser : Lexer {
         }
         Token type = *token;
         nextToken(); // eat type
-        nextToken(); // eat space
+        needSpace(); // eat space
 
         // Parse name      
         if (token.type != TokenType.Identifier) {
@@ -324,18 +367,7 @@ class Parser : Lexer {
             }
             nextToken();
             needSpace();
-            
-            if (token.type == TokenType.True || token.type == TokenType.False) {
-                value = parseBoolean();
-            } else if (token.type == TokenType.StringExpr) {
-                value = parseString();
-            } else if (BasicTypeValues.contains(token.type)) {
-                value = parseNumber();
-            } else if (token.type == TokenType.OpenBracket) {
-                value = parseTuple();
-            } else { // Add support for delegates
-                logError("Unknow variable value %s", token.type);
-            }
+            value = parsePrimary();
         } else if (token.type != TokenType.EndLine) {
             logError("Undefined symbol %s", token.type);
         }
@@ -369,9 +401,23 @@ class Parser : Lexer {
     // ... = ([[<identifier>: ]... <identifier|string|bool|numeric|delegate|tuple>])
     private TupleSymbol parseTuple() {
         nextToken();
-        Token[] types;
+        string[] names;
+        Token[]  types;
         
         while (token.type != TokenType.CloseBracket) {
+            if (token.type == TokenType.Identifier && peekNext == TokenType.Colon) { // named tuple 
+                if (types.length && !names.length) {
+                    logError("tuple parameters name mismatch!");
+                }
+
+                names ~= token.str;
+                nextToken(); // eat name
+                nextToken(); // eat :
+                needSpace();
+            } else if (names.length) {
+                logError("tuple parameter name expected");
+            }
+
             if (BasicTypeValues.contains(token.type) || 
                 token.type == TokenType.Identifier   || 
                 token.type == TokenType.StringExpr) {
@@ -388,9 +434,28 @@ class Parser : Lexer {
         }
 
         nextToken();
-        return new TupleSymbol(types); // or NamedTupleSymbol for (name: 42) tuple
+        return names.length ? new NamedTupleSymbol(names, types) : new TupleSymbol(types);
     }
 
+    private Symbol parsePrimary() {
+        switch (token.type) with (TokenType) {
+            case True, False:
+                return parseBoolean();
+
+            case StringExpr:
+                return parseString();
+
+            case CharValue: .. case RealValue:
+                return parseNumber();
+
+            case OpenBracket:
+                return parseTuple();
+
+            default:
+                logError("Unknow variable value %s", token.type);
+                return null;
+        }
+    }
 
 
 
@@ -407,7 +472,6 @@ class Parser : Lexer {
         auto str = format("Error(%s, %s): %s", row, col, format(form, args));
         nextToken(); // eat last token for error handling
         throw new Exception(str);
-        //writeln(format(form, args));
     }
 
     string currTokenString() {

@@ -17,6 +17,7 @@ enum TokenType {
     Enforce,        // enforce
     Asm,            // asm
 
+    // Must be grouped together, used in case range
     Var,            // var
     Let,            // let
     Void,           // void

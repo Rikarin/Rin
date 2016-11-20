@@ -30,6 +30,7 @@ class Lexer {
 
         private char nextChar() @trusted {
             assert(*m_ptr != '\0', "End of the line reached!");
+            m_col++;
             return *m_ptr++;
         }
         
@@ -50,7 +51,7 @@ class Lexer {
         m_ptr = &buffer[0];
     }
 
-    TokenType nextToken() {
+    final TokenType nextToken() {
         import core.stdc.string: memcpy;
         import core.stdc.stdlib: free;
 
@@ -58,13 +59,28 @@ class Lexer {
             auto t = m_token.next;
             () @trusted {
                 memcpy(&m_token, t, Token.sizeof);
-                t.free();
+                //TODO t.free();
             }();
         } else {
             scan(&m_token);
         }
 
         return m_token.type;
+    }
+
+    final TokenType peekNext() {
+        return peek(&m_token).type;
+    }
+
+    private Token* peek(Token* tok) {
+        if (tok.next) {
+            return tok.next;
+        }
+
+        auto t = new Token;
+        scan(t);
+        tok.next = t;
+        return t;
     }
 
     // Always end this function with new token in the buffer
