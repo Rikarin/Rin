@@ -1,0 +1,11 @@
+import core
+
+
+func main() -> int {
+    var test     = 42
+    let constant = "Constant"
+
+    func localFunc() throws {
+
+    }
+}
