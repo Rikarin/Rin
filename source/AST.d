@@ -22,16 +22,14 @@ abstract class Symbol {
 
 
 class NumericSymbol : Symbol {
-    private TokenType m_token;
-    private double    m_value;
+    private Token m_token;
 
-    this(TokenType token, double value) {
+    this(Token token) {
         m_token = token;
-        m_value = value;
     }
 
     override string generate() {
-        return format("(%s)%s", m_token, m_value);
+        return format("(%s)%s", m_token.type, m_token.uvalue);
     }
 }
 
@@ -119,6 +117,21 @@ class NamedTupleSymbol : TupleSymbol {
 
         buf.put(")");
         return buf.data.to!string;
+    }
+}
+
+
+class RangeSymbol : Symbol {
+    private Symbol m_start;
+    private Symbol m_end;
+
+    this(Symbol start, Symbol end) {
+        m_start = start;
+        m_end   = end;
+    }
+
+    override string generate() {
+        return m_start.generate ~ " .. " ~ m_end.generate;
     }
 }
 

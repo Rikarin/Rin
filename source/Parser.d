@@ -134,7 +134,6 @@ class Parser : Lexer {
     // if else
     // continue break
     // while repeat
-    // for in
     // switch case default
     // lock define as __rin_lock? explained in Proposal4
 
@@ -147,8 +146,6 @@ class Parser : Lexer {
     // enum
     // union
 
-    // Func,           // func
-    // Task,           // task
     // Try catch finally
     // Debug,          // debug
     // Version,        // version
@@ -236,9 +233,7 @@ class Parser : Lexer {
 
 
 /*
-    private Symbol parseExpression() {
-        assert(false);
-    }
+    
 
 
     private Symbol parseBrackets() {
@@ -274,7 +269,7 @@ class Parser : Lexer {
         needSpace();
 
         if (token.type != TokenType.OpenScope) {
-            throw new Exception("expected { at end of the function");
+            logError("expected { at end of the function not '%s'", tokenToString(*token));
         }
         
         auto scope_ = parseScope();
@@ -398,10 +393,9 @@ class Parser : Lexer {
         return parseArrayOrPtr(ret);
     }
 
-    private NumericSymbol parseNumber() {
-        // TODO: peekNext2 == .. its numeric range
-        auto ret = new NumericSymbol(token.type, token.rvalue);
-        nextToken();
+    private Symbol parseNumber() {
+        auto ret = new NumericSymbol(*token);
+        nextToken(); // eat number
 
         return ret;
     }
@@ -414,10 +408,10 @@ class Parser : Lexer {
     }
 
     private NumericSymbol parseBoolean() {
-        auto sym = token.type;
-        nextToken();
-
-        return sym == TokenType.True ? new NumericSymbol(TokenType.True, 1) : new NumericSymbol(TokenType.False, 0); 
+        auto ret = new NumericSymbol(*token);
+        nextToken(); // eat true/false
+        
+        return ret; 
     }
 
     // ... = ([[<identifier>: ]... <identifier|string|bool|numeric|delegate|tuple>])
@@ -471,6 +465,31 @@ class Parser : Lexer {
     }
 
     private Symbol parsePrimary() {
+        Symbol parseSlicePrimary() {
+            switch (token.type) with (TokenType) {
+                case CharValue: .. case RealValue:
+                    return parseNumber();
+
+                case Identifier:
+                    return parseIdentifier();
+
+                default:
+                    logError("Unknown variable value %s", tokenToString(*token));
+                    return null;
+            }
+        }
+
+        if (peekNext2 == TokenType.Slice) {
+            Symbol s1 = parseSlicePrimary();
+            writeln("primary token for slice ", s1.generate);
+            needSpace();
+            nextToken(); // eat ..
+            needSpace();
+
+            Symbol s2 = parseSlicePrimary();
+            return new RangeSymbol(s1, s2);
+        }
+
         switch (token.type) with (TokenType) {
             case True, False:
                 return parseBoolean();
@@ -485,7 +504,7 @@ class Parser : Lexer {
                 return parseTuple();
 
             case Identifier:
-                return parseIdentifier();                
+                return parseIdentifier();
 
             default:
                 logError("Unknown variable value %s", tokenToString(*token));
@@ -493,6 +512,11 @@ class Parser : Lexer {
         }
     }
 
+    private Symbol parseExpression() {
+        // parse unary & binary expressions
+        // assert(expression, string literal)
+        assert(false);
+    }
 
 
 

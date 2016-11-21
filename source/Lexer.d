@@ -72,6 +72,10 @@ class Lexer {
         return peek(&m_token).type;
     }
 
+    final TokenType peekNext2() {
+        return peek(peek(&m_token)).type;
+    }
+
     private Token* peek(Token* tok) {
         if (tok.next) {
             return tok.next;
