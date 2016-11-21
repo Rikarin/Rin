@@ -142,7 +142,8 @@ class Parser : Lexer {
 
 
 
-
+    // TODO: enum should be flaggs
+    // TODO: enums like union of tuples but safe
     private Symbol parseEnum() {
         Token type = Token(TokenType.UInt);
         nextToken(); // eat enum
@@ -186,6 +187,10 @@ class Parser : Lexer {
                     string ident = token.str;
                     nextToken(); // eat identifier
                     eatAllSpaces();
+
+                    // TODO:
+                    // if type == = set value
+                    // else set last value increased by 1
 
                     //if (token.type != TokenType.)
                     break;

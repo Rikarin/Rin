@@ -19,3 +19,36 @@ func test(num: int) {
 
     test.callFunc()
 }
+
+
+
+
+
+
+
+enum Foo : uint {
+    Bar1,
+    Bar2
+}
+
+enum Foo : uint(<< 1) { // flag enum
+    Bar1,
+    Bar2
+}
+
+enum Foo : uint {
+    Bar1(int, int, stirng),
+    Bar2(string, stirng)
+}
+
+func gotSomething(foo: Foo) -> string {
+    if (foo == .Bar1) {
+        return foo.0.toString
+    }
+
+    if (foo == .Bar2) {
+        return foo.0 ~ foo.1
+    }
+
+    return "unknown"
+}
