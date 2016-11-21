@@ -150,6 +150,7 @@ class TypeSymbol : Symbol { // int, bool, customType, etc.
     }
 }
 
+
 class ArrayTypeSymbol : Symbol {
     private Symbol m_child;
     private Token  m_assocType;
@@ -159,14 +160,11 @@ class ArrayTypeSymbol : Symbol {
         m_assocType = assocType;
     }
 
-    void setChild(Symbol child) {
-        m_child = child;
-    }
-
     override string generate() {
         return m_child.generate ~ "[]";
     }
 }
+
 
 class AttribTypeSymbol : Symbol {
     private Symbol m_child;
@@ -177,24 +175,17 @@ class AttribTypeSymbol : Symbol {
         m_attrib = attrib;
     }
 
-    void setChild(Symbol child) {
-        m_child = child;
-    }
-
     override string generate() {
         return m_attrib.tokenToString ~ "(" ~ m_child.generate ~ ")";
     }
 }
+
 
 class PointerTypeSymbol : Symbol {
     private Symbol m_child;
 
     this(Symbol child) {
         m_child  = child;
-    }
-
-    void setChild(Symbol child) {
-        m_child = child;
     }
 
     override string generate() {
@@ -312,6 +303,24 @@ class FunctionSymbol : Symbol {
         return m_proto.generate ~ m_scope.generate;
     }
 }
+
+
+class AttribScopeSymbol : Symbol {
+    private Symbol m_child;
+    private Symbol m_value;
+    private Token  m_attrib;
+
+    this(Token attrib, Symbol value, Symbol child) {
+        m_child  = child;
+        m_value  = value;
+        m_attrib = attrib;
+    }
+
+    override string generate() {
+        return m_attrib.tokenToString ~ (m_value ? m_value.generate : "") ~ m_child.generate;
+    }
+}
+
 
 
 class ForSymbol : Symbol {

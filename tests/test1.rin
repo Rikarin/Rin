@@ -1,11 +1,13 @@
 import core
 
-
-func main() -> int {
+override("Test") func main() -> int {
     var test     = 42
     let constant = "Constant"
 
+
     int? num
+
+
 
     for x in 42 .. constant {
 

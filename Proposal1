@@ -174,7 +174,10 @@ func returnmmVar2() -> (stirng, int, int, double[string]) {
 }
 
 
-
+int? num
+num = 42 // set value
+int val = num? // val = (num.isSet ? num.value : val);
+num? = null
 
 
 override deprecated("don't use it") {
