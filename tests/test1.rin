@@ -5,11 +5,17 @@ func main() -> int {
     var test     = 42
     let constant = "Constant"
 
+    int? num
+
     for x in 42 .. constant {
 
     }
 
-    func localFunc() throws {
+    func localFunc(name: string?, age: int) throws {
 
     }
+
+    localFunc(name: "Test", age: 42)
+    anyClass.anyValue.call("Test")
+
 }

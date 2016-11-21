@@ -59,10 +59,11 @@ class Parser : Lexer {
                     if (wasOpened) {
                         logError("expected } at the end of line");
                     }
-                    goto NRet;
+                    return ret;
 
                 case TokenType.CloseScope:
-                    goto NRet;
+                    nextToken(); // eat }
+                    return ret;
 
                 case TokenType.Import:
                     ret.add(parseImport());
@@ -82,13 +83,13 @@ class Parser : Lexer {
                     break;
 
                 case TokenType.For:
-                    ret.add(parseFor());                    
+                    ret.add(parseFor());
                     break;
 
                 case TokenType.Identifier:
                     if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket) { // method call test.foo(), foo()
                         writeln("method call with ", token.str, " tok ", token.type);
-                        nextToken();
+                        ret.add(parseIdentifier());
                     } else {
                         goto case TokenType.At;
                     }
@@ -106,7 +107,6 @@ class Parser : Lexer {
             }
         }
 
-    NRet:
         return ret;
     }
 
@@ -227,26 +227,6 @@ class Parser : Lexer {
         auto scope_ = parseScope();
         return new FunctionSymbol(proto, scope_);
     }
-
-
-
-
-
-/*
-    
-
-
-    private Symbol parseBrackets() {
-        nextToken(); // eat (
-        auto ret = parseExpression();
-
-        if (token.type != TokenType.CloseBracket) {
-            logError("expected ')'");
-        }
-        nextToken();
-        return ret;
-    }
-*/
 
     // for <identifier> in <identifier|number|object>[ .. <identifier|number|object>] {
     private Symbol parseFor() {
@@ -387,10 +367,16 @@ class Parser : Lexer {
             logError("Type expected, not '%s'", token.type);
         }
         Token type = *token;
+        bool isMonad;
         nextToken(); // eat type
 
-        auto ret = new TypeSymbol(type);
-        return parseArrayOrPtr(ret);
+        if (token.type == TokenType.Monad) {
+            nextToken();
+            isMonad = true;
+        }
+
+        auto ret = new TypeSymbol(type, isMonad);
+        return parseArrayOrPtr(ret); // parse [] or * after type
     }
 
     private Symbol parseNumber() {
@@ -454,10 +440,48 @@ class Parser : Lexer {
     }
 
     private Symbol parseIdentifier() {
-        // TODO: return call/var identifier
+        string[] stages;
+        while (peekNext == TokenType.Dot) {
+            stages ~= token.str;
+            nextToken(); // eat identifier
+            nextToken(); // eat .
+        }
 
-        // if peek == ( its call
-        // there can be classname.variable.call()
+        if (peekNext == TokenType.OpenBracket) {
+            string name = token.str;
+            nextToken(); // eat identifier
+            nextToken(); // eat (
+
+            string[] argName;
+            Symbol[] vals;
+            while (token.type.among(TokenType.Identifier, TokenType.StringExpr) || token.type.isBasicTypeValue) {
+                if (token.type == TokenType.Identifier && peekNext == TokenType.Colon) {
+                    argName ~= token.str;
+                    nextToken(); // eat identifier
+                    nextToken(); // eat colon
+                    needSpace();
+                } else if (argName.length) {
+                    logError("argument name expected!");
+                }
+
+                vals ~= parsePrimary();
+                if (token.type != TokenType.CloseBracket) {
+                    if (token.type != TokenType.Comma) {
+                        logError("comma or ) expected after primary symbol not '%s'", tokenToString(*token));
+                    }
+
+                    nextToken(); // eat ,
+                    needSpace();
+                }
+            }
+
+            if (token.type != TokenType.CloseBracket) {
+                logError(") expected not '%s'", tokenToString(*token));
+            }
+            nextToken();
+
+            return new CallExprSymbol(stages, name, argName, vals);
+        }
 
         auto ret = new VariableSymbol(null, token.str);
         nextToken();
@@ -481,7 +505,6 @@ class Parser : Lexer {
 
         if (peekNext2 == TokenType.Slice) {
             Symbol s1 = parseSlicePrimary();
-            writeln("primary token for slice ", s1.generate);
             needSpace();
             nextToken(); // eat ..
             needSpace();

@@ -138,13 +138,15 @@ class RangeSymbol : Symbol {
 
 class TypeSymbol : Symbol { // int, bool, customType, etc.
     private Token m_type;
+    private bool  m_isMonad;
 
-    this(Token type) {
-        m_type = type;
+    this(Token type, bool isMonad = false) {
+        m_type    = type;
+        m_isMonad = isMonad;
     }
 
     override string generate() {
-        return m_type.tokenToString;
+        return m_type.tokenToString ~ (m_isMonad ? "?" : "");
     }
 }
 
@@ -219,16 +221,20 @@ class BinaryExprSymbol : Symbol {
 
 
 class CallExprSymbol : Symbol {
+    private string[] m_stages;
     private string   m_name;
+    private string[] m_argNames;
     private Symbol[] m_args;
 
-    this(string name, Symbol[] args) {
-        m_name = name;
-        m_args = args;
+    this(string[] stages, string name, string[] argNames, Symbol[] args) {
+        m_stages   = stages;
+        m_name     = name;
+        m_argNames = argNames;
+        m_args     = args;
     }
 
     override string generate() {
-        return "call expr";
+        return m_name;
     }
 }
 
