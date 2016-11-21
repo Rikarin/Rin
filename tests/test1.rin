@@ -5,6 +5,10 @@ func main() -> int {
     var test     = 42
     let constant = "Constant"
 
+    for x in 42 .. constant {
+
+    }
+
     func localFunc() throws {
 
     }
