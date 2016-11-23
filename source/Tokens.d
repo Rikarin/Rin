@@ -59,7 +59,8 @@ enum TokenType {
     Colon,          // :
     Comma,          // ,
     Dot,            // .
-    Slice,          // ..
+    Slice,          // .. // TODO rename to DotDot
+    DotDotDot,      // ...
     ReturnType,     // ->
     MonadDeref,     // ?.
     Monad,          // ?
@@ -73,6 +74,39 @@ enum TokenType {
     Minus,          // -
     At,             // @
     Asterisk,       // *
+
+
+    Dildo,          // ~
+    Mul,            // /
+    Modulo,         // %
+    Ampersand,      // &
+    Or,             // |
+    Xor,            // ^
+    AndAnd,         // &&
+    OrOr,           // ||
+    PlusPlus,       // ++
+    MinusMinus,     // --
+    LessThan,       // <
+    GreaterThan,    // >
+    LeftShift,      // <<
+    RightShift,     // >>
+    Dollar,         // $
+
+    PlusAssign,     // +=
+    MinusAssign,    // -=
+    AsteriskAssign, // *=
+    MulAssign,      // /=
+    ModuloAssign,   // %=
+    DildoAssign,    // ~=
+    OrAssign,       // |=
+    AmpersandAssign,  // &=
+    XorAssign,        // ^=
+    LeftShiftAssign,  // <<=
+    RightShiftAssign, // >>=
+
+    LessEqual,        // <=
+    GreaterEqual,    // >=
+
 
     Blyat,          // = 
     Equal,          // ==

@@ -149,7 +149,83 @@ class Lexer {
             case ':': nextChar(); tok.type = TokenType.Colon;        break;
             case ',': nextChar(); tok.type = TokenType.Comma;        break;
             case '@': nextChar(); tok.type = TokenType.At;           break;
-            case '*': nextChar(); tok.type = TokenType.Asterisk;     break;
+            case '$': nextChar(); tok.type = TokenType.Dollar;       break;
+
+            case '*':
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.AsteriskAssign; // *=
+                } else {
+                    tok.type = TokenType.Asterisk; // *
+                }
+                break;
+
+            case '/':
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.MulAssign; // /=
+                } else {
+                    tok.type = TokenType.Mul; // /
+                }
+                break;
+
+            case '%':
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.ModuloAssign; // %=
+                } else {
+                    tok.type = TokenType.Modulo; // %
+                }
+                break;
+
+            case '^':
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.XorAssign; // ^=
+                } else {
+                    tok.type = TokenType.Xor; // ^
+                }
+                break;
+
+            case '&':
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.AmpersandAssign; // &=
+                } else if (currChar == '&') {
+                    nextChar();
+                    tok.type = TokenType.AndAnd; // &&
+                } else {
+                    tok.type = TokenType.Ampersand; // &
+                }
+                break;
+
+            case '|':
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.OrAssign; // |=
+                } else if (currChar == '|') {
+                    nextChar();
+                    tok.type = TokenType.OrOr; // ||
+                } else {
+                    tok.type = TokenType.Or; // |
+                }
+                break;
+
+            case '~':
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.DildoAssign; // ~=
+                } else {
+                    tok.type = TokenType.Dildo; // ~
+                }
+                break;
 
             case '.':
                 if (peekChar(1).isDigit) {
@@ -160,9 +236,27 @@ class Lexer {
                 nextChar();
                 if (currChar == '.') {
                     nextChar();
-                    tok.type = TokenType.Slice; // ..
+                    if (currChar == '.') {
+                        nextChar();
+                        tok.type = TokenType.DotDotDot; // ...
+                    } else {
+                        tok.type = TokenType.Slice; // ..
+                    }
                 } else {
-                    tok.type = TokenType.Dot;
+                    tok.type = TokenType.Dot; // .
+                }
+                break;
+
+            case '+':
+                nextChar();
+                if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.PlusAssign; // +=
+                } else if (currChar == '+') {
+                    nextChar();
+                    tok.type = TokenType.PlusPlus; // ++
+                } else {
+                    tok.type = TokenType.Plus; // +
                 }
                 break;
 
@@ -170,9 +264,15 @@ class Lexer {
                 nextChar();
                 if (currChar == '>') {
                     nextChar();
-                    tok.type = TokenType.ReturnType;
+                    tok.type = TokenType.ReturnType; // ->
+                } else if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.MinusAssign; // -=
+                } else if (currChar == '-') {
+                    nextChar();
+                    tok.type = TokenType.MinusMinus; // --
                 } else {
-                    tok.type = TokenType.Minus;
+                    tok.type = TokenType.Minus; // -
                 }
                 break;
 
@@ -180,9 +280,9 @@ class Lexer {
                 nextChar();
                 if (currChar == '.') {
                     nextChar();
-                    tok.type = TokenType.MonadDeref;
+                    tok.type = TokenType.MonadDeref; // ?.
                 } else {
-                    tok.type = TokenType.Monad;
+                    tok.type = TokenType.Monad; // ?
                 }
                 break;
 
@@ -190,12 +290,46 @@ class Lexer {
                 nextChar();
                 if (currChar == '=') {
                     nextChar();
-                    tok.type = TokenType.Equal;
+                    tok.type = TokenType.Equal; // ==
                 } else {
-                    tok.type = TokenType.Blyat;
+                    tok.type = TokenType.Blyat; // =
                 }
                 break;
 
+            case '<':
+                nextChar();
+                if (currChar == '<') {
+                    nextChar();
+                    if (currChar == '=') {
+                        tok.type = TokenType.LeftShiftAssign; // <<=
+                    } else {
+                        tok.type = TokenType.LeftShift; // <<
+                    }
+                } else if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.LessEqual; // <=
+                } else {
+                    tok.type = TokenType.LessThan; // <
+                }
+                break;
+
+            case '>':
+                nextChar();
+                if (currChar == '>') {
+                    nextChar();
+                    if (currChar == '=') {
+                        tok.type = TokenType.RightShiftAssign; // >>=
+                    } else {
+                        tok.type = TokenType.RightShift; // >>
+                    }
+                } else if (currChar == '=') {
+                    nextChar();
+                    tok.type = TokenType.GreaterEqual; // >=
+                } else {
+                    tok.type = TokenType.GreaterThan; // >
+                }
+                break;
+            
             case '!':
                 nextChar();
                 if (currChar == '=') {
