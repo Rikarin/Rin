@@ -81,6 +81,10 @@ class Parser : Lexer {
                     ret.add(parseFor());
                     break;
 
+                case TokenType.Enum:
+                    ret.add(parseEnum());
+                    break;
+
                 case TokenType.Identifier: // we cannot determine here if it is 'const AnyClass variable' or 'variable += AnyClass()'
                     if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket/* || peekNext2 == TokenType.Blyat*/) {
                         writeln("method call with ", token.str, " tok ", token.type);
@@ -143,7 +147,6 @@ class Parser : Lexer {
 
 
     // TODO: enum should be flaggs
-    // TODO: enums like union of tuples but safe
     private Symbol parseEnum() {
         Token type = Token(TokenType.UInt);
         nextToken(); // eat enum
@@ -162,7 +165,7 @@ class Parser : Lexer {
         } else if (tryToken(TokenType.Colon)) { // eat :
             needSpace();
 
-            if (token.type != TokenType.Identifier && !token.type.isBasicTypeValue) { // TODO: refactor required
+            if (token.type != TokenType.Identifier && !token.type.isBasicType) { // TODO: refactor required
                 logError("enum size expected after : not '%s'", tokenToString(*token));
             }
             type = *token;
@@ -170,29 +173,41 @@ class Parser : Lexer {
             needSpace();
         }
 
-        needToken(TokenType.OpenBracket);
+        needToken(TokenType.OpenScope);
+        string[] names;
+        Token[]  values;
         while (true) {
             switch (token.type) with(TokenType) {
                 case Space, EndLine:
+                    nextToken(); // eat space|end_line
                     break;
 
                 case Eof:
                     logError("end of file reached need }");
                     break;
 
-                case CloseBracket:
+                case CloseScope:
                     goto NRet;
 
                 case Identifier:
-                    string ident = token.str;
+                    names ~= token.str;
                     nextToken(); // eat identifier
+
+                    if (token.type == TokenType.OpenBracket) {
+                        // Token is tuple like Value(int, int, string) = 42
+                        // parse type tuple
+                    }
                     eatAllSpaces();
 
-                    // TODO:
-                    // if type == = set value
-                    // else set last value increased by 1
+                    if (tryToken(TokenType.Blyat)) { // eat =
+                        eatAllSpaces();
+                        values ~= *token;
+                        nextToken();
+                    } else {
+                        values ~= Token.init;
+                    }
 
-                    //if (token.type != TokenType.)
+                    needToken(TokenType.Comma);
                     break;
 
                 default:
@@ -201,10 +216,11 @@ class Parser : Lexer {
         }
 
     NRet:
-        return null; // TODO
+        return new EnumSymbol(name, type, names, values);
     }
 
 
+    // TODO: parse binary expressions!!
 
     // assert, enforce, asm
     // if else
@@ -219,8 +235,9 @@ class Parser : Lexer {
     // struct
     // protocol
     // extend
-    // enum
     // union
+    
+    // type tuple parser
 
     // maybe parse version and debug separately becasue they can have else statement version(a) { } else { }
     // Try catch finally
@@ -228,6 +245,8 @@ class Parser : Lexer {
     // parse binary & unary expr
     // whats about .glob.mthod.call()
     // delegates
+
+    // Named symbols: class|struct|enum|var|protocol|extend|union|alias
 
 
     private PrototypeSymbol parsePrototype() {

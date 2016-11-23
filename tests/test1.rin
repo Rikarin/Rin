@@ -3,11 +3,7 @@ import core
 override("Test") func main() -> int {
     var test     = 42
     let constant = "Constant"
-
-
     int? num
-
-
 
     for x in 42 .. constant {
 
@@ -21,3 +17,11 @@ override("Test") func main() -> int {
     anyClass.anyValue.call("Test")
 
 }
+
+
+enum Test : ulong {
+    Var1,
+    Var2,
+    Var3 = 42,
+}
+

@@ -291,10 +291,10 @@ class Lexer {
             case "alias":      tok.type = TokenType.Alias;      break;
             case "class":      tok.type = TokenType.Class;      break;
             case "struct":     tok.type = TokenType.Struct;     break;
-            case "Protocol":   tok.type = TokenType.Protocol;   break;
-            case "Extend":     tok.type = TokenType.Extend;     break;
-            case "Enum":       tok.type = TokenType.Enum;       break;
-            case "Union":      tok.type = TokenType.Union;      break;
+            case "protocol":   tok.type = TokenType.Protocol;   break;
+            case "extend":     tok.type = TokenType.Extend;     break;
+            case "enum":       tok.type = TokenType.Enum;       break;
+            case "union":      tok.type = TokenType.Union;      break;
         
             // Funcs, etc
             case "func":       tok.type = TokenType.Func;       break;

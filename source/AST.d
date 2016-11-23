@@ -322,7 +322,6 @@ class AttribScopeSymbol : Symbol {
 }
 
 
-
 class ForSymbol : Symbol {
     private Symbol      m_primary;
     private Symbol      m_secondary;
@@ -336,6 +335,29 @@ class ForSymbol : Symbol {
 
     override string generate() {
         return "for " ~ m_primary.generate ~ " in " ~ m_secondary.generate ~ " " ~ m_scope.generate;
+    }
+}
+
+
+class EnumSymbol : Symbol {
+    private string   m_name;
+    private Token    m_type;
+    private string[] m_names;
+    private Token[]  m_values;
+
+    this(string name, Token type, string[] names, Token[] values) {
+        m_name   = name;
+        m_type   = type;
+        m_names  = names;
+        m_values = values;
+    }
+
+    override string name() {
+        return m_name;
+    }
+
+    override string generate() {
+        return "enum " ~ m_name ~ " : " ~ tokenToString(m_type) ~ " { ... }";
     }
 }
 
