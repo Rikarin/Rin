@@ -40,11 +40,11 @@ enum TokenType {
     Null,           // null
     True,           // true
     False,          // false
-    CharValue,      // char
-    WCharValue,     // wchar
-    DCharValue,     // dchar
-    ByteValue,      // byte
-    UByteValue,     // ubyte
+    CharValue,      // char value
+    WCharValue,     // wchar value
+    DCharValue,     // dchar value
+    ByteValue,      // byte value
+    UByteValue,     // ubyte value
     ShortValue,
     UShortValue,
     IntValue,
@@ -56,97 +56,91 @@ enum TokenType {
     RealValue,
     // ============================
 
-    Colon,          // :
-    Comma,          // ,
-    Dot,            // .
-    Slice,          // .. // TODO rename to DotDot
-    DotDotDot,      // ...
-    ReturnType,     // ->
-    MonadDeref,     // ?.
-    Monad,          // ?
-    OpenScope,      // {
-    CloseScope,     // }
-    OpenArray,      // [
-    CloseArray,     // ]
-    OpenBracket,    // (
-    CloseBracket,   // )
-    Plus,           // +
-    Minus,          // -
-    At,             // @
-    Asterisk,       // *
-
-
-    Dildo,          // ~
-    Mul,            // /
-    Modulo,         // %
-    Ampersand,      // &
-    Or,             // |
-    Xor,            // ^
-    AndAnd,         // &&
-    OrOr,           // ||
-    PlusPlus,       // ++
-    MinusMinus,     // --
-    LessThan,       // <
-    GreaterThan,    // >
-    LeftShift,      // <<
-    RightShift,     // >>
-    Dollar,         // $
-
-    PlusAssign,     // +=
-    MinusAssign,    // -=
-    AsteriskAssign, // *=
-    MulAssign,      // /=
-    ModuloAssign,   // %=
-    DildoAssign,    // ~=
-    OrAssign,       // |=
+    Colon,            // :
+    Comma,            // ,
+    Dot,              // .
+    DotDot,           // ..
+    DotDotDot,        // ...
+    ReturnType,       // ->
+    MonadDeref,       // ?.
+    Monad,            // ?
+    OpenScope,        // {
+    CloseScope,       // }
+    OpenArray,        // [
+    CloseArray,       // ]
+    OpenBracket,      // (
+    CloseBracket,     // )
+    Plus,             // +
+    Minus,            // -
+    At,               // @
+    Asterisk,         // *
+    Dildo,            // ~
+    Mul,              // /
+    Modulo,           // %
+    Ampersand,        // &
+    Or,               // |
+    Xor,              // ^
+    AndAnd,           // &&
+    OrOr,             // ||
+    PlusPlus,         // ++
+    MinusMinus,       // --
+    LessThan,         // <
+    GreaterThan,      // >
+    LeftShift,        // <<
+    RightShift,       // >>
+    Dollar,           // $
+    PlusAssign,       // +=
+    MinusAssign,      // -=
+    AsteriskAssign,   // *=
+    MulAssign,        // /=
+    ModuloAssign,     // %=
+    DildoAssign,      // ~=
+    OrAssign,         // |=
     AmpersandAssign,  // &=
     XorAssign,        // ^=
     LeftShiftAssign,  // <<=
     RightShiftAssign, // >>=
-
     LessEqual,        // <=
-    GreaterEqual,    // >=
+    GreaterEqual,     // >=
+    Blyat,            // = 
+    Equal,            // ==
+    NotEqual,         // !=
+    Is,               // is
+    NotIs,            // !is
+    Not,              // !
 
+    If,               // if
+    Else,             // else
+    While,            // while
+    Repeat,           // repeat
+    For,              // for
+    Switch,           // switch
+    Case,             // case
+    Default,          // default
+    Break,            // break
+    Continue,         // continue
+    Lock,             // lock
 
-    Blyat,          // = 
-    Equal,          // ==
-    NotEqual,       // !=
-    Is,             // is
-    NotIs,          // !is
-    Not,            // !
-
-    If,             // if
-    Else,           // else
-    While,          // while
-    Repeat,         // repeat
-    For,            // for
-    Switch,         // switch
-    Case,           // case
-    Default,        // default
-    Break,          // break
-    Continue,       // continue
-    Lock,           // lock
-
-    Import,         // import
-    Module,         // module
-    Alias,          // alias
-    Struct,         // struct
-    Protocol,       // protocol
-    Extend,         // extend
-    Enum,           // enum
-    Union,          // union
+    Import,           // import
+    Module,           // module
+    Alias,            // alias
+    Struct,           // struct
+    Protocol,         // protocol
+    Extend,           // extend
+    Enum,             // enum
+    Union,            // union
     
-    Func,           // func
-    Task,           // task
-    Return,         // return
-    Throws,         // throws
-    Self,           // self
-    As,             // as
-    In,             // in
-    Throw,          // throw
-    Try,            // try
-    Catch,          // catch
-    Finally,        // finally
+    Func,             // func
+    Task,             // task
+    Return,           // return
+    Throws,           // throws
+    Self,             // self
+    As,               // as
+    In,               // in
+    Throw,            // throw
+    Try,              // try
+    Catch,            // catch
+    Finally,          // finally
 
     // Common attributes. Can be applied to single statement like func, task, class, etc. or to scope
     // ============================

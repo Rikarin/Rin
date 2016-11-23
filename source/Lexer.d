@@ -240,7 +240,7 @@ class Lexer {
                         nextChar();
                         tok.type = TokenType.DotDotDot; // ...
                     } else {
-                        tok.type = TokenType.Slice; // ..
+                        tok.type = TokenType.DotDot; // ..
                     }
                 } else {
                     tok.type = TokenType.Dot; // .

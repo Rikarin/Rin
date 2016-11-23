@@ -16,6 +16,7 @@ import Tokens;
 
 class Parser : Lexer {
 @safe:
+    private static immutable int[TokenType] m_precedence;
     private ScopeSymbol m_globalScope;
     private Symbol      m_currentScope;
 
@@ -27,6 +28,19 @@ class Parser : Lexer {
         Symbol currScope() {
             return m_currentScope;
         }
+    }
+
+    shared static this() {
+        m_precedence = [
+            TokenType.Blyat:    5,
+            //TokenType.: 10, // token >
+            //'>': 10,
+            TokenType.Plus:     20,
+            TokenType.Minus:    20,
+            TokenType.Asterisk: 40,
+            //TokenType.: 40, // token /
+            // '%': 40,
+        ];
     }
 
     this(const(char)[] buffer) {
@@ -86,6 +100,7 @@ class Parser : Lexer {
                     break;
 
                 case TokenType.Identifier: // we cannot determine here if it is 'const AnyClass variable' or 'variable += AnyClass()'
+                // or test.className.variable++;
                     if (peekNext == TokenType.Dot || peekNext == TokenType.OpenBracket/* || peekNext2 == TokenType.Blyat*/) {
                         writeln("method call with ", token.str, " tok ", token.type);
                         ret.add(parseIdentifier()); // TODO: parse expression, cuz it can be 'test.call = 42'
@@ -140,8 +155,6 @@ class Parser : Lexer {
         auto sc = parseScope(token.type == TokenType.OpenScope);
         return new AttribScopeSymbol(tok, val, sc);
     }
-
-
 
 
 
@@ -538,7 +551,7 @@ class Parser : Lexer {
             }
         }
 
-        if (peekNext2 == TokenType.Slice) {
+        if (peekNext2 == TokenType.DotDot) {
             Symbol s1 = parseSlicePrimary();
             needSpace();
             nextToken(); // eat ..
