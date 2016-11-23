@@ -16,7 +16,6 @@ import Tokens;
 
 class Parser : Lexer {
 @safe:
-    private static immutable int[TokenType] m_precedence;
     private ScopeSymbol m_globalScope;
     private Symbol      m_currentScope;
 
@@ -28,19 +27,6 @@ class Parser : Lexer {
         Symbol currScope() {
             return m_currentScope;
         }
-    }
-
-    shared static this() {
-        m_precedence = [
-            TokenType.Blyat:    5,
-            //TokenType.: 10, // token >
-            //'>': 10,
-            TokenType.Plus:     20,
-            TokenType.Minus:    20,
-            TokenType.Asterisk: 40,
-            //TokenType.: 40, // token /
-            // '%': 40,
-        ];
     }
 
     this(const(char)[] buffer) {
@@ -641,7 +627,7 @@ class Parser : Lexer {
     // TODO: add methods like needOpenScope, etc??
 
     private void logError(Args...)(string form, lazy Args args) {
-        auto str = format("Error(%s, %s): %s", row, col, format(form, args));
+        auto str = format("Error(%s, %s): %s", token.location.line, token.location.column, format(form, args));
         nextToken(); // eat last token for error handling
         throw new Exception(str);
     }

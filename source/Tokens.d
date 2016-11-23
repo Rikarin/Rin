@@ -166,6 +166,7 @@ enum TokenType {
 struct Token {
     TokenType type;
     Token*    next;
+    Location  location;
 
     union {
         long  value;
@@ -193,3 +194,38 @@ bool isAttribute(TokenType type) {
 bool isFuncAttribute(TokenType type) {
     return type >= TokenType.Final && type <= TokenType.Const;
 }
+
+
+
+struct Location {
+    string file;
+    int column;
+    int line;
+}
+
+enum Precedence : int {
+    Zero,
+    Expression,
+    Assign,
+
+    Unary,
+    Primary,
+}
+
+immutable Precedence[TokenType.max] TypePrecedence = [
+    TokenType.Blyat: Precedence.Zero
+];
+
+/**
+        m_precedence = [
+            TokenType.Blyat:    5,
+            //TokenType.: 10, // token >
+            //'>': 10,
+            TokenType.Plus:     20,
+            TokenType.Minus:    20,
+            TokenType.Asterisk: 40,
+            //TokenType.: 40, // token /
+            // '%': 40,
+        ];
+
+*/

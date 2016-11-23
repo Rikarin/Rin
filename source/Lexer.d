@@ -13,24 +13,14 @@ class Lexer {
 @safe:
     private File m_file;
     private const(char)* m_ptr;
+    private const(char)* m_line;
 
     private Token m_token;
-
-    private int m_row;
-    private int m_col;
+    private Location m_scanLoc;
 
     @property {
-        int row() const {
-            return m_row;
-        }
-
-        int col() const {
-            return m_col;
-        }
-
         private char nextChar() @trusted {
             assert(*m_ptr != '\0', "End of the line reached!");
-            m_col++;
             return *m_ptr++;
         }
         
@@ -48,7 +38,8 @@ class Lexer {
     }
 
     this(const(char)[] buffer) {
-        m_ptr = &buffer[0];
+        m_scanLoc = Location("test", 1, 1);
+        m_ptr     = &buffer[0];
     }
 
     final TokenType nextToken() {
@@ -90,6 +81,7 @@ class Lexer {
     // Always end this function with new token in the buffer
     void scan(Token* tok) @trusted {
         *tok = Token.init;
+        tok.location = location();
 
         switch (currChar) {
             case 0:
@@ -104,15 +96,23 @@ class Lexer {
 
             case '\t':
                 nextChar();
-                tok.type                = TokenType.Space;
-                tok.next                = new Token(TokenType.Space);
-                tok.next.next           = new Token(TokenType.Space);
-                tok.next.next.next      = new Token(TokenType.Space);
+                tok.type           = TokenType.Space;
+                tok.next           = new Token(TokenType.Space);
+                tok.next.next      = new Token(TokenType.Space);
+                tok.next.next.next = new Token(TokenType.Space);
                 break; 
 
-            case '\n', '\r':
-                m_col = 0;
-                m_row++;
+            case '\r':
+                if (peekChar(1) != '\n') {
+                    goto case '\n';
+                }
+
+                nextChar();
+                scan(tok);
+                break;
+
+            case '\n':
+                endOfLine();
                 nextChar();
                 tok.type = TokenType.EndLine;
                 break;
@@ -577,6 +577,16 @@ class Lexer {
         }
 
         return type;
+    }
+
+    private Location location() @trusted {
+        m_scanLoc.column = 1 + m_ptr - m_line;
+        return m_scanLoc;
+    }
+
+    private void endOfLine() {
+        m_scanLoc.line++;
+        m_line = m_ptr;
     }
 }
 
