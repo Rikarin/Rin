@@ -39,7 +39,7 @@ import core.stdc.test
     () @trusted {
         foreach (x; dirEntries("tests", SpanMode.shallow)) {
             writeln("Running test: ", x.name);
-            auto parser = new Parser(x.readText);
+            auto parser = new Parser(x.name, x.readText);
             parser.nextToken();
 
             try parser.parse();

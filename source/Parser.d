@@ -29,8 +29,8 @@ class Parser : Lexer {
         }
     }
 
-    this(const(char)[] buffer) {
-        super(buffer);
+    this(string name, const(char)[] buffer) {
+        super(name, buffer);
     }
 
     void parse() {
@@ -143,6 +143,9 @@ class Parser : Lexer {
     }
 
 
+// maybe fck spaces
+// make class Type for every type
+// rename Symbol to Expression
 
 
     // TODO: enum should be flaggs
@@ -220,6 +223,7 @@ class Parser : Lexer {
 
 
     // TODO: parse binary expressions!!
+    // refactor parsing identifiers. cannoct recognize variable/call function at scope switch
 
     // assert, enforce, asm
     // if else
@@ -627,8 +631,9 @@ class Parser : Lexer {
     // TODO: add methods like needOpenScope, etc??
 
     private void logError(Args...)(string form, lazy Args args) {
-        auto str = format("Error(%s, %s): %s", token.location.line, token.location.column, format(form, args));
+        auto str = format("%s(%s, %s): Error: %s", token.location.file, token.location.line, token.location.column, format(form, args));
         nextToken(); // eat last token for error handling
+        //writeln(str);
         throw new Exception(str);
     }
 }

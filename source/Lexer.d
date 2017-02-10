@@ -37,8 +37,8 @@ class Lexer {
         }
     }
 
-    this(const(char)[] buffer) {
-        m_scanLoc = Location("test", 1, 1);
+    this(string name, const(char)[] buffer) {
+        m_scanLoc = Location(name, 1, 1);
         m_ptr     = &buffer[0];
     }
 

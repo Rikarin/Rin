@@ -19,7 +19,7 @@ override("Test") func main() -> int {
 }
 
 
-enum Test : ulong {
+enum Test: ulong {
     Var1,
     Var2,
     Var3 = 42,
