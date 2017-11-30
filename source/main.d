@@ -4,9 +4,10 @@ import std.stdio;
 import std.file;
 
 //import AST;
-//import Lexer;
+import Lexer;
 //import Parser;
 import Tokens;
+import Domain.Context;
 
 // TODO: create symbol table for all symbols
 
@@ -19,14 +20,15 @@ void main(string[] args) @safe {
     writeln("Rin compiler starting up");
 
 //    auto buffer = "func test(name: string?, age: int) -> (bool?, int, int) { }";
-   /* auto buffer = "var test = 42
-test.call()
-let abc
-byte aa = 'test'
-const(char) abc
-const char cc
-let tupl = (method: \"str\", number: 42, randomType: false)";
-*/
+    auto buffer = "var test = 42;
+test.call();
+let abc;
+byte aa = \"test\";
+const(char) abc;
+const char cc;
+let tupl = (method: \"str\", number: 42, randomType: false);
+\0";
+
 
 /*    auto buffer = "
 import core.stdc.test
@@ -50,9 +52,13 @@ import core.stdc.test
     
     
 
-/*    auto lexer = new Lexer(buffer);
-    while (lexer.token.type != TokenType.Eof) {
-        writeln(*lexer.token);
-        lexer.nextToken();
-    }*/
+    TokenRange tr;
+    tr.context = new Context;
+    tr.content = buffer;
+    tr.popFront();
+
+    while (!tr.empty) {
+        writeln(tr.front);
+        tr.popFront();
+    }
 }

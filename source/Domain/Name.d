@@ -5,10 +5,11 @@ import Domain.Context;
 
 
 struct Name {
-    private uint m_id;
+@safe: pure:
+    private uint _id;
 
     private this(uint id) {
-        this.m_id = id;
+        this._id = id;
     }
 
     bool isEmpty() const {
@@ -16,11 +17,11 @@ struct Name {
     }
 
     bool isReserved() const {
-        return m_id < (Names.length - Prefill.length);
+        return _id < (Names.length - Prefill.length);
     }
 
     bool isDefined() const {
-        return m_id != 0;
+        return _id != 0;
     }
 
     auto getFullName(const Context c) const {
@@ -38,37 +39,39 @@ struct Name {
 
 
 struct FullName {
-    private Name m_name;
-    private const Context m_context;
+@safe: pure:
+    private Name _name;
+    private const Context _context;
 
     private this(Name name, const Context context) {
-        m_name = name;
-        m_context = context;
+        _name = name;
+        _context = context;
     }
 
     private ref nameManager() const {
-        return m_context.nameManager;
+        return _context.nameManager;
     }
 
-    alias m_name this;
+    alias _name this;
     Name name() const {
-        return m_name;
+        return _name;
     }
 
     string toString() const {
-        return nameManager.m_names[m_id];
+        return nameManager._names[_id];
     }
 
     immutable(char)* toStringz() const {
         auto s = toString();
-        return s.ptr;
+        return &s[0];
     }
 }
 
 
 struct NameManager {
-    private string[] m_names;
-    private uint[string] m_lookups;
+@safe:
+    private string[] _names;
+    private uint[string] _lookups;
 
     @disable this(this);
 
@@ -76,8 +79,8 @@ struct NameManager {
         return NameManager(Names, Lookups);
     }
 
-    auto getName(const(char)[] str) {
-        if (auto id = str in m_lookups) {
+    auto getName(const(char)[] str) @trusted {
+        if (auto id = str in _lookups) {
             return Name(*id);
         }
 
@@ -86,21 +89,21 @@ struct NameManager {
 
         scope (exit) assert(str.ptr !is s.ptr, s);
 
-        auto id = m_lookups[s] = cast(uint)m_names.length;
-        m_names ~= s;
+        auto id = _lookups[s] = cast(uint)_names.length;
+        _names ~= s;
 
         return Name(id);
     }
 
     void dump() {
-        foreach (x; m_names) {
+        foreach (x; _names) {
             import std.stdio;
-            writeln(m_lookups[x], "\t=> ", x);
+            writeln(_lookups[x], "\t=> ", x);
         }
     }
 }
 
-
+@safe: pure:
 template BuiltinName(string name) {
     private enum id = Lookups.get(name, uint.max);
     static assert(id < uint.max, name ~ " is not a buildin name!");
@@ -139,11 +142,11 @@ private enum Prefill = [
 private auto getNames() {
     auto idents = [""];
 
-    foreach (k, v; operatorsMap()) {
+    foreach (k, v; operatorsMap) {
         idents ~= k;
     }
 
-    foreach (k, v; keywordsMap()) {
+    foreach (k, v; keywordsMap) {
         idents ~= k;
     }
 

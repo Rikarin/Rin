@@ -5,15 +5,16 @@ import Domain.Location;
 
 
 final class Context {
-    package NameManager m_nameManager;
+@safe: pure:
+    public NameManager _nameManager;
 
     this() {
-        m_nameManager = NameManager.get();
+        _nameManager = NameManager.get();
     }
 
-    alias m_nameManager this;
+    alias _nameManager this;
 
     ref inout(NameManager) nameManager() inout {
-        return m_nameManager;
+        return _nameManager;
     }
 }
