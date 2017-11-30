@@ -3,9 +3,9 @@ module main;
 import std.stdio;
 import std.file;
 
-import AST;
-import Lexer;
-import Parser;
+//import AST;
+//import Lexer;
+//import Parser;
 import Tokens;
 
 // TODO: create symbol table for all symbols
@@ -36,7 +36,7 @@ import core.stdc.test
 
 //    auto buffer = "for x in array {";
 
-    () @trusted {
+    /*() @trusted {
         foreach (x; dirEntries("tests", SpanMode.shallow)) {
             writeln("Running test: ", x.name);
             auto parser = new Parser(x.name, x.readText);
@@ -46,7 +46,7 @@ import core.stdc.test
             catch (Exception e) writeln(e.msg);
             writeln("--------------");
         }
-    }();
+    }();*/
     
     
 

@@ -1,27 +1,28 @@
-import core
+using System;
 
-override("Test") func main() -> int {
-    var test     = 42
-    let constant = "Constant"
-    int? num
+namespace FooBar {
+    public Main() -> int {
+        var test     = 42;
+        let constant = "Constant";
+        int? num;
 
-    for x in 42 .. constant {
+        for x in 42 .. constant {
+
+        }
+
+        nothrow
+        localFunc(name: string?, age: int) -> (test: int, lala: string) {
+
+        }
+
+        localFunc(name: "Test", age: 42);
+        anyClass.anyValue.call("Test");
 
     }
 
-    func localFunc(name: string?, age: int) throws {
-
+    enum Test : ulong {
+        Var1,
+        Var2,
+        Var3 = 42,
     }
-
-    localFunc(name: "Test", age: 42)
-    anyClass.anyValue.call("Test")
-
 }
-
-
-enum Test: ulong {
-    Var1,
-    Var2,
-    Var3 = 42,
-}
-
