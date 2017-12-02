@@ -20,7 +20,8 @@ void main(string[] args) @safe {
     writeln("Rin compiler starting up");
 
 //    auto buffer = "func test(name: string?, age: int) -> (bool?, int, int) { }";
-    auto buffer = "var test = 42;
+    auto buffer = "namespace System.Test;
+var test = 42;
 test.call();
 let abc;
 byte aa = \"test\";
@@ -55,10 +56,16 @@ import core.stdc.test
     TokenRange tr;
     tr.context = new Context;
     tr.content = buffer;
-    tr.popFront();
+    tr.t.type = TokenType.Begin;
 
-    while (!tr.empty) {
+    /*while (!tr.empty) {
         writeln(tr.front);
         tr.popFront();
-    }
+    }*/
+
+    import Parser.Declaration;
+    tr.parseNamespace().toString(tr.context);
 }
+
+
+// TODO: Type Parser, then Identifier Parser
