@@ -5,6 +5,7 @@ import Domain.Location;
 import Domain.Context;
 import Common.Node;
 import Common.IVisitor;
+import Ast.Type;
 
 
 abstract class AstExpression : Node {
@@ -68,7 +69,7 @@ class AstUnaryExpression : AstExpression {
 
 
 enum BinaryOp {
-	//Comma,
+	Comma,
 	Assign,
 	Add,
 	Sub,
@@ -100,14 +101,14 @@ enum BinaryOp {
 	SRightShiftAssign,
 	LogicalOrAssign,
 	LogicalAndAssign,
-	ContactAssign,
+	ConcatAssign,
 	Equal,
 	NotEqual,
 	Identical,
 	NotIdentical,
 	In,
 	NotIn,
-	As, // TODO
+	As, // TODO: parse in postfix? (cuz (int) is parsed in prefix)
 	NullCoalescing, // TODO
 	Greater,
 	GreaterEqual,
@@ -147,13 +148,68 @@ class AstBinaryExpression : AstExpression {
 
 
 class AstCastExpression : AstExpression {
-	// TODO: type
+	AstType type;
 	AstExpression expr;
 
-	this(Location location, AstExpression expr) {
+	this(Location location, AstType type, AstExpression expr) {
 		super(location);
 
+		this.type = type;
 		this.expr = expr;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+
+class AstCallExpression : AstExpression {
+	AstExpression callee;
+	AstExpression[] args;
+
+	this(Location location, AstExpression callee, AstExpression[] args) {
+		super(location);
+
+		this.callee = callee;
+		this.args   = args;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+// indexed[arguments]
+class AstIndexExpression : AstExpression {
+	AstExpression indexed;
+	AstExpression[] arguments;
+
+	this(Location location, AstExpression indexed, AstExpression[] arguments) {
+		super(location);
+
+		this.indexed   = indexed;
+		this.arguments = arguments;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+// sliced[start .. end]
+class AstSliceExpression : AstExpression {
+	AstExpression sliced;
+	AstExpression[] start;
+	AstExpression[] end;
+
+	this(Location location, AstExpression sliced, AstExpression[] start, AstExpression[] end) {
+		super(location);
+
+		this.sliced = sliced;
+		this.start  = start;
+		this.end    = end;
 	}
 
 	override void visit(IVisitor visitor) {

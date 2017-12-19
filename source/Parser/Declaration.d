@@ -27,7 +27,7 @@ Namespace parseNamespace(ref TokenRange trange) {
     }
     trange.match(TokenType.Semicolon);
 
-    auto declarations = parseAggregate!false(trange);
+    auto declarations = trange.parseAggregate!false();
     loc.spanTo(trange.previous);
 
     return new Namespace(loc, name, declarations);

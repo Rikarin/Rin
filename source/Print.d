@@ -43,4 +43,18 @@ class PrintVisitor : IVisitor {
     void accept(AstCastExpression expr) {
         writeln("cast TODO");
     }
+
+    void accept(AstCallExpression expr) {
+        writeln("call expression TODO");
+    }
+
+
+
+    void accept(AstIndexExpression expr) {
+        writeln("index expr TODO");
+    }
+
+    void accept(AstSliceExpression expr) {
+        writeln("slice expr TODO");
+    }
 }

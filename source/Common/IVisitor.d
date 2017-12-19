@@ -14,4 +14,8 @@ interface IVisitor {
 
 
     void accept(AstCastExpression expr);
+    void accept(AstCallExpression expr);
+
+    void accept(AstIndexExpression expr);
+    void accept(AstSliceExpression expr);
 }

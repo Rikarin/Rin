@@ -48,7 +48,7 @@ enum TokenType {
 
     // Operators
     Slash,              // /
-    SlashEquals,        // /=
+    SlashEqual,         // /=
     Dot,                // .
     DotDot,             // ..
     DotDotDot,          // ...
@@ -71,7 +71,9 @@ enum TokenType {
     More,               // >
     MoreEqual,          // >=
     MoreMore,           // >>
+    //MoreMoreMore,       // >>>
     MoreMoreEqual,      // >>=
+    MoreMoreMoreEqual,  // >>>=
     Bang,               // !
     BangEqual,          // !=
     BangLess,           // !<
@@ -123,7 +125,7 @@ auto operatorsMap() {
     with (TokenType)
     return [
         "/" :  Slash,
-        "/=":  SlashEquals,
+        "/=":  SlashEqual,
         ".":   Dot,
         "..":  DotDot,
         "...": DotDotDot,
@@ -147,6 +149,7 @@ auto operatorsMap() {
         ">=":  MoreEqual,
         ">>":  MoreMore,
         ">>=": MoreMoreEqual,
+        ">>>=": MoreMoreMoreEqual,
         "!":   Bang,
         "!=":  BangEqual,
         "!<":  BangLess,
