@@ -3,14 +3,17 @@ module Common.Node;
 
 import Domain.Location;
 import Domain.Context;
+import Common.IVisitor;
 
 
-class Node {
+abstract class Node {
 	Location location;
 	
 	this(Location location) {
 		this.location = location;
 	}
+
+	void visit(IVisitor decl);
 
 	invariant() {
 		// FIXME: reenable this when ct paradoxes know their location.

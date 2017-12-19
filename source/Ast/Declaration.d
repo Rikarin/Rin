@@ -5,6 +5,7 @@ import Domain.Location;
 import Domain.Context;
 import Domain.Name;
 import Common.Node;
+import Common.IVisitor;
 
 
 abstract class Declaration : Node {
@@ -12,9 +13,9 @@ abstract class Declaration : Node {
 		super(location);
 	}
 	
-	string toString(const Context) const {
+	/*string toString(const Context) const {
 		assert(0, "toString not implement for " ~ typeid(this).toString());
-	}
+	}*/
 }
 
 
@@ -28,6 +29,10 @@ final class Namespace : Declaration {
         this.name = name;
         this.declarations = declarations;
     }
+
+    override void visit(IVisitor visitor) {
+        visitor.accept(this);
+    }
 }
 
 
@@ -38,5 +43,9 @@ final class UsingDeclaration : Declaration {
         super(location);
 
         this.namespace = namespace;
+    }
+
+    override void visit(IVisitor visitor) {
+        visitor.accept(this);
     }
 }

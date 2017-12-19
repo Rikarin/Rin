@@ -21,6 +21,8 @@ void main(string[] args) @safe {
 
 //    auto buffer = "func test(name: string?, age: int) -> (bool?, int, int) { }";
     auto buffer = "namespace System.Test;
+
+using System.IO;
 var test = 42;
 test.call();
 let abc;
@@ -63,8 +65,12 @@ import core.stdc.test
         tr.popFront();
     }*/
 
+    import Print;
+    auto visitor = new PrintVisitor();
+
     import Parser.Declaration;
-    tr.parseNamespace().toString(tr.context);
+    auto ns = tr.parseNamespace();//.toString(tr.context);
+    ns.visit(visitor);
 }
 
 

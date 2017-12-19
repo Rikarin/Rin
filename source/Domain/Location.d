@@ -22,6 +22,10 @@ struct Location {
     void spanTo(Position p) {
         // TODO
     }
+
+    void spanTo(Location l) {
+        // TODO
+    }
 }
 
 struct Position {
