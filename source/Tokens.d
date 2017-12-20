@@ -7,7 +7,7 @@ import Domain.Location;
 enum TokenType {
     Invalid = 0,
 
-    Begin,          // What is this?
+    Begin,
     End,
 
     // Literals
@@ -39,8 +39,7 @@ enum TokenType {
     Real, Ref, Return, Repeat,
     Scope, Shared, Short, Static, Struct, Super,
     Self, Switch,
-    Template, Throw, True, Try,
-    TypeOf,
+    Template, Throw, True, Try, TypeOf, TypeId, Traits,
     UByte, UCent, UInt, ULong, Union, Unittest, Ushort,
     Using, Unsafe,
     Version, Void, Volatile, Var,
@@ -71,7 +70,7 @@ enum TokenType {
     More,               // >
     MoreEqual,          // >=
     MoreMore,           // >>
-    //MoreMoreMore,       // >>>
+    MoreMoreMore,       // >>>
     MoreMoreEqual,      // >>=
     MoreMoreMoreEqual,  // >>>=
     Bang,               // !
@@ -80,6 +79,10 @@ enum TokenType {
     BangLessEqual,      // !<=
     BangMore,           // !>
     BangMoreEqual,      // !>=
+    LessMoreEqual,      // <>=
+    BangLessMoreEqual,  // !<>=
+    LessMore,           // <>
+    BangLessMore,       // !<>
     OpenParen,          // (
     CloseParen,         // )
     OpenBracket,        // [
@@ -89,6 +92,7 @@ enum TokenType {
     QuestionMark,       // ?
     QuestionMarkQuestionMark, // ??
     QuestionMarkDot,    // ?.
+    QuestionMarkOpenBracket, // ?[
     Comma,              // ,
     Semicolon,          // ;
     Colon,              // :
@@ -111,11 +115,7 @@ enum TokenType {
     Hash,               // #
 
     //Enforce,        // enforce
-    // >>> maybe this?
-    // <>, <>=, !<>, !<>=
 
-    /// ?? Protocol,         // protocol
-    // ??Extend,           // extend or partial?
 
     // __gshared = mark variable as unsafe e.g. private unsafe test: int;
     // let == immutable
@@ -124,67 +124,73 @@ enum TokenType {
 auto operatorsMap() {
     with (TokenType)
     return [
-        "/" :  Slash,
-        "/=":  SlashEqual,
-        ".":   Dot,
-        "..":  DotDot,
-        "...": DotDotDot,
-        "&":   Ampersand,
-        "&=":  AmpersandEqual,
-        "&&":  AmpersandAmpersand,
-        "|":   Pipe,
-        "|=":  PipeEqual,
-        "||":  PipePipe,
-        "-":   Minus,
-        "-=":  MinusEqual,
-        "--":  MinusMinus,
-        "+":   Plus,
-        "+=":  PlusEqual,
-        "++":  PlusPlus,
-        "<":   Less,
-        "<=":  LessEqual,
-        "<<":  LessLess,
-        "<<=": LessLessEqual,
-        ">":   More,
-        ">=":  MoreEqual,
-        ">>":  MoreMore,
-        ">>=": MoreMoreEqual,
+        "/" :   Slash,
+        "/=":   SlashEqual,
+        ".":    Dot,
+        "..":   DotDot,
+        "...":  DotDotDot,
+        "&":    Ampersand,
+        "&=":   AmpersandEqual,
+        "&&":   AmpersandAmpersand,
+        "|":    Pipe,
+        "|=":   PipeEqual,
+        "||":   PipePipe,
+        "-":    Minus,
+        "-=":   MinusEqual,
+        "--":   MinusMinus,
+        "+":    Plus,
+        "+=":   PlusEqual,
+        "++":   PlusPlus,
+        "<":    Less,
+        "<=":   LessEqual,
+        "<<":   LessLess,
+        "<<=":  LessLessEqual,
+        ">":    More,
+        ">=":   MoreEqual,
+        ">>":   MoreMore,
+        ">>>":  MoreMoreMore,
+        ">>=":  MoreMoreEqual,
         ">>>=": MoreMoreMoreEqual,
-        "!":   Bang,
-        "!=":  BangEqual,
-        "!<":  BangLess,
-        "!<=": BangLessEqual,
-        "!>":  BangMore,
-        "!>=": BangMoreEqual,
-        "(":   OpenParen,
-        ")":   CloseParen,
-        "[":   OpenBracket,
-        "]":   CloseBracket,
-        "{":   OpenBrace,
-        "}":   CloseBrace,
-        "?":   QuestionMark,
-        "??":  QuestionMarkQuestionMark,
-        "?.":  QuestionMarkDot,
-        ",":   Comma,
-        ";":   Semicolon,
-        ":":   Colon,
-        "->":  MinusMore,
-        "$":   Dollar,
-        "=":   Equal,
-        "==":  EqualEqual,
-        "*":   Asterisk,
-        "*=":  AsteriskEqual,
-        "%":   Percent,
-        "%=":  PercentEqual,
-        "^":   Caret,
-        "^=":  CaretEqual,
-        "^^":  CaretCaret,
-        "^^=": CaretCaretEqual,
-        "~":   Tilde,
-        "~=":  TildeEqual,
-        "=>":  EqualMore,
-        "#":   Hash,
-        "\0":  End
+        "!":    Bang,
+        "!=":   BangEqual,
+        "!<":   BangLess,
+        "!<=":  BangLessEqual,
+        "!>":   BangMore,
+        "!>=":  BangMoreEqual,
+        "<>=":  LessMoreEqual,
+        "!<>=": BangLessMoreEqual,
+        "<>":   LessMore,
+        "!<>":  BangLessMore,
+        "(":    OpenParen,
+        ")":    CloseParen,
+        "[":    OpenBracket,
+        "]":    CloseBracket,
+        "{":    OpenBrace,
+        "}":    CloseBrace,
+        "?":    QuestionMark,
+        "??":   QuestionMarkQuestionMark,
+        "?.":   QuestionMarkDot,
+        "?[":   QuestionMarkOpenBracket,
+        ",":    Comma,
+        ";":    Semicolon,
+        ":":    Colon,
+        "->":   MinusMore,
+        "$":    Dollar,
+        "=":    Equal,
+        "==":   EqualEqual,
+        "*":    Asterisk,
+        "*=":   AsteriskEqual,
+        "%":    Percent,
+        "%=":   PercentEqual,
+        "^":    Caret,
+        "^=":   CaretEqual,
+        "^^":   CaretCaret,
+        "^^=":  CaretCaretEqual,
+        "~":    Tilde,
+        "~=":   TildeEqual,
+        "=>":   EqualMore,
+        "#":    Hash,
+        "\0":   End
     ];
 }
 

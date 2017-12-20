@@ -19,7 +19,7 @@ abstract class AstExpression : Node {
 }
 
 
-
+// Unary operators
 enum UnaryOp {
 	AddressOf,
 	Await,
@@ -67,7 +67,7 @@ class AstUnaryExpression : AstExpression {
 }
 
 
-
+// Binary operators
 enum BinaryOp {
 	Comma,
 	Assign,
@@ -80,7 +80,7 @@ enum BinaryOp {
 	Or,
 	And,
 	Xor,
-	LeftShirt,
+	LeftShift,
 	URightShift,
 	SRightShift,
 	LogicalOr,
@@ -115,7 +115,7 @@ enum BinaryOp {
 	Less,
 	LessEqual,
 
-	// Some float stuff
+	// Some floating stuff
 	LessGreater,
 	LessEqualGreater,
 	UnorderedLess,
@@ -145,8 +145,7 @@ class AstBinaryExpression : AstExpression {
 }
 
 
-
-
+// (int)expr
 class AstCastExpression : AstExpression {
 	AstType type;
 	AstExpression expr;
@@ -164,7 +163,7 @@ class AstCastExpression : AstExpression {
 }
 
 
-
+// callee(args)
 class AstCallExpression : AstExpression {
 	AstExpression callee;
 	AstExpression[] args;
@@ -181,16 +180,19 @@ class AstCallExpression : AstExpression {
 	}
 }
 
+
 // indexed[arguments]
 class AstIndexExpression : AstExpression {
 	AstExpression indexed;
 	AstExpression[] arguments;
+	bool isConditional;
 
-	this(Location location, AstExpression indexed, AstExpression[] arguments) {
+	this(Location location, AstExpression indexed, AstExpression[] arguments, bool isConditional) {
 		super(location);
 
-		this.indexed   = indexed;
-		this.arguments = arguments;
+		this.indexed       = indexed;
+		this.arguments     = arguments;
+		this.isConditional = isConditional;
 	}
 
 	override void visit(IVisitor visitor) {
@@ -198,18 +200,21 @@ class AstIndexExpression : AstExpression {
 	}
 }
 
+
 // sliced[start .. end]
 class AstSliceExpression : AstExpression {
 	AstExpression sliced;
 	AstExpression[] start;
 	AstExpression[] end;
+	bool isConditional;
 
-	this(Location location, AstExpression sliced, AstExpression[] start, AstExpression[] end) {
+	this(Location location, AstExpression sliced, AstExpression[] start, AstExpression[] end, bool isConditional) {
 		super(location);
 
-		this.sliced = sliced;
-		this.start  = start;
-		this.end    = end;
+		this.sliced        = sliced;
+		this.start         = start;
+		this.end           = end;
+		this.isConditional = isConditional;
 	}
 
 	override void visit(IVisitor visitor) {

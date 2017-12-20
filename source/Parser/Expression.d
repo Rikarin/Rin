@@ -183,27 +183,140 @@ AstExpression parseLogicalBitwiseAndExpression(ref TokenRange trange, AstExpress
 }
 
 
+// comparison == != is !is in ??
+AstExpression parseComparisonExpression(ref TokenRange trange) {
+    return trange.parseComparisonExpression(trange.parsePrefixExpression());
+}
+
+AstExpression parseComparisonExpression(ref TokenRange trange, AstExpression lhs) {
+    lhs = trange.parseShiftExpression(lhs);
+    Location loc = lhs.location;
+
+    void processToken(BinaryOp op) {
+        trange.popFront();
+
+        auto rhs = trange.parseShiftExpression();
+
+        loc.spanTo(rhs.location);
+        lhs = new AstBinaryExpression(loc, op, lhs, rhs);
+    }
+
+    switch (trange.front.type) with (TokenType) {
+        case EqualEqual:               processToken(BinaryOp.Equal);                 break;
+        case BangEqual:                processToken(BinaryOp.NotEqual);              break;
+        case More:                     processToken(BinaryOp.Greater);               break;
+        case MoreEqual:                processToken(BinaryOp.GreaterEqual);          break;
+        case Less:                     processToken(BinaryOp.Less);                  break;
+        case LessEqual:                processToken(BinaryOp.LessEqual);             break;
+        case BangLessMoreEqual:        processToken(BinaryOp.Unordered);             break;
+        case BangLessMore:             processToken(BinaryOp.UnorderedEqual);        break;
+        case LessMore:                 processToken(BinaryOp.LessGreater);           break;
+        case LessMoreEqual:            processToken(BinaryOp.LessEqualGreater);      break;
+        case BangMore:                 processToken(BinaryOp.UnorderedLessEqual);    break;
+        case BangMoreEqual:            processToken(BinaryOp.UnorderedLess);         break;
+        case BangLess:                 processToken(BinaryOp.UnorderedGreaterEqual); break;
+        case BangLessEqual:            processToken(BinaryOp.UnorderedGreater);      break;
+        case Is:                       processToken(BinaryOp.Identical);             break;
+        case In:                       processToken(BinaryOp.In);                    break;
+        case As:                       processToken(BinaryOp.As);                    break; // TODO: is this ok here?
+        case QuestionMarkQuestionMark: processToken(BinaryOp.NullCoalescing);        break;
+
+        case Bang:
+            trange.popFront();
+
+            switch (trange.front.type) {
+                case Is: processToken(BinaryOp.NotIdentical); break;
+                case In: processToken(BinaryOp.NotIn);        break;
+                default: assert(false, "Error pyco");
+            }
+            break;
+        default:
+    }
+
+    return lhs;
+}
 
 
+// <<, >>, >>>
+AstExpression parseShiftExpression(ref TokenRange trange) {
+    return trange.parseShiftExpression(trange.parsePrefixExpression());
+}
+
+AstExpression parseShiftExpression(ref TokenRange trange, AstExpression lhs) {
+    lhs = trange.parseAddExpression(lhs);
+    Location loc = lhs.location;
+
+    while (true) {
+        void processToken(BinaryOp op) {
+            trange.popFront();
+            auto rhs = trange.parseAddExpression();
+
+            loc.spanTo(rhs.location);
+            lhs = new AstBinaryExpression(loc, op, lhs, rhs);
+        }
+
+        switch (trange.front.type) with (BinaryOp) with (TokenType) {
+            case LessLess:     processToken(LeftShift);   break;
+            case MoreMore:     processToken(SRightShift); break;
+            case MoreMoreMore: processToken(URightShift); break;
+            default: return lhs;
+        }
+    }
+}
 
 
+// +, -, ~
+AstExpression parseAddExpression(ref TokenRange trange) {
+    return trange.parseAddExpression(trange.parsePrefixExpression());
+}
+
+AstExpression parseAddExpression(ref TokenRange trange, AstExpression lhs) {
+    lhs = trange.parseMulExpression(lhs);
+    Location loc = lhs.location;
+
+    while (true) {
+        void processToken(BinaryOp op) {
+            trange.popFront();
+            auto rhs = trange.parseMulExpression();
+
+            loc.spanTo(rhs.location);
+            lhs = new AstBinaryExpression(loc, op, lhs, rhs);
+        }
+
+        switch (trange.front.type) with (BinaryOp) with (TokenType) {
+            case Plus:  processToken(Add);    break;
+            case Minus: processToken(Sub);    break;
+            case Tilde: processToken(Concat); break;
+            default: return lhs;
+        }
+    }
+}
 
 
+// *, /, %
+AstExpression parseMulExpression(ref TokenRange trange) {
+    return trange.parseMulExpression(trange.parsePrefixExpression());
+}
 
+AstExpression parseMulExpression(ref TokenRange trange, AstExpression lhs) {
+    Location loc = lhs.location;
 
+    while (true) {
+        void processToken(BinaryOp op) {
+            trange.popFront();
+            auto rhs = trange.parsePrefixExpression();
 
+            loc.spanTo(rhs.location);
+            lhs = new AstBinaryExpression(loc, op, lhs, rhs);
+        }
 
-
-
-
-
-
-
-AstExpression parsePrimaryExpression(ref TokenRange trange) {
-    auto loc = trange.front.location;
-
-
-    assert(false, "LOLO");
+        switch (trange.front.type) with (BinaryOp) with (TokenType) {
+            case Asterisk: processToken(Mul); break;
+            case Slash:    processToken(Div); break;
+            case Percent:  processToken(Rem); break;
+            default: return lhs;
+        }
+    }
 }
 
 
@@ -252,6 +365,43 @@ private AstExpression parsePrefixExpression(ParseMode mode = ParseMode.Greedy)(r
 }
 
 
+AstExpression parsePrimaryExpression(ref TokenRange trange) {
+    Location loc = trange.front.location;
+
+    switch (trange.front.type) with (TokenType) {
+        case Identifier: assert(false, "TODO"); // TODO
+        case Dot: assert(false); // TODO
+        case Self: assert(false); // TODO
+        case Super: assert(false); // TODO
+        case True: assert(false); // TODO
+        case False: assert(false); // TODO
+        case Null: assert(false); // TODO
+        case IntegerLiteral: assert(false); // TODO
+        case StringLiteral: assert(false); // TODO
+        case CharacterLiteral: assert(false); // TODO
+
+
+        case OpenBracket: assert(false); // TODO
+        case OpenBrace: assert(false); // TODO
+        case Function: assert(false); // TODO
+        case Delegate: assert(false); // TODO
+        // __FILE__
+        // __LINE__
+        case Dollar: assert(false); // TODO
+        case TypeId: assert(false); // TODO
+        case NameOf: assert(false); // TODO
+        case Is: assert(false); // TODO
+        case Mixin: assert(false); // TODO
+        case OpenParen: assert(false); // TODO
+
+        default:
+            // TODO
+    }
+
+    assert(false, "LOLO");
+}
+
+
 /*
  * Parse postfix expr. [ ... ], ++, --, .identifier, ?.identifier
  */
@@ -259,6 +409,8 @@ private AstExpression parsePrefixExpression(ParseMode mode = ParseMode.Greedy)(r
     Location loc;
 
     while (true) {
+        bool isConditional;
+
         switch (trange.front.type) with (TokenType) {
             case PlusPlus:
                 loc.spanTo(trange.front.location);
@@ -281,6 +433,10 @@ private AstExpression parsePrefixExpression(ParseMode mode = ParseMode.Greedy)(r
                 expr = new AstCallExpression(loc, expr, args);
                 break;
 
+            case QuestionMarkOpenBracket:
+                isConditional = true;
+                goto case;
+
             case OpenBracket:
                 trange.popFront();
 
@@ -292,7 +448,7 @@ private AstExpression parsePrefixExpression(ParseMode mode = ParseMode.Greedy)(r
                 switch (trange.front.type) {
                     case CloseBracket:
                         loc.spanTo(trange.front.location);
-                        expr = new AstIndexExpression(loc, expr, args);
+                        expr = new AstIndexExpression(loc, expr, args, isConditional);
                         break;
 
                     case DotDot:
@@ -300,7 +456,7 @@ private AstExpression parsePrefixExpression(ParseMode mode = ParseMode.Greedy)(r
                         auto end = trange.parseArguments();
 
                         loc.spanTo(trange.front.location);
-                        expr = new AstSliceExpression(loc, expr, args, end);
+                        expr = new AstSliceExpression(loc, expr, args, end, isConditional);
                         break;
 
                     default:
@@ -321,6 +477,8 @@ private AstExpression parsePrefixExpression(ParseMode mode = ParseMode.Greedy)(r
                 return expr;
         }
     }
+
+    assert(false);
  }
 
 
