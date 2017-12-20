@@ -44,6 +44,10 @@ class PrintVisitor : IVisitor {
         writeln("cast TODO");
     }
 
+    void accept(AstAsExpression expr) {
+        writeln("identifier as type TODO");
+    }
+
     void accept(AstCallExpression expr) {
         writeln("call expression TODO");
     }

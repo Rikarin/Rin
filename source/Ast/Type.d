@@ -1,5 +1,8 @@
 module Ast.Type;
 
+import Domain.Location;
+
+
 enum AstTypeKind : ubyte {
     Builtin,
     Identifier,
@@ -16,5 +19,6 @@ enum AstTypeKind : ubyte {
 
 
 class AstType {
-
+@safe:
+    Location location() { assert(false, "TODO"); }
 }

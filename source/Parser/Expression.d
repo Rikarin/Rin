@@ -218,7 +218,6 @@ AstExpression parseComparisonExpression(ref TokenRange trange, AstExpression lhs
         case BangLessEqual:            processToken(BinaryOp.UnorderedGreater);      break;
         case Is:                       processToken(BinaryOp.Identical);             break;
         case In:                       processToken(BinaryOp.In);                    break;
-        case As:                       processToken(BinaryOp.As);                    break; // TODO: is this ok here?
         case QuestionMarkQuestionMark: processToken(BinaryOp.NullCoalescing);        break;
 
         case Bang:
@@ -409,8 +408,6 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
     Location loc;
 
     while (true) {
-        bool isConditional;
-
         switch (trange.front.type) with (TokenType) {
             case PlusPlus:
                 loc.spanTo(trange.front.location);
@@ -433,14 +430,23 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
                 expr = new AstCallExpression(loc, expr, args);
                 break;
 
-            case QuestionMarkOpenBracket:
-                isConditional = true;
-                goto case;
+            case As:
+                trange.popFront();
+                auto type = trange.parseType();
+                loc.spanTo(type.location);
 
-            case OpenBracket:
+                expr = new AstAsExpression(loc, type, expr);
+                break;
+
+            case OpenBracket, QuestionMarkOpenBracket:
+                const isCond = trange.front.type == QuestionMarkOpenBracket;
                 trange.popFront();
 
                 if (trange.front.type == CloseBracket) {
+                    if (isCond) {
+                        assert(false, "Slicing cannot be conditional");
+                    }
+
                     assert(false, "TODO"); // TODO
                 }
 
@@ -448,7 +454,7 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
                 switch (trange.front.type) {
                     case CloseBracket:
                         loc.spanTo(trange.front.location);
-                        expr = new AstIndexExpression(loc, expr, args, isConditional);
+                        expr = new AstIndexExpression(loc, expr, args, isCond);
                         break;
 
                     case DotDot:
@@ -456,7 +462,7 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
                         auto end = trange.parseArguments();
 
                         loc.spanTo(trange.front.location);
-                        expr = new AstSliceExpression(loc, expr, args, end, isConditional);
+                        expr = new AstSliceExpression(loc, expr, args, end, isCond);
                         break;
 
                     default:
@@ -467,6 +473,7 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
             static if (mode == ParseMode.Greedy) {
             case Dot:
             case QuestionMarkDot:
+                const isConditional = trange.front.type == QuestionMarkDot;
                 trange.popFront();
                 // TODO
                 // parse...(trange, trange.front.type == Dot);

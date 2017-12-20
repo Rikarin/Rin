@@ -163,6 +163,24 @@ class AstCastExpression : AstExpression {
 }
 
 
+// expr as Type
+class AstAsExpression : AstExpression {
+	AstType type;
+	AstExpression expr;
+
+	this(Location location, AstType type, AstExpression expr) {
+		super(location);
+
+		this.type = type;
+		this.expr = expr;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
 // callee(args)
 class AstCallExpression : AstExpression {
 	AstExpression callee;
