@@ -368,9 +368,13 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
     Location loc = trange.front.location;
 
     switch (trange.front.type) with (TokenType) {
+        case Self:     trange.popFront(); return new AstSelfExpression(loc);
+        case Dollar:   trange.popFront(); return new AstDollarExpression(loc);
+        case __File__: trange.popFront(); return new __File__Literal(loc);
+        case __Line__: trange.popFront(); return new __Line__Literal(loc);
+
         case Identifier: assert(false, "TODO"); // TODO
         case Dot: assert(false); // TODO
-        case Self: assert(false); // TODO
         case Super: assert(false); // TODO
         case True: assert(false); // TODO
         case False: assert(false); // TODO
@@ -379,14 +383,13 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case StringLiteral: assert(false); // TODO
         case CharacterLiteral: assert(false); // TODO
 
-
         case OpenBracket: assert(false); // TODO
         case OpenBrace: assert(false); // TODO
         case Function: assert(false); // TODO
         case Delegate: assert(false); // TODO
         // __FILE__
         // __LINE__
-        case Dollar: assert(false); // TODO
+
         case TypeId: assert(false); // TODO
         case NameOf: assert(false); // TODO
         case Is: assert(false); // TODO

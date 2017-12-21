@@ -12,11 +12,16 @@ interface IVisitor {
     void accept(AstUnaryExpression expr);
     void accept(AstBinaryExpression expr);
 
-
     void accept(AstCastExpression expr);
     void accept(AstAsExpression expr);
     void accept(AstCallExpression expr);
+    void accept(AstIsExpression expr);
+    void accept(AstSelfExpression expr);
 
     void accept(AstIndexExpression expr);
     void accept(AstSliceExpression expr);
+    void accept(AstDollarExpression expr);
+
+    void accept(__File__Literal literal);
+    void accept(__Line__Literal literal);
 }

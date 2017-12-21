@@ -239,3 +239,67 @@ class AstSliceExpression : AstExpression {
 		visitor.accept(this);
 	}
 }
+
+
+// identifier is identifier
+class AstIsExpression : AstExpression {
+	AstType tested;
+
+	this(Location location, AstType tested) {
+		super(location);
+
+		this.tested = tested;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// $
+class AstDollarExpression : AstExpression {
+	this(Location location) {
+		super(location);
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// self
+class AstSelfExpression : AstExpression {
+	this(Location location) {
+		super(location);
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// __FILE__
+class __File__Literal : AstExpression {
+	this(Location location) {
+		super(location);
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// __LINE__
+class __Line__Literal : AstExpression {
+	this(Location location) {
+		super(location);
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}

@@ -25,9 +25,6 @@ class PrintVisitor : IVisitor {
         writeln("using TODO;");
     }
 
-
-
-
     void accept(AstUnaryExpression expr) {
         writeln("unary expr TODO");
     }
@@ -35,10 +32,6 @@ class PrintVisitor : IVisitor {
     void accept(AstBinaryExpression expr) {
         writeln("binary expr TODO");
     }
-
-
-
-
 
     void accept(AstCastExpression expr) {
         writeln("cast TODO");
@@ -52,13 +45,31 @@ class PrintVisitor : IVisitor {
         writeln("call expression TODO");
     }
 
-
-
     void accept(AstIndexExpression expr) {
         writeln("index expr TODO");
     }
 
     void accept(AstSliceExpression expr) {
         writeln("slice expr TODO");
+    }
+
+    void accept(AstDollarExpression expr) {
+        writeln("$");
+    }
+
+    void accept(AstIsExpression expr) {
+        writeln("is TODO");
+    }
+
+    void accept(AstSelfExpression expr) {
+        writeln("self");
+    }
+
+    void accept(__File__Literal literal) {
+        writeln("__FILE__");
+    }
+
+    void accept(__Line__Literal literal) {
+        writeln("__LINE__");
     }
 }

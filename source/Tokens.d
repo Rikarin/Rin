@@ -44,6 +44,7 @@ enum TokenType {
     Using, Unsafe,
     Version, Void, Volatile, Var,
     WChar, While, With, Weak,
+    __File__, __Line__,
 
     // Operators
     Slash,              // /
@@ -290,7 +291,9 @@ auto keywordsMap() {
         "wchar":        WChar,
         "while":        While,
         "with":         With,
-        "weak":         Weak
+        "weak":         Weak,
+        "__FILE__":     __File__,
+        "__LINE__":     __Line__
     ];
 }
 
