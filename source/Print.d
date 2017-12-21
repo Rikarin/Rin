@@ -8,13 +8,19 @@ import std.algorithm;
 import Ast.Declaration;
 import Ast.Expression;
 
+import Domain.Context;
 import Common.IVisitor;
 
 
 class PrintVisitor : IVisitor {
+    private Context _context;
+
+    this(Context context) {
+        _context = context;
+    }
+
     void accept(Namespace decl) {
-        //writeln("namespace ", decl.name.map!(x => x.toString()).array().join("."));
-        writeln("namespace TODO;");
+        writeln("namespace ", decl.name.map!(x => x.toString(_context)).array().join("."), ";");
 
         foreach (x; decl.declarations) {
             x.visit(this);
@@ -22,7 +28,7 @@ class PrintVisitor : IVisitor {
     }
 
     void accept(UsingDeclaration decl) {
-        writeln("using TODO;");
+        writeln("using ", decl.namespace.map!(x => x.toString(_context)).array().join("."), ";");
     }
 
     void accept(AstUnaryExpression expr) {

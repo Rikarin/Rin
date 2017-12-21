@@ -387,8 +387,6 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case OpenBrace: assert(false); // TODO
         case Function: assert(false); // TODO
         case Delegate: assert(false); // TODO
-        // __FILE__
-        // __LINE__
 
         case TypeId: assert(false); // TODO
         case NameOf: assert(false); // TODO

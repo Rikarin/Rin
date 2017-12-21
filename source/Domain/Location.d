@@ -10,23 +10,34 @@ struct Location {
 
     this(Position start, Position stop) {
         this.start = start;
-        this.stop = stop;
+        this.stop  = stop;
     }
 
     uint length() const {
         return stop.offset - start.offset;
     }
 
-    // TODO
+    bool isFile() const {
+        return start.isFile();
+    }
+
+    bool isMixin() const {
+        return start.isMixin();
+    }
 
     void spanTo(Position p) {
-        // TODO
+        stop = p;
     }
 
     void spanTo(Location l) {
-        // TODO
+        spanTo(l.stop);
+    }
+
+    auto getFullLocation(Context c) const {
+        assert(false); // TODO
     }
 }
+
 
 struct Position {
 @safe: pure:
@@ -52,11 +63,13 @@ struct Position {
         return _mixin;
     }
 
-    Position getWithOffset(uint offset) const {
+    Position getWithOffset(uint offset) const out(result) {
+        assert(result.isMixin == isMixin, "Position overflow");
+    } body {
         return Position(raw + offset);
     }
 
     auto getFullPosition(Context c) const {
-        return 0; // TODO
+        assert(false); // TODO
     }
 }

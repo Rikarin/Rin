@@ -23,6 +23,8 @@ void main(string[] args) @safe {
     auto buffer = "namespace System.Test;
 
 using System.IO;
+using System.Core.Test;
+
 var test = 42;
 test.call();
 let abc;
@@ -66,12 +68,10 @@ import core.stdc.test
     }*/
 
     import Print;
-    auto visitor = new PrintVisitor();
+    import Domain.Context;
+    auto visitor = new PrintVisitor(tr.context);
 
     import Parser.Declaration;
-    auto ns = tr.parseNamespace();//.toString(tr.context);
+    auto ns = tr.parseNamespace();
     ns.visit(visitor);
 }
-
-
-// TODO: Type Parser, then Identifier Parser
