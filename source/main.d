@@ -3,13 +3,11 @@ module main;
 import std.stdio;
 import std.file;
 
-//import AST;
 import Lexer;
-//import Parser;
 import Tokens;
+import Print;
 import Domain.Context;
-
-// TODO: create symbol table for all symbols
+import Parser.Declaration;
 
 void main(string[] args) @safe {
     /*if (args.length < 2) {
@@ -19,7 +17,6 @@ void main(string[] args) @safe {
     
     writeln("Rin compiler starting up");
 
-//    auto buffer = "func test(name: string?, age: int) -> (bool?, int, int) { }";
     auto buffer = "namespace System.Test;
 
 using System.IO;
@@ -34,18 +31,9 @@ const char cc;
 let tupl = (method: \"str\", number: 42, randomType: false);
 \0";
 
-
-/*    auto buffer = "
-import core.stdc.test
-@my(const(char)) test
-";
-*/
-
-//    auto buffer = "for x in array {";
-
     /*() @trusted {
-        foreach (x; dirEntries("tests", SpanMode.shallow)) {
-            writeln("Running test: ", x.name);
+        foreach (x; dirEntries("lib", SpanMode.shallow)) {
+            writeln("building: ", x.name);
             auto parser = new Parser(x.name, x.readText);
             parser.nextToken();
 
@@ -55,23 +43,14 @@ import core.stdc.test
         }
     }();*/
     
-    
 
     TokenRange tr;
     tr.context = new Context;
     tr.content = buffer;
-    tr.t.type = TokenType.Begin;
+    tr.t.type  = TokenType.Begin;
 
-    /*while (!tr.empty) {
-        writeln(tr.front);
-        tr.popFront();
-    }*/
-
-    import Print;
-    import Domain.Context;
     auto visitor = new PrintVisitor(tr.context);
 
-    import Parser.Declaration;
     auto ns = tr.parseNamespace();
     ns.visit(visitor);
 }
