@@ -2,6 +2,7 @@ module Common.IVisitor;
 
 import Ast.Declaration;
 import Ast.Expression;
+import Ast.Type;
 
 
 interface IVisitor {
@@ -11,11 +12,12 @@ interface IVisitor {
 
     void accept(AstUnaryExpression expr);
     void accept(AstBinaryExpression expr);
+    void accept(AstTernaryExpression expr);
 
     void accept(AstCastExpression expr);
     void accept(AstAsExpression expr);
     void accept(AstCallExpression expr);
-    void accept(AstIsExpression expr);
+    //void accept(AstIsExpression expr);
     void accept(AstSelfExpression expr);
 
     void accept(AstIndexExpression expr);
@@ -24,4 +26,8 @@ interface IVisitor {
 
     void accept(__File__Literal literal);
     void accept(__Line__Literal literal);
+
+
+
+    void accept(AstType type);
 }

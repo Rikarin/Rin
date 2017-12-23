@@ -55,14 +55,20 @@ Declaration[] parseAggregate(bool braces = true)(ref TokenRange trange) {
 Declaration parseDeclaration(ref TokenRange trange) {
     Location loc = trange.front.location;
 
+    // Declarations without storage classes support
     switch (trange.front.type) with (TokenType) {
         case Static:
             // TODO
             break;
 
         case Using: return trange.parseUsing();
-        default: break;
+        default:
+            break;
     }
+
+
+    // TODO: parse qualifiers in strict order!
+    // visibility, async, synchronized, virtual, pure, nogc, unsafe, <name>, ->, return type
 
 
     trange.popFront();

@@ -2,6 +2,12 @@ namespace System;
 
 alias TODO = assert(false, "TODO");
 
+// Basic types
+alias string  = readonly(char)[];
+alias wstring = readonly(wchar)[];
+alias dstring = readonly(dchar)[];
+alias object  = Object;
+
 
 public class Object {
     public virtual toString() const -> string => typeid(self).name;

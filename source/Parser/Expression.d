@@ -106,6 +106,7 @@ AstExpression parseTernaryExpression(ref TokenRange trange, AstExpression condit
         auto ifFalse = trange.parseTernaryExpression();
 
         loc.spanTo(ifFalse.location);
+        condition = new AstTernaryExpression(loc, condition, ifTrue, ifFalse);
         // TOOD: ret; ternary
     }
 

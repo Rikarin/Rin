@@ -51,14 +51,14 @@ string unarizeString(string s, UnaryOp op) {
 }
 
 class AstUnaryExpression : AstExpression {
-	AstExpression expression;
+	AstExpression expr;
 	UnaryOp op;
 
-	this(Location location, UnaryOp op, AstExpression expression) {
+	this(Location location, UnaryOp op, AstExpression expr) {
 		super(location);
 
-		this.op = op;
-		this.expression = expression;
+		this.op   = op;
+		this.expr = expr;
 	}
 
 	override void visit(IVisitor visitor) {
@@ -108,8 +108,8 @@ enum BinaryOp {
 	NotIdentical,
 	In,
 	NotIn,
-	As, // TODO: parse in postfix? (cuz (int) is parsed in prefix)
-	NullCoalescing, // TODO
+	As,
+	NullCoalescing,
 	Greater,
 	GreaterEqual,
 	Less,
@@ -137,6 +137,25 @@ class AstBinaryExpression : AstExpression {
 		this.op  = op;
 		this.lhs = lhs;
 		this.rhs = rhs;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+class AstTernaryExpression : AstExpression {
+	AstExpression condition;
+	AstExpression ifTrue;
+	AstExpression ifFalse;
+
+	this(Location location, AstExpression condition, AstExpression ifTrue, AstExpression ifFalse) {
+		super(location);
+
+		this.condition = condition;
+		this.ifTrue    = ifTrue;
+		this.ifFalse   = ifFalse;
 	}
 
 	override void visit(IVisitor visitor) {
@@ -242,7 +261,7 @@ class AstSliceExpression : AstExpression {
 
 
 // identifier is identifier
-class AstIsExpression : AstExpression {
+/*class AstIsExpression : AstExpression {
 	AstType tested;
 
 	this(Location location, AstType tested) {
@@ -254,7 +273,7 @@ class AstIsExpression : AstExpression {
 	override void visit(IVisitor visitor) {
 		visitor.accept(this);
 	}
-}
+}*/
 
 
 // $

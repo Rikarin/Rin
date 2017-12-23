@@ -1,6 +1,7 @@
 module Ast.Type;
 
 import Domain.Location;
+import Common.IVisitor;
 
 
 enum AstTypeKind : ubyte {
@@ -21,4 +22,8 @@ enum AstTypeKind : ubyte {
 class AstType {
 @safe:
     Location location() { assert(false, "TODO"); }
+
+    void visit(IVisitor visitor) {
+        visitor.accept(this);
+    }
 }
