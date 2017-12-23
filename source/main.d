@@ -22,6 +22,10 @@ void main(string[] args) @safe {
 using System.IO;
 using System.Core.Test;
 
+private async test() -> Task!int {
+
+}
+
 var test = 42;
 test.call();
 let abc;

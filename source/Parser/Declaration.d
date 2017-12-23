@@ -6,7 +6,14 @@ import Lexer;
 import Ast.Declaration;
 import Domain.Name;
 import Domain.Location;
+import Common.Qualifier;
 import Parser.Utils;
+
+import std.conv;
+
+void TODO() {
+    assert(false, "TODO");
+}
 
 
 Namespace parseNamespace(ref TokenRange trange) {
@@ -52,27 +59,80 @@ Declaration[] parseAggregate(bool braces = true)(ref TokenRange trange) {
     return declarations;
 }
 
+
 Declaration parseDeclaration(ref TokenRange trange) {
     Location loc = trange.front.location;
 
     // Declarations without storage classes support
     switch (trange.front.type) with (TokenType) {
-        case Static:
-            // TODO
+        case Static: goto case;
+        case Version: goto case;
+        case Debug: goto case;
+        case Mixin:
+            TODO;
             break;
 
         case Using: return trange.parseUsing();
+
         default:
-            break;
     }
+
+    auto sc = StorageClass.defaults;
+
+    // Parse Visibility qualifier
+    void processToken(Visibility v) {
+        trange.popFront();
+        sc.visibility = v;
+    }
+
+    switch (trange.front.type) with (TokenType) {
+        case Public:    processToken(Visibility.Public);    break;
+        case Protected: processToken(Visibility.Protected); break;
+        case Internal:  processToken(Visibility.Internal);  break;
+        case Private:   processToken(Visibility.Private);   break;
+        default:
+    }
+
+    if (trange.front.type == TokenType.Async) {
+        trange.popFront();
+        sc.isAsync = true;
+    }
+
+    if (trange.front.type == TokenType.Synchronized) {
+        trange.popFront();
+        sc.isSynchronized = true;
+    }
+
+    if (trange.front.type == TokenType.Virtual) { // virtual or final or abstract
+        trange.popFront();
+        sc.isVirtual = true;
+    }
+
+    // TODO
+     // [Attrib()]
+     // abstract, override, deprecated, static, final
+     // nameFunc()
+     // const, ref, shared, readonly, nogc, pure, inout
+     // -> return type
+    
+    // func and class must have the same qualifiers before name declaration
+    // visibility, abstract, final, static, external, extern, synchronized
+
+
+     // can be extern (C) or external
+
+
+    // name (can be property, function or variable)
+    // return type
 
 
     // TODO: parse qualifiers in strict order!
     // visibility, async, synchronized, virtual, pure, nogc, unsafe, <name>, ->, return type
 
+    assert(false, "undefined " ~ trange.front.type.to!string);
 
-    trange.popFront();
-    return null;
+    //trange.popFront();
+    //return null;
 }
 
 
