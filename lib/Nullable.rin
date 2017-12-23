@@ -2,22 +2,22 @@ namespace System;
 
 
 // This class is returned from ?. and ?[] operator usages. same as monad e.g. 'value: int?'
-public final class Nullable(T) {
-    private T    _value;
-    private bool _hasValue;
+final class Nullable(T) {
+    private value:    T;
+    private hasValue: bool;
 
-    public self() {
+    self() {
 
     }
 
-    public self(T value) {
+    self(value: T) {
         _value    = value;
         _hasValue = true;
     }
 
-    public hasValue -> bool => _hasValue;
+    hasValue -> bool => _hasValue;
 
-    public value -> T {
+    value -> T {
         if (!_hasValue) {
             throw new InvalidOperationException;
         }

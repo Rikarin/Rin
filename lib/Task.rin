@@ -1,0 +1,25 @@
+namespace System.Threading.Tasks;
+
+use System;
+
+
+class Task(T) : IDisposable {
+    id -> int => TODO;
+
+    isCanceled -> bool {
+        TODO;
+    }
+
+    isCompleted -> bool {
+        TODO;
+    }
+
+    isFaulted -> bool {
+        TODO;
+    }
+
+
+    static run(action: Action) -> Task {
+        return Task();
+    }
+}
