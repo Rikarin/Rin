@@ -32,6 +32,10 @@ class PrintVisitor : IVisitor {
         writeln("using ", decl.namespace.map!(x => x.toString(_context)).array().join("."), ";");
     }
 
+    void accept(TupleDeclaration decl) {
+        writeln("TUPLE TODO");
+    }
+
     void accept(AstUnaryExpression expr) {
         write(unarizeString("", expr.op));
         expr.expr.visit(this);

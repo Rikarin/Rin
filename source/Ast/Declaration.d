@@ -42,7 +42,7 @@ struct StorageClass {
 
     static StorageClass defaults() {
         StorageClass ret;
-        ret.visibility = Visibility.Public;
+        ret.visibility = Visibility.Default;
 
         return ret;
     }
@@ -54,10 +54,6 @@ abstract class Declaration : Node {
 	this(Location location) {
 		super(location);
 	}
-	
-	/*string toString(const Context) const {
-		assert(0, "toString not implement for " ~ typeid(this).toString());
-	}*/
 }
 
 
@@ -90,4 +86,24 @@ final class UsingDeclaration : Declaration {
     override void visit(IVisitor visitor) {
         visitor.accept(this);
     }
+}
+
+
+final class TupleDeclaration : Declaration {
+	ParamDecl[] params;
+
+	this(Location location, ParamDecl[] params) {
+		super(location);
+
+		this.params = params;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+class ParamDecl {
+
 }

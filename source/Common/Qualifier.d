@@ -2,10 +2,12 @@ module Common.Qualifier;
 
 
 enum Visibility {
+	Default, // This is there because variable inside class has different default visibility, than method
     Private,
     Protected,
     Internal,
-    Public
+    Public,
+	Extern
 }
 
 
