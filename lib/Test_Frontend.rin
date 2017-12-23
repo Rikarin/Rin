@@ -1,0 +1,27 @@
+namespace Test;
+
+
+test01() {
+    var test = <div>
+            <h2>Hello World</h2>
+        </div>;
+}
+
+
+class Test2 {
+    prop1: int;
+    prop2: string = "test";
+
+    enum EnumTest = "lalala";
+
+
+    getData() -> Data { // throws error: Use const(Data) or ref Data instead!
+        return default(Data);
+    }
+}
+
+
+struct Data {
+    name: string;
+    age:  int;
+}

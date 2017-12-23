@@ -3,8 +3,9 @@ namespace System;
 
 // This class is returned from ?. and ?[] operator usages. same as monad e.g. 'value: int?'
 final class Nullable(T) {
-    private value:    T;
-    private hasValue: bool;
+    value:    T; // variables of class are default private and cannot be public.
+    hasValue: bool; // in class's function it can be referenced by _<name>; e.g. _hasValue;
+    // variables must be defined at the beginning of the class.
 
     self() {
 

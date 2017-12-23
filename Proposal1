@@ -1,19 +1,17 @@
-import Core;
+use Core;
 
-alias string = let(char)[] // string is just array of immutable chars
-
-func add(a: int, b: int) -> int {
-    return a + b
+add(a: int, b: int) -> int {
+    return a + b;
 }
 
-private func sub(a: int, b: int) throws -> int {
-    return a - b
+private sub(a: int, b: int) pure nothrow -> int {
+    return a - b;
 }
 
 
 class BaseClass {
-    final func dup(this R)() -> R {
-        var ret = typeid(self).create()
+    final dup(this R)() -> R {
+        var ret = typeid(self).create();
         ret.__self()
 
         return ret
