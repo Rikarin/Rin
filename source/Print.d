@@ -6,8 +6,9 @@ import std.array;
 import std.algorithm;
 
 import Ast.Type;
-import Ast.Declaration;
+import Ast.Statement;
 import Ast.Expression;
+import Ast.Declaration;
 
 import Domain.Context;
 import Common.IVisitor;
@@ -113,4 +114,26 @@ class PrintVisitor : IVisitor {
     void accept(AstType type) {
         writeln("tyoe TODO");
     }
+
+
+
+
+
+    void accept(BlockStatement statement) {
+        assert(false); // TODO
+    }
+
+    void accept(ExpressionStatement statement) {
+        assert(false); // TODO
+    }
+
+    void accept(DeclarationStatement statement) {
+        assert(false); // TODO
+    }
+
+    void accept(IfStatement statement) {
+        assert(false); // TODO
+    }
+
+    void accept(Statement x) { }
 }

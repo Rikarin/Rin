@@ -22,17 +22,11 @@ void main(string[] args) @safe {
 using System.IO;
 using System.Core.Test;
 
-private async test() -> Task!int {
+/*private async test() -> Task!int {
 
-}
+}*/
 
-var test = 42;
-test.call();
-let abc;
-byte aa = \"test\";
-const(char) abc;
-const char cc;
-let tupl = (method: \"str\", number: 42, randomType: false);
+
 \0";
 
     /*() @trusted {

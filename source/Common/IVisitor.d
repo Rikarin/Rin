@@ -1,5 +1,6 @@
 module Common.IVisitor;
 
+import Ast.Statement;
 import Ast.Declaration;
 import Ast.Expression;
 import Ast.Type;
@@ -31,4 +32,13 @@ interface IVisitor {
 
 
     void accept(AstType type);
+
+
+    // Statements
+    void accept(BlockStatement statement);
+    void accept(ExpressionStatement statement);
+    void accept(DeclarationStatement statement);
+    void accept(IfStatement statement);
+
+    void accept(Statement x);
 }

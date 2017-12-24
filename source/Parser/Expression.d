@@ -107,7 +107,6 @@ AstExpression parseTernaryExpression(ref TokenRange trange, AstExpression condit
 
         loc.spanTo(ifFalse.location);
         condition = new AstTernaryExpression(loc, condition, ifTrue, ifFalse);
-        // TOOD: ret; ternary
     }
 
     return condition;
@@ -230,6 +229,7 @@ AstExpression parseComparisonExpression(ref TokenRange trange, AstExpression lhs
                 default: assert(false, "Error pyco");
             }
             break;
+
         default:
     }
 
@@ -384,8 +384,9 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case StringLiteral: assert(false); // TODO
         case CharacterLiteral: assert(false); // TODO
 
-        case OpenBracket: assert(false); // TODO
-        case OpenBrace: assert(false); // TODO
+        case OpenBracket: assert(false); // TODO: array expr
+        case OpenBrace: assert(false); // TODO: delegate expr
+        case OpenParen: assert(false); // TODO: tuple expr + something else
         case Function: assert(false); // TODO
         case Delegate: assert(false); // TODO
 
@@ -393,7 +394,6 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case NameOf: assert(false); // TODO
         case Is: assert(false); // TODO
         case Mixin: assert(false); // TODO
-        case OpenParen: assert(false); // TODO
 
         default:
             // TODO

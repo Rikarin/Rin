@@ -186,6 +186,8 @@ StorageClass parsePrefixStorageClasses(ref TokenRange trange) {
         default:
     }
 
+    // TODO: scope somewhere (class can be scoped)
+
     if (trange.front.type == TokenType.External) {
         trange.popFront();
         TODO;
