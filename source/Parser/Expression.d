@@ -404,7 +404,7 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
 
 
 /*
- * Parse postfix expr. [ ... ], ++, --, .identifier, ?.identifier
+ * Parse postfix expr. [ ... ], ++, --, !, .identifier, ?.identifier
  */
  AstExpression parsePostfixExpression(ParseMode mode)(ref TokenRange trange, AstExpression expr) {
     Location loc;
@@ -412,16 +412,16 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
     while (true) {
         switch (trange.front.type) with (TokenType) {
             case PlusPlus:
-                loc.spanTo(trange.front.location);
                 trange.popFront();
 
+                loc.spanTo(trange.previous);
                 expr = new AstUnaryExpression(loc, UnaryOp.PostInc, expr);
                 break;
 
             case MinusMinus:
-                loc.spanTo(trange.front.location);
                 trange.popFront();
 
+                loc.spanTo(trange.previous);
                 expr = new AstUnaryExpression(loc, UnaryOp.PostDec, expr);
                 break;
 
@@ -432,12 +432,26 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
                 expr = new AstCallExpression(loc, expr, args);
                 break;
 
+            case Bang:
+                trange.popFront();
+
+                loc.spanTo(trange.previous);
+                expr = new AstUnaryExpression(loc, UnaryOp.Unwrap, expr);
+                break;
+
             case As:
                 trange.popFront();
+
+                bool isNullable;
+                if (trange.front.type == QuestionMark) {
+                    trange.popFront();
+                    isNullable = true;
+                }
+
                 auto type = trange.parseType();
                 loc.spanTo(type.location);
 
-                expr = new AstAsExpression(loc, type, expr);
+                expr = new AstAsExpression(loc, type, isNullable, expr);
                 break;
 
             case OpenBracket, QuestionMarkOpenBracket:

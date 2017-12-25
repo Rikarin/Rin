@@ -26,7 +26,7 @@ struct StorageClass {
 		bool,          "isFinal",        1,
 		bool,          "isAbstract",     1,
 		bool,          "isDeprecated",   1,
-		bool,          "isNoThrow",      1,
+		bool,          "isThrow",        1,
 		bool,          "isOverride",     1,
 		bool,          "isPure",         1,
 		bool,          "isSynchronized", 1,
@@ -36,7 +36,7 @@ struct StorageClass {
 
 		bool,          "isAsync",        1,
 		bool,          "isUnsafe",       1,
-		bool,          "isVirtual",      1,
+		bool,          "isPartial",      1,
 		uint,          "",               7,
 	));
 

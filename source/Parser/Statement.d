@@ -32,12 +32,9 @@ Statement parseStatement(ref TokenRange trange) {
             if (trange.front.type == Else) {
                 trange.popFront();
                 ifFalse = trange.parseBlock();
-
-                loc.spanTo(ifFalse.location);
-            } else {
-                loc.spanTo(ifTrue.location);
             }
 
+            loc.spanTo(trange.previous);
             return new IfStatement(loc, cond, ifTrue, ifFalse);
 
         case While:
@@ -68,6 +65,37 @@ Statement parseStatement(ref TokenRange trange) {
             trange.popFront();
             trange.match(OpenParen);
 
+            // It's range
+            if (trange.front.type == Identifier || trange.front.type == Ref) {
+                // TODO: refactor this, we can have for (i, ref x in range)
+                bool isRef;
+                if (trange.front.type == Ref) {
+                    trange.popFront();
+                    isRef = true;
+                }
+
+                auto iter = trange.front.name;
+                trange.match(Identifier);
+                trange.match(In);
+
+                auto expr = trange.parseExpression();
+                AstExpression end;
+
+                if (trange.front.type == DotDot) {
+                    trange.popFront();
+                    end = trange.parseExpression();
+                }
+
+                trange.match(CloseParen);
+                auto block = trange.parseBlock();
+
+                loc.spanTo(trange.previous);
+                // TODO: fix nulls
+                return end ? 
+                    new ForInRangeStatement(loc, null, expr, end, block) : 
+                    new ForInStatement(loc, null, expr, block);
+            }
+
             Statement init;
             if (trange.front.type != Semicolon) {
                 init = trange.parseStatement();
@@ -93,9 +121,6 @@ Statement parseStatement(ref TokenRange trange) {
             loc.spanTo(trange.previous);
             return new ForStatement(loc, init, cond, increment, block);
 
-        case Foreach: // TODO: reverse?
-            assert(false); // TODO
-
         case Return:
             trange.popFront();
 
@@ -105,8 +130,8 @@ Statement parseStatement(ref TokenRange trange) {
             }
 
             trange.match(Semicolon);
-            loc.spanTo(trange.previous);
 
+            loc.spanTo(trange.previous);
             return new ReturnStatement(loc, value);
 
         case Break:
@@ -146,16 +171,117 @@ Statement parseStatement(ref TokenRange trange) {
 
         case Default:
             assert(false);
-        //case Goto:
-            //assert(false);
-        case Scope:
-            assert(false);
+
+        case Goto:
+            trange.popFront();
+            Name name;
+
+            switch (trange.front.type) {
+                case Identifier, Default, Case:
+                    name = trange.front.name;
+                    trange.popFront();
+                    break;
+
+                default:
+                    trange.match(Identifier);
+            }
+
+            loc.spanTo(trange.previous);
+            return new GotoStatement(loc, name);
+
+        case Defer:
+            trange.popFront();
+            auto type = DeferType.Exit;
+
+            if (trange.front.type == OpenParen) {
+                trange.popFront();
+                auto name = trange.front.name;
+                trange.match(Identifier);
+
+                if (name == BuiltinName!"success") {
+                    type = DeferType.Success;
+                } else if (name == BuiltinName!"failure") {
+                    type = DeferType.Failure;
+                } else {
+                    assert(false, name.toString(trange.context) ~ " is not a valid scope identifier.");
+                }
+
+                trange.match(CloseParen);
+            }
+
+            auto block = trange.parseBlock();
+
+            loc.spanTo(trange.previous);
+            return new DeferStatement(loc, type, block);
+
         case Assert:
-            assert(false);
+            trange.popFront();
+            trange.match(OpenParen);
+
+            auto expr = trange.parseAssignExpression();
+            AstExpression msg;
+            if (trange.front.type == Comma) {
+                trange.popFront();
+
+                msg = trange.parseAssignExpression();
+            }
+
+            trange.match(CloseParen);
+            trange.match(Semicolon);
+
+            loc.spanTo(trange.previous);
+            return new AssertStatement(loc, expr, msg);
+            
         case Throw:
-            assert(false);
+            trange.popFront();
+
+            auto value = trange.parseExpression();
+            trange.match(Semicolon);
+            
+            loc.spanTo(trange.previous);
+            return new ThrowStatement(loc, value);
+
         case Try:
-            assert(false);
+            trange.popFront();
+
+            bool isNullable;
+            if (trange.front.type == QuestionMark) {
+                trange.popFront();
+                isNullable = true;
+            }
+
+            auto tryStatement = isNullable ? 
+                new ExpressionStatement(trange.front.location, trange.parseExpression()) :
+                trange.parseBlock();
+
+            CatchBlock[] catches;
+            while (!isNullable && trange.front.type == Catch) {
+                trange.popFront();
+                trange.match(OpenParen);
+
+                auto type = trange.parseIdentifier();
+                Name name;
+
+                if (trange.front.type == Idenfier) {
+                    name = trange.front.name;
+                    trange.popFront();
+                }
+
+
+                // TODO
+            }
+
+            // TODO: parse catches
+
+            BlockStatement finallyBlock;
+            if (!isNullable && trange.front.type == Finally) {
+                trange.popFront();
+                finallyBlock = trange.parseBlock();
+            }
+
+            loc.spanTo(trange.previous);
+            return new TryStatement(loc, tryStatement, isNullable, null, finallyBlock);
+
         case Mixin:
             assert(false);
         case Static:

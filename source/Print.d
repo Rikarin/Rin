@@ -9,6 +9,7 @@ import Ast.Type;
 import Ast.Statement;
 import Ast.Expression;
 import Ast.Declaration;
+import Ast.Identifiers;
 
 import Domain.Context;
 import Common.IVisitor;
@@ -136,4 +137,5 @@ class PrintVisitor : IVisitor {
     }
 
     void accept(Statement x) { }
+    void accept(Identifier x) { }
 }

@@ -3,7 +3,7 @@ namespace System.Threading.Tasks;
 use System;
 
 
-class Task(T) : IDisposable {
+class Task(T) {
     id -> int => TODO;
 
     isCanceled -> bool {

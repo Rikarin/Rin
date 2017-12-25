@@ -187,6 +187,10 @@ StorageClass parsePrefixStorageClasses(ref TokenRange trange) {
     }
 
     // TODO: scope somewhere (class can be scoped)
+    if (trange.front.type == TokenType.Partial) {
+        trange.popFront();
+        sc.isPartial = true;
+    }
 
     if (trange.front.type == TokenType.External) {
         trange.popFront();
@@ -214,11 +218,6 @@ StorageClass parsePrefixStorageClasses(ref TokenRange trange) {
     }
 
     switch (trange.front.type) with (TokenType) {
-        case Virtual:
-            trange.popFront();
-            sc.isVirtual = true;
-            break;
-
         case Abstract:
             trange.popFront();
             sc.isAbstract = true;

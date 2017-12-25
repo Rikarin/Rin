@@ -1,9 +1,10 @@
 module Common.IVisitor;
 
-import Ast.Statement;
-import Ast.Declaration;
-import Ast.Expression;
 import Ast.Type;
+import Ast.Statement;
+import Ast.Expression;
+import Ast.Identifiers;
+import Ast.Declaration;
 
 
 interface IVisitor {
@@ -40,5 +41,7 @@ interface IVisitor {
     void accept(DeclarationStatement statement);
     void accept(IfStatement statement);
 
+    // TODO: remove these dummies
     void accept(Statement x);
+    void accept(Identifier x);
 }

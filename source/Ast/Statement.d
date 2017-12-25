@@ -157,19 +157,17 @@ final class ForStatement : Statement {
 }
 
 
-final class ForeachStatement : Statement {
+final class ForInStatement : Statement {
     ParamDecl[] params;
     AstExpression iterated;
     BlockStatement block;
-    bool isReverse;
 
-    this(Location location, ParamDecl[] params, AstExpression iterated, BlockStatement block, bool isReverse) {
+    this(Location location, ParamDecl[] params, AstExpression iterated, BlockStatement block) {
         super(location);
 
         this.params    = params;
         this.iterated  = iterated;
         this.block     = block;
-        this.isReverse = isReverse;
     }
 
     override void visit(IVisitor visitor) {
@@ -178,21 +176,19 @@ final class ForeachStatement : Statement {
 }
 
 
-final class ForeachRangeStatement : Statement {
+final class ForInRangeStatement : Statement {
     ParamDecl[] params;
     AstExpression start;
     AstExpression stop;
     BlockStatement block;
-    bool isReverse;
 
-    this(Location location, ParamDecl[] params, AstExpression start, AstExpression stop, BlockStatement block, bool isReverse) {
+    this(Location location, ParamDecl[] params, AstExpression start, AstExpression stop, BlockStatement block) {
         super(location);
 
         this.params    = params;
         this.start     = start;
         this.stop      = stop;
         this.block     = block;
-        this.isReverse = isReverse;
     }
 
     override void visit(IVisitor visitor) {
@@ -317,17 +313,17 @@ final class UnsafeStatement : Statement {
 }
 
 
-enum ScopeType {
-    Success,
+enum DeferType {
     Exit,
+    Success,
     Failure
 }
 
-final class ScopeStatement : Statement {
-    ScopeType type;
+final class DeferStatement : Statement {
+    DeferType type;
     Statement statement;
 
-    this(Location locaiton, ScopeType type, Statement statement) {
+    this(Location locaiton, DeferType type, Statement statement) {
         super(location);
 
         this.type      = type;
@@ -373,15 +369,17 @@ final class ThrowStatement : Statement {
 
 
 final class TryStatement : Statement {
-    BlockStatement tryBlock;
+    Statement tryStatement;
     CatchBlock[] catches;
     BlockStatement finallyBlock;
+    bool isNullable;
 
-
-    this(Location locaiton, BlockStatement tryBlock, CatchBlock[] catches, BlockStatement finallyBlock) {
+    this(Location locaiton, Statement tryStatement, bool isNullable, CatchBlock[] catches, BlockStatement finallyBlock) {
         super(location);
 
-        this.tryBlock     = tryBlock;
+        this.tryStatement = tryStatement;
+        this.isNullable   = isNullable;
+        this.catches      = catches;
         this.finallyBlock = finallyBlock;
     }
 

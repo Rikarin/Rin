@@ -1,5 +1,0 @@
-namespace System;
-
-interface IDisposable {
-    dispose();
-}

@@ -31,7 +31,8 @@ enum UnaryOp {
 	Plus,
 	Minus,
 	Complement,
-	Not
+	Not,
+	Unwrap
 }
 
 string unarizeString(string s, UnaryOp op) {
@@ -46,6 +47,7 @@ string unarizeString(string s, UnaryOp op) {
 		case Plus:        return "+" ~ s;
 		case Minus:       return "-" ~ s;
 		case Not:         return "!" ~ s;
+		case Unwrap:      return s ~ "!";
 		case Complement:  return "~" ~ s;
 	}
 }
@@ -185,13 +187,15 @@ class AstCastExpression : AstExpression {
 // expr as Type
 class AstAsExpression : AstExpression {
 	AstType type;
+	bool isNullable;
 	AstExpression expr;
 
-	this(Location location, AstType type, AstExpression expr) {
+	this(Location location, AstType type, bool isNullable, AstExpression expr) {
 		super(location);
 
-		this.type = type;
-		this.expr = expr;
+		this.type       = type;
+		this.isNullable = isNullable;
+		this.expr       = expr;
 	}
 
 	override void visit(IVisitor visitor) {
