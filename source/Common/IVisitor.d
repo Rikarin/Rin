@@ -32,7 +32,6 @@ interface IVisitor {
     void accept(Lambda expr);
 
 
-
     // Declarations
     void accept(Namespace decl);
     void accept(UsingDeclaration decl);
@@ -44,6 +43,37 @@ interface IVisitor {
     void accept(ExpressionStatement statement);
     void accept(DeclarationStatement statement);
     void accept(IfStatement statement);
+    void accept(WhileStatement statement);
+    void accept(RepeatStatement statement);
+    void accept(IdentifierAsteriskIdentifierStatement statement);
+    void accept(ForStatement statement);
+    void accept(ForInStatement statement);
+    void accept(ForInRangeStatement statement);
+    void accept(ReturnStatement statement);
+    void accept(SwitchStatement statement);
+    void accept(CaseStatement statement);
+    void accept(BreakStatement statement);
+    void accept(ContinueStatement statement);
+    void accept(GotoStatement statement);
+    void accept(LockStatement statement);
+    void accept(UnsafeStatement statement);
+    void accept(DeferStatement statement);
+    void accept(AssertStatement statement);
+    void accept(ThrowStatement statement);
+    void accept(TryStatement statement);
+
+
+    // Identifiers 
+    void accept(BasicIdentifier identifier);
+    void accept(IdentifierDotIdentifier identifier);
+    void accept(TypeDotIdentifier identifier);
+    void accept(ExpressionDotIdentifier identifier);
+    void accept(DotIdentifier identifier);
+    void accept(IdentifierBracketIdentifier identifier);
+    void accept(IdentifierBracketExpression identifier);
+    void accept(TypeTemplateArgument identifier);
+    void accept(ValueTemplateArgument identifier);
+    void accept(IdentifierTemplateArgument identifier);
 
 
      // undefined
@@ -51,8 +81,9 @@ interface IVisitor {
     void accept(LineLiteral literal);
     void accept(AstType type);
 
+
     // TODO: remove these dummies
-    void accept(Statement x);
+    /*void accept(Statement x);
     void accept(Identifier x);
-    void accept(TemplateArgument x);
+    void accept(TemplateArgument x);*/
 }

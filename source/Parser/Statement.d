@@ -18,7 +18,15 @@ Statement parseStatement(ref TokenRange trange) {
     switch (trange.front.type) with (TokenType) {
         case OpenBrace: return trange.parseBlock();
 
-        case Identifier: assert(false, "TODO");
+        case Identifier:
+            /*auto lookAhead = trange.save;
+            lookAhead.popFront();
+
+            if (lookAhead.front.type == TokenType.Colon) {
+                goto case Default;
+            }*/
+
+            goto default; // parse ambigous
 
         case If:
             trange.popFront();
@@ -321,6 +329,7 @@ Statement parseStatement(ref TokenRange trange) {
     
     assert(false);
 }
+
 
 BlockStatement parseBlock(ref TokenRange trange) {
     Location loc = trange.front.location;
