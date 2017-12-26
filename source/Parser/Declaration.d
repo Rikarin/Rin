@@ -96,6 +96,7 @@ Declaration parseDeclaration(ref TokenRange trange) {
         case Interface: goto case;
         case Template: goto case;
         case Self: goto case; // constructor
+        case Tilde: goto case; // destructor
         case Alias: goto case;
         case Unittest: goto case;
         case Union: 

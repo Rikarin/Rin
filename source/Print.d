@@ -81,6 +81,28 @@ class PrintVisitor : IVisitor {
         write(")");
     }
 
+    void accept(IdentifierCallExpression expr) {
+        expr.callee.visit(this);
+        write("(");
+        foreach (x; expr.args) {
+            x.visit(this);
+            write(", ");
+        }
+
+        write(")");
+    }
+
+    void accept(AstTypeCallExpression expr) {
+        expr.type.visit(this);
+        write("(");
+        foreach (x; expr.args) {
+            x.visit(this);
+            write(", ");
+        }
+
+        write(")");
+    }
+
     void accept(AstIndexExpression expr) {
         writeln("index expr TODO");
     }
@@ -89,16 +111,26 @@ class PrintVisitor : IVisitor {
         writeln("slice expr TODO");
     }
 
-    void accept(AstDollarExpression expr) {
+    void accept(DollarExpression expr) {
         write("$");
     }
 
-    /*void accept(AstIsExpression expr) {
-        writeln("is TODO");
-    }*/
-
-    void accept(AstSelfExpression expr) {
+    void accept(SelfExpression expr) {
         write("self");
+    }
+
+    void accept(SuperExpression expr) {
+        write("super");
+    }
+
+    void accept(ParenExpression expr) {
+        write("(");
+        expr.visit(this);
+        write(")");
+    }
+
+    void accept(IdentifierExpression expr) {
+        expr.identifier.visit(this);
     }
 
     void accept(FileLiteral literal) {
@@ -109,6 +141,25 @@ class PrintVisitor : IVisitor {
         write("#line");
     }
 
+    void accept(AstVoidInitializer expr) {
+        write("void");
+    }
+
+    void accept(AstTypeOfExpression expr) {
+        write("typeof(");
+        expr.identifier.visit(this);    
+        write(")");
+    }
+
+    void accept(AstNameOfExpression expr) {
+        write("nameof(");
+        expr.identifier.visit(this);    
+        write(")");
+    }
+
+    void accept(Lambda expr) {
+        assert(false, "TODO");
+    }
 
 
 

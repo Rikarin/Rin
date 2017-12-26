@@ -1,4 +1,5 @@
 module Ast.Identifiers;
+@safe:
 
 import Domain.Name;
 import Domain.Location;

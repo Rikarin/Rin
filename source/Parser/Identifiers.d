@@ -1,4 +1,5 @@
 module Parser.Identifiers;
+@safe:
 
 import Lexer;
 import Tokens;

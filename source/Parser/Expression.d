@@ -3,10 +3,15 @@ module Parser.Expression;
 
 import Tokens;
 import Lexer;
-import Parser.Utils;
 import Domain.Location;
-import Ast.Expression;
+
 import Ast.Type;
+import Ast.Expression;
+import Ast.Identifiers;
+
+import Parser.Utils;
+import Parser.Identifiers;
+
 
 enum ParseMode {
     Greedy
@@ -369,14 +374,14 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
     Location loc = trange.front.location;
 
     switch (trange.front.type) with (TokenType) {
-        case Self:      trange.popFront(); return new AstSelfExpression(loc);
-        case Dollar:    trange.popFront(); return new AstDollarExpression(loc);
+        case Self:      trange.popFront(); return new SelfExpression(loc);
+        case Super:     trange.popFront(); return new SuperExpression(loc);
+        case Dollar:    trange.popFront(); return new DollarExpression(loc);
         case SharpFile: trange.popFront(); return new FileLiteral(loc);
         case SharpLine: trange.popFront(); return new LineLiteral(loc);
 
-        case Identifier: assert(false, "TODO"); // TODO
-        case Dot: assert(false); // TODO
-        case Super: assert(false); // TODO
+        case Identifier: return trange.parseIdentifierExpression(trange.parseIdentifier());
+        case Dot:        return trange.parseIdentifierExpression(trange.parseDotIdentifier());
         case True: assert(false); // TODO
         case False: assert(false); // TODO
         case Null: assert(false); // TODO
@@ -384,14 +389,51 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case StringLiteral: assert(false); // TODO
         case CharacterLiteral: assert(false); // TODO
 
+        case More: 
+            trange.popFront();
+
+            auto name = trange.front.name;
+            trange.match(Identifier);
+
+            // TODO: parse args
+
+            // TODO: we must parse body, if element is not closed by />
+            bool isClosed;
+            if (trange.front.type == Slash) {
+                trange.popFront();
+                isClosed = true;
+            }
+
+            trange.match(Less);
+            assert(false); // TODO: html stuff
+
         case OpenBracket: assert(false); // TODO: array expr
         case OpenBrace: assert(false); // TODO: delegate expr
         case OpenParen: assert(false); // TODO: tuple expr + something else
         case Function: assert(false); // TODO
         case Delegate: assert(false); // TODO
 
+        case TypeOf: 
+            trange.popFront();
+            trange.match(OpenParen);
+
+            auto ident = trange.parseIdentifier();
+            trange.match(CloseParen);
+
+            loc.spanTo(trange.previous);
+            return new AstTypeOfExpression(loc, ident);
+            
+        case NameOf: 
+            trange.popFront();
+            trange.match(OpenParen);
+
+            auto ident = trange.parseIdentifier();
+            trange.match(CloseParen);
+
+            loc.spanTo(trange.previous);
+            return new AstNameOfExpression(loc, ident);
+
         case TypeId: assert(false); // TODO
-        case NameOf: assert(false); // TODO
         case Is: assert(false); // TODO
         case Mixin: assert(false); // TODO
 
@@ -399,7 +441,7 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
             // TODO
     }
 
-    assert(false, "LOLO");
+    assert(false, "Reached unreachable code!");
 }
 
 
@@ -531,6 +573,7 @@ private AstExpression parsePowExpression(ref TokenRange trange, AstExpression ex
 
 
 
+// TODO: parse is() expr
 
 
 // TODO: mockups
@@ -544,4 +587,17 @@ AstExpression[] parseArguments(ref TokenRange trange) {
 
 AstType parseType(ref TokenRange trange) {
     return null;
+}
+
+
+AstExpression parseIdentifierExpression(ref TokenRange trange, Identifier identifier) {
+    if (trange.front.type != TokenType.OpenParen) {
+        return new IdentifierExpression(identifier);
+    }
+
+    auto args = trange.parseArguments!(TokenType.OpenParen)();
+    auto loc = identifier.location;
+
+    loc.spanTo(trange.previous);
+    return new IdentifierCallExpression(loc, identifier, args);
 }

@@ -5,7 +5,10 @@ import Domain.Location;
 import Domain.Context;
 import Common.Node;
 import Common.IVisitor;
+
 import Ast.Type;
+import Ast.Identifiers;
+import Ast.Declaration;
 
 
 abstract class AstExpression : Node {
@@ -52,7 +55,7 @@ string unarizeString(string s, UnaryOp op) {
 	}
 }
 
-class AstUnaryExpression : AstExpression {
+final class AstUnaryExpression : AstExpression {
 	AstExpression expr;
 	UnaryOp op;
 
@@ -128,7 +131,7 @@ enum BinaryOp {
 	UnorderedEqual
 }
 
-class AstBinaryExpression : AstExpression {
+final class AstBinaryExpression : AstExpression {
 	BinaryOp op;
 	AstExpression lhs;
 	AstExpression rhs;
@@ -147,7 +150,7 @@ class AstBinaryExpression : AstExpression {
 }
 
 
-class AstTernaryExpression : AstExpression {
+final class AstTernaryExpression : AstExpression {
 	AstExpression condition;
 	AstExpression ifTrue;
 	AstExpression ifFalse;
@@ -167,7 +170,7 @@ class AstTernaryExpression : AstExpression {
 
 
 // (int)expr
-class AstCastExpression : AstExpression {
+final class AstCastExpression : AstExpression {
 	AstType type;
 	AstExpression expr;
 
@@ -185,7 +188,7 @@ class AstCastExpression : AstExpression {
 
 
 // expr as Type
-class AstAsExpression : AstExpression {
+final class AstAsExpression : AstExpression {
 	AstType type;
 	bool isNullable;
 	AstExpression expr;
@@ -204,8 +207,44 @@ class AstAsExpression : AstExpression {
 }
 
 
+// identifier(args)
+final class IdentifierCallExpression : AstExpression {
+	Identifier callee;
+	AstExpression[] args;
+
+	this(Location location, Identifier callee, AstExpression[] args) {
+		super(location);
+
+		this.callee = callee;
+		this.args   = args;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// type(args)
+final class AstTypeCallExpression : AstExpression {
+	AstType type;
+	AstExpression[] args;
+
+	this(Location location, AstType type, AstExpression[] args) {
+		super(location);
+
+		this.type = type;
+		this.args = args;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
 // callee(args)
-class AstCallExpression : AstExpression {
+final class AstCallExpression : AstExpression {
 	AstExpression callee;
 	AstExpression[] args;
 
@@ -223,7 +262,7 @@ class AstCallExpression : AstExpression {
 
 
 // indexed[arguments]
-class AstIndexExpression : AstExpression {
+final class AstIndexExpression : AstExpression {
 	AstExpression indexed;
 	AstExpression[] arguments;
 	bool isConditional;
@@ -243,7 +282,7 @@ class AstIndexExpression : AstExpression {
 
 
 // sliced[start .. end]
-class AstSliceExpression : AstExpression {
+final class AstSliceExpression : AstExpression {
 	AstExpression sliced;
 	AstExpression[] start;
 	AstExpression[] end;
@@ -264,24 +303,61 @@ class AstSliceExpression : AstExpression {
 }
 
 
-// identifier is identifier
-/*class AstIsExpression : AstExpression {
-	AstType tested;
+// ()
+final class ParenExpression : AstExpression {
+	AstExpression expr;
 
-	this(Location location, AstType tested) {
+	this(Location location, AstExpression expr) {
 		super(location);
 
-		this.tested = tested;
+		this.expr = expr;
 	}
 
 	override void visit(IVisitor visitor) {
 		visitor.accept(this);
 	}
-}*/
+}
+
+
+// identifier
+final class IdentifierExpression : AstExpression {
+	Identifier identifier;
+
+	this(Identifier identifier) {
+		super(identifier.location);
+
+		this.identifier = identifier;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// TODO: delegate
+
+
+// lambda
+final class Lambda : AstExpression {
+	ParamDecl[] params;
+	AstExpression value;
+
+	this(Location location, ParamDecl[] params, AstExpression value) {
+		super(location);
+
+		this.params = params;
+		this.value  = value;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
 
 
 // $
-class AstDollarExpression : AstExpression {
+final class DollarExpression : AstExpression {
 	this(Location location) {
 		super(location);
 	}
@@ -293,7 +369,19 @@ class AstDollarExpression : AstExpression {
 
 
 // self
-class AstSelfExpression : AstExpression {
+class SelfExpression : AstExpression {
+	this(Location location) {
+		super(location);
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// super
+class SuperExpression : AstExpression {
 	this(Location location) {
 		super(location);
 	}
@@ -319,6 +407,46 @@ class FileLiteral : AstExpression {
 // #line
 class LineLiteral : AstExpression {
 	this(Location location) {
+		super(location);
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// identifier = void;
+final class AstVoidInitializer : AstExpression {
+	this(Location location) {
+		super(location);
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// typeof(identifier)
+final class AstTypeOfExpression : AstExpression {
+	Identifier identifier;
+
+	this(Location location, Identifier identifier) {
+		super(location);
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+// nameof(identifier)
+final class AstNameOfExpression : AstExpression {
+	Identifier identifier;
+
+	this(Location location, Identifier identifier) {
 		super(location);
 	}
 
