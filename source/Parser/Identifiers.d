@@ -14,5 +14,69 @@ Identifier parseIdentifier(ref TokenRange trange) {
     auto name = trange.front.name;
     trange.match(TokenType.Identifier);
 
-    return null;
+    return trange.parseBuiltIdentifier(new BasicIdentifier(loc, name));
+}
+
+
+// .identifier
+Identifier parseDotIdentifier(ref TokenRange trange) {
+    Location loc = trange.front.location;
+    trange.match(TokenType.Dot);
+
+    auto name = trange.front.name;
+    trange.match(TokenType.Identifier);
+
+    loc.spanTo(trange.previous);
+    return trange.parseBuiltIdentifier(new DotIdentifier(loc, name));
+}
+
+
+// qualifier.identifier
+auto parseQualifierIdentifier(N)(ref TokenRange trange, Location loc, N ns) {
+    auto name = trange.front.name;
+    trange.match(TokenType.Identifier);
+
+    loc.spanTo(trange.previous);
+
+    static if (is(N : Identifier)) {
+        alias QualifiedIdentifier = IdentifierDotIdentifier;
+    } else static if (is(N : AstType)) {
+        alias QualifiedIdentifier = TypeDotIdentifier;
+    } else static if (is(N : Expression)) {
+        alias QualifiedIdentifier = ExpressionDotIdentifier;
+    } else {
+        static assert(false);
+    }
+
+    return trange.parseBuiltIdentifier(new QualifiedIdentifier(loc, name, ns));
+}
+
+
+private Identifier parseBuiltIdentifier(ref TokenRange trange, Identifier identifier) {
+    Location loc = identifier.location;
+
+    while (true) {
+        switch (trange.front.type) with (TokenType) {
+            case Dot:
+                trange.popFront();
+
+                auto name = trange.front.name;
+                trange.match(Identifier);
+
+                loc.spanTo(trange.previous);
+                identifier = new IdentifierDotIdentifier(loc, name, identifier);
+                break;
+
+            case Less:
+                trange.popFront();
+
+                assert(false, "TODO parse template arguments");
+                //trange.match(More);
+                //break;
+                // TODO: template parsing
+
+            default:
+                return identifier;
+        }
+    }
 }
