@@ -7,8 +7,9 @@ import Domain.Location;
 import Ast.Statement;
 import Ast.Expression;
 
-import Parser.Expression;
 import Parser.Utils;
+import Parser.Expression;
+import Parser.Identifiers;
 
 
 Statement parseStatement(ref TokenRange trange) {
@@ -262,10 +263,12 @@ Statement parseStatement(ref TokenRange trange) {
                 auto type = trange.parseIdentifier();
                 Name name;
 
-                if (trange.front.type == Idenfier) {
+                if (trange.front.type == Identifier) {
                     name = trange.front.name;
                     trange.popFront();
                 }
+
+                auto block = trange.parseBlock();
 
 
                 // TODO

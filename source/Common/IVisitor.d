@@ -27,8 +27,8 @@ interface IVisitor {
     void accept(AstSliceExpression expr);
     void accept(AstDollarExpression expr);
 
-    void accept(__File__Literal literal);
-    void accept(__Line__Literal literal);
+    void accept(FileLiteral literal);
+    void accept(LineLiteral literal);
 
 
 
@@ -44,4 +44,5 @@ interface IVisitor {
     // TODO: remove these dummies
     void accept(Statement x);
     void accept(Identifier x);
+    void accept(TemplateArgument x);
 }

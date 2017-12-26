@@ -19,7 +19,7 @@ enum TokenType {
 
     // Keywords
     Abstract, Alias, Align, As, Asm, Assert,
-    Async, Await,
+    Async, Await, Any,
     Bool, Break, Byte,
     Case, Catch, Cent, Char,
     Class, Const, Continue,
@@ -45,7 +45,7 @@ enum TokenType {
     Using, Unsafe,
     Version, Void, Volatile, Var,
     WChar, While, With, Weak, Where,
-    __File__, __Line__,
+    SharpFile, SharpLine,
 
     // Operators
     Slash,              // /
@@ -114,7 +114,7 @@ enum TokenType {
     TildeEqual,         // ~=
     //At,                 // @ TODO, do I need this simbol?
     EqualMore,          // =>
-    Hash,               // #
+    Sharp,              // #
 
     //Enforce,        // enforce
 
@@ -191,7 +191,7 @@ auto operatorsMap() {
         "~":    Tilde,
         "~=":   TildeEqual,
         "=>":   EqualMore,
-        "#":    Hash,
+        "#":    Sharp,
         "\0":   End
     ];
 }
@@ -206,7 +206,8 @@ auto keywordsMap() {
         "asm":          Asm,
         "assert":       Assert,
         "async":        Async,
-        "Await":        Await,
+        "await":        Await,
+        "any":          Any,
         "bool":         Bool,
         "break":        Break,
         "byte":         Byte,
@@ -298,8 +299,8 @@ auto keywordsMap() {
         "with":         With,
         "weak":         Weak,
         "where":        Where,
-        "__FILE__":     __File__,
-        "__LINE__":     __Line__
+        "#file":        SharpFile,
+        "#line":        SharpLine
     ];
 }
 

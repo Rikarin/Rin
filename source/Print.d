@@ -101,12 +101,12 @@ class PrintVisitor : IVisitor {
         write("self");
     }
 
-    void accept(__File__Literal literal) {
-        write("__FILE__");
+    void accept(FileLiteral literal) {
+        write("#file");
     }
 
-    void accept(__Line__Literal literal) {
-        write("__LINE__");
+    void accept(LineLiteral literal) {
+        write("#line");
     }
 
 
@@ -138,4 +138,5 @@ class PrintVisitor : IVisitor {
 
     void accept(Statement x) { }
     void accept(Identifier x) { }
+    void accept(TemplateArgument x) { }
 }

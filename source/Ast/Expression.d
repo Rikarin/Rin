@@ -304,8 +304,8 @@ class AstSelfExpression : AstExpression {
 }
 
 
-// __FILE__
-class __File__Literal : AstExpression {
+// #file
+class FileLiteral : AstExpression {
 	this(Location location) {
 		super(location);
 	}
@@ -316,8 +316,8 @@ class __File__Literal : AstExpression {
 }
 
 
-// __LINE__
-class __Line__Literal : AstExpression {
+// #line
+class LineLiteral : AstExpression {
 	this(Location location) {
 		super(location);
 	}

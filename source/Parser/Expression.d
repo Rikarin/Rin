@@ -369,10 +369,10 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
     Location loc = trange.front.location;
 
     switch (trange.front.type) with (TokenType) {
-        case Self:     trange.popFront(); return new AstSelfExpression(loc);
-        case Dollar:   trange.popFront(); return new AstDollarExpression(loc);
-        case __File__: trange.popFront(); return new __File__Literal(loc);
-        case __Line__: trange.popFront(); return new __Line__Literal(loc);
+        case Self:      trange.popFront(); return new AstSelfExpression(loc);
+        case Dollar:    trange.popFront(); return new AstDollarExpression(loc);
+        case SharpFile: trange.popFront(); return new FileLiteral(loc);
+        case SharpLine: trange.popFront(); return new LineLiteral(loc);
 
         case Identifier: assert(false, "TODO"); // TODO
         case Dot: assert(false); // TODO
