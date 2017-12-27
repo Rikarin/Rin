@@ -1,6 +1,9 @@
 module Ast.Declaration;
 @safe:
 
+import Ast.Type;
+import Ast.Expression;
+
 import Domain.Location;
 import Domain.Context;
 import Domain.Name;
@@ -104,6 +107,16 @@ final class TupleDeclaration : Declaration {
 }
 
 
-class ParamDecl {
-
+struct ParamDecl {
+	Location location;
+	AstType type;
+	Name name;
+	AstExpression value;
+	
+	this(Location location, AstType type, Name name, AstExpression value) {
+		this.location = location;
+		this.type     = type;
+		this.name     = name;
+		this.value    = value;
+	}
 }

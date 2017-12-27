@@ -1,4 +1,5 @@
 module Parser.Statement;
+@safe:
 
 import Lexer;
 import Tokens;
@@ -8,6 +9,7 @@ import Ast.Statement;
 import Ast.Expression;
 
 import Parser.Utils;
+import Parser.Ambigous;
 import Parser.Expression;
 import Parser.Identifiers;
 
@@ -324,10 +326,8 @@ Statement parseStatement(ref TokenRange trange) {
             return new UnsafeStatement(loc, block);
 
         default:
-            // parse ambigous
+            return trange.parseAmbigousStatement();
     }
-    
-    assert(false);
 }
 
 

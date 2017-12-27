@@ -25,9 +25,9 @@ class PrintVisitor : IVisitor {
     void accept(Namespace decl) {
         writeln("namespace ", decl.name.map!(x => x.toString(_context)).array().join("."), ";");
 
-        foreach (x; decl.declarations) {
+        /*foreach (x; decl.declarations) {
             x.visit(this);
-        }
+        }*/
     }
 
     void accept(UsingDeclaration decl) {

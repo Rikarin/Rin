@@ -1,4 +1,5 @@
 module Ast.Statement;
+@safe:
 
 import Ast.Expression;
 import Ast.Identifiers;

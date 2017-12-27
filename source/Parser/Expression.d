@@ -9,6 +9,7 @@ import Ast.Type;
 import Ast.Expression;
 import Ast.Identifiers;
 
+import Parser.Type;
 import Parser.Utils;
 import Parser.Identifiers;
 
@@ -120,7 +121,7 @@ AstExpression parseTernaryExpression(ref TokenRange trange, AstExpression condit
 
 // ||
 AstExpression parseLogicalOrExpression(ref TokenRange trange) {
-    return trange.parseLogicalOrExpression();
+    return trange.parseLogicalOrExpression(trange.parsePrefixExpression());
 }
 
 AstExpression parseLogicalOrExpression(ref TokenRange trange, AstExpression lhs) {
@@ -134,56 +135,56 @@ AstExpression parseLogicalOrExpression(ref TokenRange trange, AstExpression lhs)
 
 // &&
 AstExpression parseLogicalAndExpression(ref TokenRange trange) {
-    return trange.parseLogicalAndExpression();
+    return trange.parseLogicalAndExpression(trange.parsePrefixExpression());
 }
 
 AstExpression parseLogicalAndExpression(ref TokenRange trange, AstExpression lhs) {
     return trange.parseBinaryExpression!(
         TokenType.AmpersandAmpersand,
         BinaryOp.LogicalAnd,
-        parseLogicalBitwiseOrExpression
+        parseBitwiseOrExpression
     )(lhs);
 }
 
 
 // |
-AstExpression parseLogicalBitwiseOrExpression(ref TokenRange trange) {
-    return trange.parseLogicalBitwiseOrExpression();
+AstExpression parseBitwiseOrExpression(ref TokenRange trange) {
+    return trange.parseBitwiseOrExpression(trange.parsePrefixExpression());
 }
 
-AstExpression parseLogicalBitwiseOrExpression(ref TokenRange trange, AstExpression lhs) {
+AstExpression parseBitwiseOrExpression(ref TokenRange trange, AstExpression lhs) {
     return trange.parseBinaryExpression!(
         TokenType.PipePipe,
         BinaryOp.LogicalOr,
-        parseLogicalBitwiseXorExpression
+        parseBitwiseXorExpression
     )(lhs);
 }
 
 
 // ^
-AstExpression parseLogicalBitwiseXorExpression(ref TokenRange trange) {
-    return trange.parseLogicalBitwiseXorExpression();
+AstExpression parseBitwiseXorExpression(ref TokenRange trange) {
+    return trange.parseBitwiseXorExpression(trange.parsePrefixExpression());
 }
 
-AstExpression parseLogicalBitwiseXorExpression(ref TokenRange trange, AstExpression lhs) {
+AstExpression parseBitwiseXorExpression(ref TokenRange trange, AstExpression lhs) {
     return trange.parseBinaryExpression!(
         TokenType.Caret,
         BinaryOp.Xor,
-        parseLogicalBitwiseAndExpression
+        parseBitwiseAndExpression
     )(lhs);
 }
 
 
 // &
-AstExpression parseLogicalBitwiseAndExpression(ref TokenRange trange) {
-    return trange.parseLogicalBitwiseAndExpression();
+AstExpression parseBitwiseAndExpression(ref TokenRange trange) {
+    return trange.parseBitwiseAndExpression(trange.parsePrefixExpression());
 }
 
-AstExpression parseLogicalBitwiseAndExpression(ref TokenRange trange, AstExpression lhs) {
+AstExpression parseBitwiseAndExpression(ref TokenRange trange, AstExpression lhs) {
     return trange.parseBinaryExpression!(
         TokenType.Ampersand,
         BinaryOp.And,
-        parseLogicalAndExpression
+        parseComparisonExpression
     )(lhs);
 }
 
@@ -572,21 +573,33 @@ private AstExpression parsePowExpression(ref TokenRange trange, AstExpression ex
 
 
 
-
 // TODO: parse is() expr
 
 
-// TODO: mockups
 AstExpression[] parseArguments(TokenType open)(ref TokenRange trange) {
-    return null;
+    alias close = TokenType.CloseParen; // TODO: fix this
+
+    trange.match(open);
+    if (trange.front.type == close) {
+        trange.popFront();
+        return [];
+    }
+
+    auto args = trange.parseArguments();    
+    trange.match(close);
+    return args;
 }
+
 
 AstExpression[] parseArguments(ref TokenRange trange) {
-    return null;
-}
+    AstExpression[] args = [trange.parseAssignExpression()];
 
-AstType parseType(ref TokenRange trange) {
-    return null;
+    while (trange.front.type == TokenType.Comma) {
+        trange.popFront();
+        args ~= trange.parseAssignExpression();
+    }
+
+    return args;
 }
 
 

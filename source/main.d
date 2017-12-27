@@ -22,9 +22,17 @@ void main(string[] args) @safe {
 using System.IO;
 using System.Core.Test;
 
-/*private async test() -> Task!int {
+main() {
+    var xxx: int;
 
-}*/
+    if (foo == bar) {
+        for (i in array) {
+
+        }
+    }
+
+    //writeln(\"Hello World!\");
+}
 
 
 \0";
