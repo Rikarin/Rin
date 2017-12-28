@@ -29,18 +29,17 @@ struct StorageClass {
 		bool,          "isFinal",        1,
 		bool,          "isAbstract",     1,
 		bool,          "isDeprecated",   1,
-		bool,          "isThrow",        1,
+		bool,          "isThrows",       1,
 		bool,          "isOverride",     1,
 		bool,          "isPure",         1,
 		bool,          "isSynchronized", 1,
 		bool,          "isGlobal",       1,
 		bool,          "isProperty",     1,
-		bool,          "isNoGC",         1,
 
 		bool,          "isAsync",        1,
 		bool,          "isUnsafe",       1,
 		bool,          "isPartial",      1,
-		uint,          "",               7,
+		uint,          "",               7 + 1,
 	));
 
     static StorageClass defaults() {
@@ -52,10 +51,42 @@ struct StorageClass {
 }
 
 
-
 abstract class Declaration : Node {
 	this(Location location) {
 		super(location);
+	}
+}
+
+
+abstract class StorageClassDeclaration : Declaration {
+	StorageClass storageClass;
+
+	this(Location location, StorageClass storageClass) {
+		super(location);
+
+		this.storageClass = storageClass;
+	}
+}
+
+
+abstract class NamedDeclaration : StorageClassDeclaration {
+	Name name;
+
+	this(Location location, StorageClass storageClass, Name name) {
+		super(location, storageClass);
+
+		this.name = name;
+	}
+}
+
+
+abstract class AstTemplateParameter : Declaration {
+	Name name;
+
+	this(Location location, Name name) {
+		super(location);
+
+		this.name = name;
 	}
 }
 
@@ -118,5 +149,22 @@ struct ParamDecl {
 		this.type     = type;
 		this.name     = name;
 		this.value    = value;
+	}
+}
+
+
+final class VariableDeclaration : NamedDeclaration {
+	AstType type;
+	AstExpression value;
+
+	this(Location location, StorageClass storageClass, Name name, AstType type, AstExpression value) {
+		super(location, storageClass, name);
+
+		this.type  = type;
+		this.value = value;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
 	}
 }

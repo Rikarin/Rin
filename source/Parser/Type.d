@@ -7,6 +7,7 @@ import Ast.Type;
 
 
 AstType parseType(ref TokenRange trange) {
+    trange.popFront();
     //parse type + monad
     return null;
 }

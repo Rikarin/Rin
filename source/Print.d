@@ -169,6 +169,9 @@ class PrintVisitor : IVisitor {
 
 
 
+    void accept(VariableDeclaration decl) {
+        writeln("VARIABLE"); // TODO
+    }
 
 
     void accept(BlockStatement statement) {

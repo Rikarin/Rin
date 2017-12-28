@@ -72,34 +72,12 @@ Declaration parseDeclaration(ref TokenRange trange) {
         case OpenParen: // Tuple
             return trange.parseTuple();
 
-        case Var:
-            trange.popFront();
-            auto name = trange.front.name;
-            trange.match(Identifier);
-
-            AstType type;
-            if (trange.front.type == Colon) {
-                trange.popFront();
-                type = trange.parseType();
-            }
-
-            AstExpression value;
-            if (trange.front.type == Equal) {
-                trange.popFront();
-                value = trange.parseAssignExpression();
-            } else if (type is null) {
-                assert(false, "Value or type required");
-            }
-        
-            // TODO: finish this
-            goto case; // local variable
-
         case Static: goto case; // static if
         case Version: goto case;
         case Debug: goto case;
         //case Unsafe: goto case; // TODO: isn't this statement?
         case Mixin:
-assert(false, "TODO");
+            assert(false, "TODO");
 
         case Using: return trange.parseUsing();
 
@@ -125,37 +103,40 @@ assert(false, "TODO");
             trange.popFront();
 
             switch (trange.front.type) {
-                case OpenParen: // Func
-                    return trange.parseFunction(loc, sc, null, name);
-
-                case Colon: // Variable
-                    break;
-
-                case MinusMore: // Property
-                    break;
+                case OpenParen: return trange.parseFunction(loc, sc, name);
+                case Colon:     return trange.parseVariable(loc, sc, name);
+                case MinusMore: return trange.parseProperty(loc, sc, name);
 
                 default:
                     trange.match(OpenParen);
+                    assert(false);
             }
-            break;
 
-        // func() -> bool { }
-        // prop -> bool { get; set; }
-        // var: int;
+        case Var:
+            trange.popFront();
+            auto name = trange.front.name;
+            trange.match(Identifier);
 
+            return trange.parseVariable(loc, sc, name);
 
+        case Self:
+            trange.popFront();
+            return trange.parseFunction(loc, sc, BuiltinName!"__ctor");
+
+        case Tilde:
+            trange.popFront();
+            trange.match(Self);
+            return trange.parseFunction(loc, sc, BuiltinName!"__dtor");
         
+        case Alias: goto case;
+        case Unittest: goto case;
         case Class: goto case;
         case Struct: goto case;
         case Enum: goto case;
         case Interface: goto case;
         case Template: goto case;
-        case Self: goto case; // constructor
-        case Tilde: goto case; // destructor
-        case Alias: goto case;
-        case Unittest: goto case;
         case Union: 
-assert(false, "TODO");
+            assert(false, "TODO");
 
         default:
     }
@@ -281,30 +262,80 @@ StorageClass parsePrefixStorageClasses(ref TokenRange trange) {
 
 
 
-private Declaration parseFunction(ref TokenRange trange, Location loc, StorageClass sc, AstType type, Name name) {
+
+
+
+
+VariableDeclaration parseVariable(ref TokenRange trange, Location loc, StorageClass sc, Name name) {
+    AstType type;
+    if (trange.front.type == TokenType.Colon) {
+        trange.popFront();
+        type = trange.parseType();
+    }
+
+    AstExpression value;
+    if (trange.front.type == TokenType.Equal) {
+        trange.popFront();
+        value = trange.parseAssignExpression();
+    } else if (type is null) {
+        assert(false, "Value or type required");
+    }
+
+    trange.match(TokenType.Semicolon);
+    loc.spanTo(trange.previous);
+    return new VariableDeclaration(loc, sc, name, type, value);
+}
+
+
+private Declaration parseFunction(ref TokenRange trange, Location loc, StorageClass sc, Name name) {
     bool isVariadic;
     
     // TODO: parse template params
 
-    // TODO: parse parameters
     auto params = trange.parseParameters(isVariadic);
 
+    // constrain
     if (false && trange.front.type == TokenType.Where) { // TODO
         // TODO: parse constrain
     }
 
-
-    // TODO: parse post attributes: throws, pure
-    // const, ref, shared, readonly, nogc, pure, inout
-
+    // storage class
     if (trange.front.type == TokenType.Pure) {
         sc.isPure = true;
     }
 
+    if (trange.front.type == TokenType.Throws) {
+        sc.isThrows = true;
+    }
+
+    if (trange.front.type == TokenType.Shared) {
+        sc.qualifier = TypeQualifier.Shared;
+    }
+
+    switch (trange.front.type) with (TokenType) {
+        case Const:    sc.qualifier = sc.qualifier.add(TypeQualifier.Const);    break;
+        case ReadOnly: sc.qualifier = sc.qualifier.add(TypeQualifier.ReadOnly); break;
+        case Inout:    sc.qualifier = sc.qualifier.add(TypeQualifier.Inout);    break;
+        default:
+    }
+
+    // return type
+    AstType retType; // TODO: = AstType.getVoid();
+    if (trange.front.type == TokenType.MinusMore) {
+        trange.popFront();
+        retType = trange.parseType();
+    }
 
     auto block = trange.parseBlock();
 
     return null;
+}
+
+
+Declaration parseProperty(ref TokenRange trange, Location loc, StorageClass sc, Name name) {
+    trange.match(TokenType.MinusMore);
+
+    return null; // TODO
 }
 
 

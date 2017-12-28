@@ -111,7 +111,7 @@ template BuiltinName(string name) {
     enum BuiltinName = Name(id);
 }
  
-private enum Reserved = ["__ctor", "__postblit", "__vtbl"];
+private enum Reserved = ["__ctor", "__dtor", "__postblit", "__vtbl"];
 
 private enum Prefill = [
     // Linkages

@@ -23,7 +23,7 @@ using System.IO;
 using System.Core.Test;
 
 main() {
-    var xxx: int;
+    var xxx: int = test;
 
     if (foo == bar) {
         for (i in array) {
