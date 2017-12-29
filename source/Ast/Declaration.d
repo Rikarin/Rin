@@ -103,8 +103,8 @@ final class Namespace : Declaration {
         this.declarations = declarations;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -118,8 +118,8 @@ final class UsingDeclaration : Declaration {
         this.namespace = namespace;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -133,8 +133,8 @@ final class TupleDeclaration : Declaration {
 		this.params = params;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -165,8 +165,8 @@ final class VariableDeclaration : NamedDeclaration {
 		this.value = value;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -189,8 +189,8 @@ final class FunctionDeclaration : NamedDeclaration {
 		this.block      = block;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -206,7 +206,7 @@ final class PropertyDeclaration : NamedDeclaration {
 		this.block = block;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -22,256 +22,256 @@ class PrintVisitor : IVisitor {
         _context = context;
     }
 
-    void accept(Namespace decl) {
+    void visit(Namespace decl) {
         print("namespace");
         printn(1, decl.name.map!(x => x.toString(_context)).array().join("."));
 
         foreach (x; decl.declarations) {
             if (x)
-            x.visit(this);
+            x.accept(this);
         }
     }
 
-    void accept(UsingDeclaration decl) {
+    void visit(UsingDeclaration decl) {
         print("using");
         printn(1, decl.namespace.map!(x => x.toString(_context)).array().join("."));
     }
 
-    void accept(TupleDeclaration decl) {
+    void visit(TupleDeclaration decl) {
         assert(false);
     }
 
-    void accept(FunctionDeclaration decl) {
+    void visit(FunctionDeclaration decl) {
         print("function TODO");
-        decl.block.visit(this);
+        decl.block.accept(this);
     }
 
-    void accept(PropertyDeclaration decl) {
+    void visit(PropertyDeclaration decl) {
         print("property TODO");
-        decl.block.visit(this);
+        decl.block.accept(this);
     }
 
-    void accept(AstUnaryExpression expr) {
+    void visit(AstUnaryExpression expr) {
         print(unarizeString("", expr.op));
-        expr.expr.visit(this);
+        expr.expr.accept(this);
     }
 
-    void accept(AstBinaryExpression expr) {
-        expr.lhs.visit(this);
+    void visit(AstBinaryExpression expr) {
+        expr.lhs.accept(this);
         write(" ", expr.op, " ");
-        expr.rhs.visit(this);
+        expr.rhs.accept(this);
     }
 
-    void accept(AstTernaryExpression expr) {
-        expr.condition.visit(this);
+    void visit(AstTernaryExpression expr) {
+        expr.condition.accept(this);
         write(" ? ");
-        expr.ifTrue.visit(this);
+        expr.ifTrue.accept(this);
         write(" : ");
-        expr.ifFalse.visit(this);
+        expr.ifFalse.accept(this);
     }
 
-    void accept(AstCastExpression expr) {
+    void visit(AstCastExpression expr) {
         write("(");
-        expr.type.visit(this);
+        expr.type.accept(this);
         write(")");
-        expr.expr.visit(this);
+        expr.expr.accept(this);
     }
 
-    void accept(AstAsExpression expr) {
-        expr.expr.visit(this);
+    void visit(AstAsExpression expr) {
+        expr.expr.accept(this);
         write(" as ");
-        expr.type.visit(this);
+        expr.type.accept(this);
     }
 
-    void accept(AstCallExpression expr) {
-        expr.callee.visit(this);
+    void visit(AstCallExpression expr) {
+        expr.callee.accept(this);
         write("(");
         foreach (x; expr.args) {
-            x.visit(this);
+            x.accept(this);
             write(", ");
         }
 
         write(")");
     }
 
-    void accept(IdentifierCallExpression expr) {
-        expr.callee.visit(this);
+    void visit(IdentifierCallExpression expr) {
+        expr.callee.accept(this);
         write("(");
         foreach (x; expr.args) {
-            x.visit(this);
+            x.accept(this);
             write(", ");
         }
 
         write(")");
     }
 
-    void accept(AstTypeCallExpression expr) {
-        expr.type.visit(this);
+    void visit(AstTypeCallExpression expr) {
+        expr.type.accept(this);
         write("(");
         foreach (x; expr.args) {
-            x.visit(this);
+            x.accept(this);
             write(", ");
         }
 
         write(")");
     }
 
-    void accept(AstIndexExpression expr) {
+    void visit(AstIndexExpression expr) {
         writeln("index expr TODO");
     }
 
-    void accept(AstSliceExpression expr) {
+    void visit(AstSliceExpression expr) {
         writeln("slice expr TODO");
     }
 
-    void accept(DollarExpression expr) {
+    void visit(DollarExpression expr) {
         write("$");
     }
 
-    void accept(SelfExpression expr) {
+    void visit(SelfExpression expr) {
         write("self");
     }
 
-    void accept(SuperExpression expr) {
+    void visit(SuperExpression expr) {
         write("super");
     }
 
-    void accept(ParenExpression expr) {
+    void visit(ParenExpression expr) {
         write("(");
-        expr.visit(this);
+        expr.accept(this);
         write(")");
     }
 
-    void accept(IdentifierExpression expr) {
-        expr.identifier.visit(this);
+    void visit(IdentifierExpression expr) {
+        expr.identifier.accept(this);
     }
 
-    void accept(FileLiteral literal) {
+    void visit(FileLiteral literal) {
         write("#file");
     }
 
-    void accept(LineLiteral literal) {
+    void visit(LineLiteral literal) {
         write("#line");
     }
 
-    void accept(AstVoidInitializer expr) {
+    void visit(AstVoidInitializer expr) {
         write("void");
     }
 
-    void accept(AstTypeOfExpression expr) {
+    void visit(AstTypeOfExpression expr) {
         write("typeof(");
-        expr.identifier.visit(this);    
+        expr.identifier.accept(this);    
         write(")");
     }
 
-    void accept(AstNameOfExpression expr) {
+    void visit(AstNameOfExpression expr) {
         write("nameof(");
-        expr.identifier.visit(this);    
+        expr.identifier.accept(this);    
         write(")");
     }
 
-    void accept(Lambda expr) {
+    void visit(Lambda expr) {
         print("lambda TODO");
     }
 
-    void accept(AstType type) {
+    void visit(AstType type) {
         print("type TODO");
     }
 
-    void accept(GetStatement statement) {
+    void visit(GetStatement statement) {
         print("get");
 
         if (statement.block) {
-            statement.block.visit(this);
+            statement.block.accept(this);
         }
     }
 
-    void accept(SetStatement statement) {
+    void visit(SetStatement statement) {
         print("set");
 
         if (statement.block) {
-            statement.block.visit(this);
+            statement.block.accept(this);
         }
     }
 
-    void accept(VariableDeclaration decl) {
+    void visit(VariableDeclaration decl) {
         print("variable TODO");
     }
 
-    void accept(BlockStatement statement) {
+    void visit(BlockStatement statement) {
         _space++;
         foreach (x; statement.statements) {
-            x.visit(this);
+            x.accept(this);
         }
         _space--;
     }
 
-    void accept(ExpressionStatement statement) {
-        statement.expr.visit(this);
+    void visit(ExpressionStatement statement) {
+        statement.expr.accept(this);
     }
 
-    void accept(DeclarationStatement statement) {
-        statement.decl.visit(this);
+    void visit(DeclarationStatement statement) {
+        statement.decl.accept(this);
     }
 
-    void accept(IfStatement statement) {
+    void visit(IfStatement statement) {
         print("if TODO");
     }
 
-    void accept(WhileStatement statement) {
+    void visit(WhileStatement statement) {
         print("while TODO");
     }
 
-    void accept(RepeatStatement statement) {
+    void visit(RepeatStatement statement) {
         print("repeat TODO");
     }
 
-    void accept(IdentifierAsteriskIdentifierStatement statement) {
+    void visit(IdentifierAsteriskIdentifierStatement statement) {
         print("TODO");
     }
 
-    void accept(ForStatement statement) {
+    void visit(ForStatement statement) {
         print("TODO");
     }
 
-    void accept(ForInStatement statement) {
+    void visit(ForInStatement statement) {
         print("TODO");
     }
 
-    void accept(ForInRangeStatement statement) {
+    void visit(ForInRangeStatement statement) {
         print("TODO");
     }
 
-    void accept(ReturnStatement statement) {
+    void visit(ReturnStatement statement) {
         print("return TODO");
     }
     
-    void accept(SwitchStatement statement) { 
+    void visit(SwitchStatement statement) { 
         print("TODO");
     }
 
-    void accept(CaseStatement statement) { }
-    void accept(BreakStatement statement) { }
-    void accept(ContinueStatement statement) { }
-    void accept(GotoStatement statement) { }
-    void accept(LockStatement statement) { }
-    void accept(UnsafeStatement statement) { }
-    void accept(DeferStatement statement) { }
-    void accept(AssertStatement statement) { }
-    void accept(ThrowStatement statement) { }
-    void accept(TryStatement statement) { }
+    void visit(CaseStatement statement) { }
+    void visit(BreakStatement statement) { }
+    void visit(ContinueStatement statement) { }
+    void visit(GotoStatement statement) { }
+    void visit(LockStatement statement) { }
+    void visit(UnsafeStatement statement) { }
+    void visit(DeferStatement statement) { }
+    void visit(AssertStatement statement) { }
+    void visit(ThrowStatement statement) { }
+    void visit(TryStatement statement) { }
 
-    void accept(BasicIdentifier identifier) { }
-    void accept(IdentifierDotIdentifier identifier) { }
-    void accept(TypeDotIdentifier identifier) { }
-    void accept(ExpressionDotIdentifier identifier) { }
-    void accept(DotIdentifier identifier) { }
-    void accept(IdentifierBracketIdentifier identifier) { }
-    void accept(IdentifierBracketExpression identifier) { }
-    void accept(TypeTemplateArgument identifier) { }
-    void accept(ValueTemplateArgument identifier) { }
-    void accept(IdentifierTemplateArgument identifier) { }
-    void accept(IsExpression expr) { }
+    void visit(BasicIdentifier identifier) { }
+    void visit(IdentifierDotIdentifier identifier) { }
+    void visit(TypeDotIdentifier identifier) { }
+    void visit(ExpressionDotIdentifier identifier) { }
+    void visit(DotIdentifier identifier) { }
+    void visit(IdentifierBracketIdentifier identifier) { }
+    void visit(IdentifierBracketExpression identifier) { }
+    void visit(TypeTemplateArgument identifier) { }
+    void visit(ValueTemplateArgument identifier) { }
+    void visit(IdentifierTemplateArgument identifier) { }
+    void visit(IsExpression expr) { }
 
 
 

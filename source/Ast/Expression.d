@@ -66,8 +66,8 @@ final class AstUnaryExpression : AstExpression {
 		this.expr = expr;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -144,8 +144,8 @@ final class AstBinaryExpression : AstExpression {
 		this.rhs = rhs;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -163,8 +163,8 @@ final class AstTernaryExpression : AstExpression {
 		this.ifFalse   = ifFalse;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -181,8 +181,8 @@ final class AstCastExpression : AstExpression {
 		this.expr = expr;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -201,8 +201,8 @@ final class AstAsExpression : AstExpression {
 		this.expr       = expr;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -219,8 +219,8 @@ final class IdentifierCallExpression : AstExpression {
 		this.args   = args;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -237,8 +237,8 @@ final class AstTypeCallExpression : AstExpression {
 		this.args = args;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -255,8 +255,8 @@ final class AstCallExpression : AstExpression {
 		this.args   = args;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -275,8 +275,8 @@ final class AstIndexExpression : AstExpression {
 		this.isConditional = isConditional;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -297,8 +297,8 @@ final class AstSliceExpression : AstExpression {
 		this.isConditional = isConditional;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -313,8 +313,8 @@ final class ParenExpression : AstExpression {
 		this.expr = expr;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -329,8 +329,8 @@ final class IdentifierExpression : AstExpression {
 		this.identifier = identifier;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -350,8 +350,8 @@ final class Lambda : AstExpression {
 		this.value  = value;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -362,8 +362,8 @@ final class DollarExpression : AstExpression {
 		super(location);
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -374,8 +374,8 @@ class SelfExpression : AstExpression {
 		super(location);
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -386,8 +386,8 @@ class SuperExpression : AstExpression {
 		super(location);
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -398,8 +398,8 @@ class FileLiteral : AstExpression {
 		super(location);
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -410,8 +410,8 @@ class LineLiteral : AstExpression {
 		super(location);
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -422,8 +422,8 @@ final class AstVoidInitializer : AstExpression {
 		super(location);
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -436,8 +436,8 @@ final class AstTypeOfExpression : AstExpression {
 		super(location);
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -450,8 +450,8 @@ final class AstNameOfExpression : AstExpression {
 		super(location);
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -466,7 +466,7 @@ final class IsExpression : AstExpression {
 		this.type = type;
 	}
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }

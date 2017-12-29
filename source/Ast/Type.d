@@ -23,7 +23,7 @@ class AstType {
 @safe:
     Location location() { assert(false, "TODO"); }
 
-    void visit(IVisitor visitor) {
-        visitor.accept(this);
+    void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }

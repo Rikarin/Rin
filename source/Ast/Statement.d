@@ -28,8 +28,8 @@ final class BlockStatement : Statement {
         this.statements = statements;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -43,8 +43,8 @@ final class ExpressionStatement : Statement {
         this.expr = expr;
     }
     
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -58,8 +58,8 @@ final class DeclarationStatement : Statement {
         this.decl = decl;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -77,8 +77,8 @@ final class IfStatement : Statement {
         this.ifFalse   = ifFalse;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -94,8 +94,8 @@ final class WhileStatement : Statement {
         this.block     = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -111,8 +111,8 @@ final class RepeatStatement : Statement {
         this.block     = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -131,8 +131,8 @@ final class IdentifierAsteriskIdentifierStatement : Statement {
         this.value      = value;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -152,8 +152,8 @@ final class ForStatement : Statement {
         this.block      = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -171,8 +171,8 @@ final class ForInStatement : Statement {
         this.block     = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -192,8 +192,8 @@ final class ForInRangeStatement : Statement {
         this.block     = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -207,8 +207,8 @@ final class ReturnStatement : Statement {
         this.value = value;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -224,8 +224,8 @@ final class SwitchStatement : Statement {
         this.block = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -239,8 +239,8 @@ final class CaseStatement : Statement {
         this.cases = cases;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -250,8 +250,8 @@ final class BreakStatement : Statement {
         super(location);
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -261,8 +261,8 @@ final class ContinueStatement : Statement {
         super(location);
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -276,8 +276,8 @@ final class GotoStatement : Statement {
         this.name = name;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -293,8 +293,8 @@ final class LockStatement : Statement {
         this.block = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -308,8 +308,8 @@ final class UnsafeStatement : Statement {
         this.block = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -331,8 +331,8 @@ final class DeferStatement : Statement {
         this.statement = statement;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -348,8 +348,8 @@ final class AssertStatement : Statement {
         this.message   = message;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -363,8 +363,8 @@ final class ThrowStatement : Statement {
         this.value = value;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -384,8 +384,8 @@ final class TryStatement : Statement {
         this.finallyBlock = finallyBlock;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -412,8 +412,8 @@ final class GetStatement : Statement {
         this.block = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }
 
@@ -427,7 +427,7 @@ final class SetStatement : Statement {
         this.block = block;
     }
 
-    override void visit(IVisitor visitor) {
-        visitor.accept(this);
+    override void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }

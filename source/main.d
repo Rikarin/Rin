@@ -65,5 +65,5 @@ prop -> Foo {
     auto visitor = new PrintVisitor(tr.context);
 
     auto ns = tr.parseNamespace();
-    ns.visit(visitor);
+    ns.accept(visitor);
 }

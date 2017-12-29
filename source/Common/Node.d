@@ -13,7 +13,7 @@ abstract class Node {
 		this.location = location;
 	}
 
-	void visit(IVisitor decl);
+	void accept(IVisitor decl);
 
 	invariant() {
 		// FIXME: reenable this when ct paradoxes know their location.

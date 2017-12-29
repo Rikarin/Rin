@@ -10,86 +10,86 @@ import Ast.Declaration;
 interface IVisitor {
 @safe:
     // Expressions
-    void accept(AstUnaryExpression expr);
-    void accept(AstBinaryExpression expr);
-    void accept(AstTernaryExpression expr);
-    void accept(AstCastExpression expr);
-    void accept(AstAsExpression expr);
-    void accept(AstCallExpression expr);
-    void accept(AstTypeCallExpression expr);
-    void accept(AstIndexExpression expr);
-    void accept(AstSliceExpression expr);
-    void accept(AstVoidInitializer expr);
-    void accept(AstTypeOfExpression expr);
-    void accept(AstNameOfExpression expr);
+    void visit(AstUnaryExpression expr);
+    void visit(AstBinaryExpression expr);
+    void visit(AstTernaryExpression expr);
+    void visit(AstCastExpression expr);
+    void visit(AstAsExpression expr);
+    void visit(AstCallExpression expr);
+    void visit(AstTypeCallExpression expr);
+    void visit(AstIndexExpression expr);
+    void visit(AstSliceExpression expr);
+    void visit(AstVoidInitializer expr);
+    void visit(AstTypeOfExpression expr);
+    void visit(AstNameOfExpression expr);
 
-    void accept(DollarExpression expr);
-    void accept(SelfExpression expr);
-    void accept(SuperExpression expr);
-    void accept(ParenExpression expr);
-    void accept(IdentifierExpression expr);
-    void accept(IdentifierCallExpression expr);
-    void accept(Lambda expr);
-    void accept(IsExpression expr);
+    void visit(DollarExpression expr);
+    void visit(SelfExpression expr);
+    void visit(SuperExpression expr);
+    void visit(ParenExpression expr);
+    void visit(IdentifierExpression expr);
+    void visit(IdentifierCallExpression expr);
+    void visit(Lambda expr);
+    void visit(IsExpression expr);
 
 
     // Declarations
-    void accept(Namespace decl);
-    void accept(UsingDeclaration decl);
-    void accept(TupleDeclaration decl);
-    void accept(VariableDeclaration decl);
-    void accept(FunctionDeclaration decl);
-    void accept(PropertyDeclaration decl);
+    void visit(Namespace decl);
+    void visit(UsingDeclaration decl);
+    void visit(TupleDeclaration decl);
+    void visit(VariableDeclaration decl);
+    void visit(FunctionDeclaration decl);
+    void visit(PropertyDeclaration decl);
 
 
     // Statements
-    void accept(BlockStatement statement);
-    void accept(ExpressionStatement statement);
-    void accept(DeclarationStatement statement);
-    void accept(IfStatement statement);
-    void accept(WhileStatement statement);
-    void accept(RepeatStatement statement);
-    void accept(IdentifierAsteriskIdentifierStatement statement);
-    void accept(ForStatement statement);
-    void accept(ForInStatement statement);
-    void accept(ForInRangeStatement statement);
-    void accept(ReturnStatement statement);
-    void accept(SwitchStatement statement);
-    void accept(CaseStatement statement);
-    void accept(BreakStatement statement);
-    void accept(ContinueStatement statement);
-    void accept(GotoStatement statement);
-    void accept(LockStatement statement);
-    void accept(UnsafeStatement statement);
-    void accept(DeferStatement statement);
-    void accept(AssertStatement statement);
-    void accept(ThrowStatement statement);
-    void accept(TryStatement statement);
-    void accept(GetStatement statement);
-    void accept(SetStatement statement);
+    void visit(BlockStatement statement);
+    void visit(ExpressionStatement statement);
+    void visit(DeclarationStatement statement);
+    void visit(IfStatement statement);
+    void visit(WhileStatement statement);
+    void visit(RepeatStatement statement);
+    void visit(IdentifierAsteriskIdentifierStatement statement);
+    void visit(ForStatement statement);
+    void visit(ForInStatement statement);
+    void visit(ForInRangeStatement statement);
+    void visit(ReturnStatement statement);
+    void visit(SwitchStatement statement);
+    void visit(CaseStatement statement);
+    void visit(BreakStatement statement);
+    void visit(ContinueStatement statement);
+    void visit(GotoStatement statement);
+    void visit(LockStatement statement);
+    void visit(UnsafeStatement statement);
+    void visit(DeferStatement statement);
+    void visit(AssertStatement statement);
+    void visit(ThrowStatement statement);
+    void visit(TryStatement statement);
+    void visit(GetStatement statement);
+    void visit(SetStatement statement);
 
 
     // Identifiers 
-    void accept(BasicIdentifier identifier);
-    void accept(IdentifierDotIdentifier identifier);
-    void accept(TypeDotIdentifier identifier);
-    void accept(ExpressionDotIdentifier identifier);
-    void accept(DotIdentifier identifier);
-    void accept(IdentifierBracketIdentifier identifier);
-    void accept(IdentifierBracketExpression identifier);
-    void accept(TypeTemplateArgument identifier);
-    void accept(ValueTemplateArgument identifier);
-    void accept(IdentifierTemplateArgument identifier);
+    void visit(BasicIdentifier identifier);
+    void visit(IdentifierDotIdentifier identifier);
+    void visit(TypeDotIdentifier identifier);
+    void visit(ExpressionDotIdentifier identifier);
+    void visit(DotIdentifier identifier);
+    void visit(IdentifierBracketIdentifier identifier);
+    void visit(IdentifierBracketExpression identifier);
+    void visit(TypeTemplateArgument identifier);
+    void visit(ValueTemplateArgument identifier);
+    void visit(IdentifierTemplateArgument identifier);
 
 
      // undefined
-    void accept(FileLiteral literal);
-    void accept(LineLiteral literal);
-    void accept(AstType type);
+    void visit(FileLiteral literal);
+    void visit(LineLiteral literal);
+    void visit(AstType type);
 
 
     // TODO: remove these dummies
-    /*void accept(Statement x);
-    void accept(Identifier x);
-    void accept(TemplateArgument x);*/
+    /*void visit(Statement x);
+    void visit(Identifier x);
+    void visit(TemplateArgument x);*/
 }

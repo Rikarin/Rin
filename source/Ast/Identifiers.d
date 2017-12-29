@@ -34,8 +34,8 @@ final class BasicIdentifier : Identifier {
         super(location, name);
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -50,8 +50,8 @@ final class IdentifierDotIdentifier : Identifier {
         this.identifier = identifier;
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -66,8 +66,8 @@ final class TypeDotIdentifier : Identifier {
         this.type = type;
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -82,8 +82,8 @@ final class ExpressionDotIdentifier : Identifier {
         this.expression = expression;
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -100,8 +100,8 @@ final class TypeTemplateArgument : TemplateArgument {
         this.type = type;
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 } 
 
@@ -115,8 +115,8 @@ final class ValueTemplateArgument : TemplateArgument {
         this.value = value;
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -130,8 +130,8 @@ final class IdentifierTemplateArgument : TemplateArgument {
         this.identifier = identifier;
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -142,8 +142,8 @@ final class DotIdentifier : Identifier {
         super(location, name);
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -160,8 +160,8 @@ final class IdentifierBracketIdentifier : Identifier {
         this.index   = index;
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
@@ -178,8 +178,8 @@ final class IdentifierBracketExpression : Identifier {
         this.index   = index;
     }
 
-	override void visit(IVisitor visitor) {
-		visitor.accept(this);
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
 
