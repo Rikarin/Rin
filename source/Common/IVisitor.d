@@ -30,6 +30,7 @@ interface IVisitor {
     void accept(IdentifierExpression expr);
     void accept(IdentifierCallExpression expr);
     void accept(Lambda expr);
+    void accept(IsExpression expr);
 
 
     // Declarations

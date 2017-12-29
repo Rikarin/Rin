@@ -3,6 +3,7 @@ module Parser.Expression;
 
 import Tokens;
 import Lexer;
+import Domain.Name;
 import Domain.Location;
 
 import Ast.Type;
@@ -14,15 +15,6 @@ import Parser.Utils;
 import Parser.Identifiers;
 
 
-enum ParseMode {
-    Greedy
-}
-
-void test(ref TokenRange trange) {
-    trange.parseExpression();
-}
-
-
 AstExpression parseExpression(ParseMode mode = ParseMode.Greedy)(ref TokenRange trange) {
     auto lhs = trange.parsePrefixExpression();
 
@@ -32,6 +24,7 @@ AstExpression parseExpression(ParseMode mode = ParseMode.Greedy)(ref TokenRange 
         parseAssignExpression
         )(lhs);
 }
+
 
 private AstExpression parseBinaryExpression(
     TokenType type,
@@ -383,6 +376,7 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
 
         case Identifier: return trange.parseIdentifierExpression(trange.parseIdentifier());
         case Dot:        return trange.parseIdentifierExpression(trange.parseDotIdentifier());
+        case Is:         return trange.parseIsExpression();
         case True: assert(false); // TODO
         case False: assert(false); // TODO
         case Null: assert(false); // TODO
@@ -435,7 +429,6 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
             return new AstNameOfExpression(loc, ident);
 
         case TypeId: assert(false); // TODO
-        case Is: assert(false); // TODO
         case Mixin: assert(false); // TODO
 
         default:
@@ -548,11 +541,6 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
  }
 
 
-
-
-
-
-
 /*
  * Parse ^^
  */
@@ -571,9 +559,48 @@ private AstExpression parsePowExpression(ref TokenRange trange, AstExpression ex
 }
 
 
+private auto parseIsExpression(ref TokenRange trange) {
+    Location loc = trange.front.location;
 
+    trange.match(TokenType.Is);
+    trange.match(TokenType.OpenParen);
 
-// TODO: parse is() expr
+    auto type = trange.parseType();
+
+    Name identifier;
+    if (trange.front.type == TokenType.Identifier) {
+        identifier = trange.front.name;
+        trange.popFront();
+    }
+
+    if (trange.front.type == TokenType.Colon) {
+        trange.popFront();
+        // TODO
+    } else if (trange.front.type == TokenType.EqualEqual) {
+        trange.popFront();
+        // TODO
+    } else {
+        trange.match(TokenType.EqualEqual);
+    }
+
+    switch (trange.front.type) with (TokenType) {
+        case Struct, Union, Class, Interface, Enum, Function, Delegate,
+            Super, Const, ReadOnly, Inout, Shared, Return:
+            assert(false, "TODO"); // TODO:
+
+        default:
+            trange.parseType(); // TODO
+    }
+
+    while (trange.front.type == TokenType.Comma) {
+        assert(false); // TODO: parse template arguments
+    }
+
+    trange.match(TokenType.CloseParen);
+
+    loc.spanTo(trange.previous);
+    return new IsExpression(loc, type);
+}
 
 
 AstExpression[] parseArguments(TokenType open)(ref TokenRange trange) {

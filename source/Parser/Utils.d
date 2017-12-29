@@ -9,6 +9,12 @@ import Domain.Context;
 import std.conv, std.string;
 
 
+enum ParseMode {
+    Greedy,
+    Reluctant
+}
+
+
 class CompileException : Exception {
     Location location;
     

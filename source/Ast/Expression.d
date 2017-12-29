@@ -454,3 +454,19 @@ final class AstNameOfExpression : AstExpression {
 		visitor.accept(this);
 	}
 }
+
+
+// is()
+final class IsExpression : AstExpression {
+	AstType type;
+
+	this(Location location, AstType type) {
+		super(location);
+
+		this.type = type;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}

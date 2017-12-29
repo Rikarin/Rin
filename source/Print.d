@@ -271,6 +271,7 @@ class PrintVisitor : IVisitor {
     void accept(TypeTemplateArgument identifier) { }
     void accept(ValueTemplateArgument identifier) { }
     void accept(IdentifierTemplateArgument identifier) { }
+    void accept(IsExpression expr) { }
 
 
 

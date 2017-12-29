@@ -272,11 +272,6 @@ void parsePostfixStorageClasses(ref TokenRange trange, ref StorageClass sc) {
 }
 
 
-
-
-
-
-
 VariableDeclaration parseVariable(ref TokenRange trange, Location loc, StorageClass sc, Name name, AstExpression[] attribs) {
     AstType type;
     if (trange.front.type == TokenType.Colon) {

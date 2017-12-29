@@ -351,6 +351,9 @@ Statement parseStatement(ref TokenRange trange) {
             loc.spanTo(trange.previous);
             return new UnsafeStatement(loc, block);
 
+        case Asm:
+            return trange.parseAssembly();
+
         default:
             return trange.parseAmbigousStatement();
     }
@@ -369,4 +372,21 @@ BlockStatement parseBlock(ref TokenRange trange) {
     trange.popFront();
     loc.spanTo(trange.previous);
     return new BlockStatement(loc, statements);
+}
+
+
+Statement parseAssembly(ref TokenRange trange) {
+    Location loc = trange.front.location;
+
+    trange.match(TokenType.Asm);
+    trange.match(TokenType.OpenBrace);
+
+    while (trange.front.type != TokenType.CloseBrace) {
+        trange.popFront(); // TODO: finish this
+    }
+
+    trange.popFront();
+
+    loc.spanTo(trange.previous);
+    return null; // TODO
 }
