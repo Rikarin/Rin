@@ -428,6 +428,19 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
             loc.spanTo(trange.previous);
             return new AstNameOfExpression(loc, ident);
 
+        case Default:
+            trange.popFront();
+            trange.match(OpenParen);
+
+            if (trange.front.type == Identifier) {
+                trange.parseIdentifier(); // TODO
+            } else {
+                trange.parseType(); // TODO
+            }
+            
+            loc.spanTo(trange.previous);
+            assert(false); // TODO
+
         case TypeId: assert(false); // TODO
         case Mixin: assert(false); // TODO
 

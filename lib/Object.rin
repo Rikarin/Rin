@@ -13,12 +13,12 @@ alias Predicate(T) = delegate(T) -> bool;
 
 
 class Object {
-    virtual toString() const -> string => typeid(self).name;
-    virtual getHash() const -> size_t => 0;
+    toString() const -> string => typeid(self).name;
+    getHash() const -> size_t => 0;
 
-    type -> const(Type) => typeid(self);
+    final type -> const(Type) => typeid(self);
 
-    virtual finalize() {
+    finalize() {
 
     }
 
