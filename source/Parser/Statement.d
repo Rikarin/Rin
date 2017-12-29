@@ -181,7 +181,7 @@ Statement parseStatement(ref TokenRange trange) {
             return new CaseStatement(loc, args);
 
         case Default:
-            assert(false);
+            assert(false); // TODO
 
         case Goto:
             trange.popFront();
@@ -303,6 +303,32 @@ Statement parseStatement(ref TokenRange trange) {
             assert(false);
         case Debug:
             assert(false);
+
+        case Get:
+            trange.popFront();
+
+            BlockStatement block;
+            if (trange.front.type == OpenBrace) {
+                block = trange.parseBlock();
+            } else {
+                trange.match(Semicolon);
+            }
+
+            loc.spanTo(trange.previous);
+            return new GetStatement(loc, block);
+
+        case Set:
+            trange.popFront();
+
+            BlockStatement block;
+            if (trange.front.type == OpenBrace) {
+                block = trange.parseBlock();
+            } else {
+                trange.match(Semicolon);
+            }
+
+            loc.spanTo(trange.previous);
+            return new SetStatement(loc, block);
 
         case Lock:
             trange.popFront();

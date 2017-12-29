@@ -37,6 +37,8 @@ interface IVisitor {
     void accept(UsingDeclaration decl);
     void accept(TupleDeclaration decl);
     void accept(VariableDeclaration decl);
+    void accept(FunctionDeclaration decl);
+    void accept(PropertyDeclaration decl);
 
 
     // Statements
@@ -62,6 +64,8 @@ interface IVisitor {
     void accept(AssertStatement statement);
     void accept(ThrowStatement statement);
     void accept(TryStatement statement);
+    void accept(GetStatement statement);
+    void accept(SetStatement statement);
 
 
     // Identifiers 

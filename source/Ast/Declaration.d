@@ -2,6 +2,7 @@ module Ast.Declaration;
 @safe:
 
 import Ast.Type;
+import Ast.Statement;
 import Ast.Expression;
 
 import Domain.Location;
@@ -162,6 +163,47 @@ final class VariableDeclaration : NamedDeclaration {
 
 		this.type  = type;
 		this.value = value;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+final class FunctionDeclaration : NamedDeclaration {
+	AstType returnType;
+	ParamDecl[] params;
+	BlockStatement block;
+
+	bool isVariadic;
+
+	this(Location location, StorageClass storageClass, Name name, AstType returnType,
+		ParamDecl[] params, bool isVariadic, BlockStatement block
+	) {
+		super(location, storageClass, name);
+
+		this.returnType = returnType;
+		this.params     = params;
+		this.isVariadic = isVariadic;
+		this.block      = block;
+	}
+
+	override void visit(IVisitor visitor) {
+		visitor.accept(this);
+	}
+}
+
+
+final class PropertyDeclaration : NamedDeclaration {
+	AstType returnType;
+	BlockStatement block;
+
+	this(Location location, StorageClass storageClass, Name name, AstType returnType, BlockStatement block) {
+		super(location, storageClass, name);
+
+		this.returnType = returnType;
+		this.block = block;
 	}
 
 	override void visit(IVisitor visitor) {

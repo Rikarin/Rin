@@ -201,7 +201,7 @@ final class ForInRangeStatement : Statement {
 final class ReturnStatement : Statement {
     AstExpression value;    
 
-    this(Location locaiton, AstExpression value) {
+    this(Location location, AstExpression value) {
         super(location);
 
         this.value = value;
@@ -217,7 +217,7 @@ final class SwitchStatement : Statement {
     AstExpression expr;
     BlockStatement block;
 
-    this(Location locaiton, AstExpression expr, BlockStatement block) {
+    this(Location location, AstExpression expr, BlockStatement block) {
         super(location);
 
         this.expr  = expr;
@@ -233,7 +233,7 @@ final class SwitchStatement : Statement {
 final class CaseStatement : Statement {
     AstExpression[] cases;
 
-    this(Location locaiton, AstExpression[] cases) {
+    this(Location location, AstExpression[] cases) {
         super(location);
 
         this.cases = cases;
@@ -246,7 +246,7 @@ final class CaseStatement : Statement {
 
 
 final class BreakStatement : Statement {
-    this(Location locaiton) {
+    this(Location location) {
         super(location);
     }
 
@@ -257,7 +257,7 @@ final class BreakStatement : Statement {
 
 
 final class ContinueStatement : Statement {
-    this(Location locaiton) {
+    this(Location location) {
         super(location);
     }
 
@@ -270,7 +270,7 @@ final class ContinueStatement : Statement {
 final class GotoStatement : Statement {
     Name name;
 
-    this(Location locaiton, Name name) {
+    this(Location location, Name name) {
         super(location);
 
         this.name = name;
@@ -286,7 +286,7 @@ final class LockStatement : Statement {
     Name name;
     BlockStatement block;
 
-    this(Location locaiton, Name name, BlockStatement block) {
+    this(Location location, Name name, BlockStatement block) {
         super(location);
 
         this.name  = name;
@@ -302,7 +302,7 @@ final class LockStatement : Statement {
 final class UnsafeStatement : Statement {
     BlockStatement block;
 
-    this(Location locaiton, BlockStatement block) {
+    this(Location location, BlockStatement block) {
         super(location);
 
         this.block = block;
@@ -324,7 +324,7 @@ final class DeferStatement : Statement {
     DeferType type;
     Statement statement;
 
-    this(Location locaiton, DeferType type, Statement statement) {
+    this(Location location, DeferType type, Statement statement) {
         super(location);
 
         this.type      = type;
@@ -341,7 +341,7 @@ final class AssertStatement : Statement {
     AstExpression condition;
     AstExpression message;
 
-    this(Location locaiton, AstExpression condition, AstExpression message) {
+    this(Location location, AstExpression condition, AstExpression message) {
         super(location);
 
         this.condition = condition;
@@ -357,7 +357,7 @@ final class AssertStatement : Statement {
 final class ThrowStatement : Statement {
     AstExpression value;
 
-    this(Location locaiton, AstExpression value) {
+    this(Location location, AstExpression value) {
         super(location);
 
         this.value = value;
@@ -375,7 +375,7 @@ final class TryStatement : Statement {
     BlockStatement finallyBlock;
     bool isNullable;
 
-    this(Location locaiton, Statement tryStatement, bool isNullable, CatchBlock[] catches, BlockStatement finallyBlock) {
+    this(Location location, Statement tryStatement, bool isNullable, CatchBlock[] catches, BlockStatement finallyBlock) {
         super(location);
 
         this.tryStatement = tryStatement;
@@ -399,5 +399,35 @@ struct CatchBlock {
         this.location = location;
         this.type     = type;
         this.block    = block;
+    }
+}
+
+
+final class GetStatement : Statement {
+    BlockStatement block;
+
+    this(Location location, BlockStatement block) {
+        super(location);
+
+        this.block = block;
+    }
+
+    override void visit(IVisitor visitor) {
+        visitor.accept(this);
+    }
+}
+
+
+final class SetStatement : Statement {
+    BlockStatement block;
+
+    this(Location location, BlockStatement block) {
+        super(location);
+
+        this.block = block;
+    }
+
+    override void visit(IVisitor visitor) {
+        visitor.accept(this);
     }
 }

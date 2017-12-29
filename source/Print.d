@@ -23,23 +23,36 @@ class PrintVisitor : IVisitor {
     }
 
     void accept(Namespace decl) {
-        writeln("namespace ", decl.name.map!(x => x.toString(_context)).array().join("."), ";");
+        print("namespace");
+        printn(1, decl.name.map!(x => x.toString(_context)).array().join("."));
 
-        /*foreach (x; decl.declarations) {
+        foreach (x; decl.declarations) {
+            if (x)
             x.visit(this);
-        }*/
+        }
     }
 
     void accept(UsingDeclaration decl) {
-        writeln("using ", decl.namespace.map!(x => x.toString(_context)).array().join("."), ";");
+        print("using");
+        printn(1, decl.namespace.map!(x => x.toString(_context)).array().join("."));
     }
 
     void accept(TupleDeclaration decl) {
-        writeln("TUPLE TODO");
+        assert(false);
+    }
+
+    void accept(FunctionDeclaration decl) {
+        print("function TODO");
+        decl.block.visit(this);
+    }
+
+    void accept(PropertyDeclaration decl) {
+        print("property TODO");
+        decl.block.visit(this);
     }
 
     void accept(AstUnaryExpression expr) {
-        write(unarizeString("", expr.op));
+        print(unarizeString("", expr.op));
         expr.expr.visit(this);
     }
 
@@ -158,46 +171,85 @@ class PrintVisitor : IVisitor {
     }
 
     void accept(Lambda expr) {
-        assert(false, "TODO");
+        print("lambda TODO");
     }
-
-
 
     void accept(AstType type) {
-        writeln("tyoe TODO");
+        print("type TODO");
     }
 
+    void accept(GetStatement statement) {
+        print("get");
 
+        if (statement.block) {
+            statement.block.visit(this);
+        }
+    }
+
+    void accept(SetStatement statement) {
+        print("set");
+
+        if (statement.block) {
+            statement.block.visit(this);
+        }
+    }
 
     void accept(VariableDeclaration decl) {
-        writeln("VARIABLE"); // TODO
+        print("variable TODO");
     }
 
-
     void accept(BlockStatement statement) {
-        assert(false); // TODO
+        _space++;
+        foreach (x; statement.statements) {
+            x.visit(this);
+        }
+        _space--;
     }
 
     void accept(ExpressionStatement statement) {
-        assert(false); // TODO
+        statement.expr.visit(this);
     }
 
     void accept(DeclarationStatement statement) {
-        assert(false); // TODO
+        statement.decl.visit(this);
     }
 
     void accept(IfStatement statement) {
-        assert(false); // TODO
+        print("if TODO");
     }
 
-    void accept(WhileStatement statement) { }
-    void accept(RepeatStatement statement) { }
-    void accept(IdentifierAsteriskIdentifierStatement statement) { }
-    void accept(ForStatement statement) { }
-    void accept(ForInStatement statement) { }
-    void accept(ForInRangeStatement statement) { }
-    void accept(ReturnStatement statement) { }
-    void accept(SwitchStatement statement) { }
+    void accept(WhileStatement statement) {
+        print("while TODO");
+    }
+
+    void accept(RepeatStatement statement) {
+        print("repeat TODO");
+    }
+
+    void accept(IdentifierAsteriskIdentifierStatement statement) {
+        print("TODO");
+    }
+
+    void accept(ForStatement statement) {
+        print("TODO");
+    }
+
+    void accept(ForInStatement statement) {
+        print("TODO");
+    }
+
+    void accept(ForInRangeStatement statement) {
+        print("TODO");
+    }
+
+    void accept(ReturnStatement statement) {
+        print("return TODO");
+    }
+    
+    void accept(SwitchStatement statement) { 
+        print("TODO");
+    }
+
     void accept(CaseStatement statement) { }
     void accept(BreakStatement statement) { }
     void accept(ContinueStatement statement) { }
@@ -220,7 +272,25 @@ class PrintVisitor : IVisitor {
     void accept(ValueTemplateArgument identifier) { }
     void accept(IdentifierTemplateArgument identifier) { }
 
-    /*void accept(Statement x) { }
-    void accept(Identifier x) { }
-    void accept(TemplateArgument x) { }*/
+
+
+    private int _space;
+
+    private void printn(int add, string msg) {
+        add = (add + _space) * 2;
+
+        foreach (i; 0 .. add) {
+            write(" ");
+        }
+
+        writeln(msg);
+    }
+
+    private void print(string msg) {
+        foreach (i; 0 .. _space * 2) {
+            write(" ");
+        }
+
+        writeln(msg);
+    }
 }

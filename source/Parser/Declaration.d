@@ -85,15 +85,15 @@ Declaration parseDeclaration(ref TokenRange trange) {
     }
 
     // Parse attributes
-    if (trange.front.type == TokenType.OpenBracket) {
+    AstExpression[] attribs;
+    while (trange.front.type == TokenType.OpenBracket) {
         trange.popFront();
 
-        while (trange.front.type != TokenType.CloseBracket) {
-            trange.popFront(); // TODO: imeplement this
-        }
+        do {
+            attribs ~= trange.parseAssignExpression();
+        } while (trange.front.type == TokenType.Comma);
 
         trange.match(TokenType.CloseBracket);
-        // TODO
     }
 
     auto sc = trange.parsePrefixStorageClasses();
@@ -103,9 +103,9 @@ Declaration parseDeclaration(ref TokenRange trange) {
             trange.popFront();
 
             switch (trange.front.type) {
-                case OpenParen: return trange.parseFunction(loc, sc, name);
-                case Colon:     return trange.parseVariable(loc, sc, name);
-                case MinusMore: return trange.parseProperty(loc, sc, name);
+                case OpenParen: return trange.parseFunction(loc, sc, name, attribs);
+                case Colon:     return trange.parseVariable(loc, sc, name, attribs);
+                case MinusMore: return trange.parseProperty(loc, sc, name, attribs);
 
                 default:
                     trange.match(OpenParen);
@@ -117,16 +117,16 @@ Declaration parseDeclaration(ref TokenRange trange) {
             auto name = trange.front.name;
             trange.match(Identifier);
 
-            return trange.parseVariable(loc, sc, name);
+            return trange.parseVariable(loc, sc, name, attribs);
 
         case Self:
             trange.popFront();
-            return trange.parseFunction(loc, sc, BuiltinName!"__ctor");
+            return trange.parseFunction(loc, sc, BuiltinName!"__ctor", attribs);
 
         case Tilde:
             trange.popFront();
             trange.match(Self);
-            return trange.parseFunction(loc, sc, BuiltinName!"__dtor");
+            return trange.parseFunction(loc, sc, BuiltinName!"__dtor", attribs);
         
         case Alias: goto case;
         case Unittest: goto case;
@@ -140,12 +140,6 @@ Declaration parseDeclaration(ref TokenRange trange) {
 
         default:
     }
-
-    // name (can be property, function or variable)
-    // const, ref, shared, readonly, nogc, pure, inout
-    // -> return type
-    
-    // parse qualifiers in strict order!
 
     assert(false, "undefined " ~ trange.front.type.to!string);
 }
@@ -208,7 +202,6 @@ StorageClass parsePrefixStorageClasses(ref TokenRange trange) {
         default:
     }
 
-    // TODO: scope somewhere (class can be scoped)
     if (trange.front.type == TokenType.Partial) {
         trange.popFront();
         sc.isPartial = true;
@@ -257,6 +250,26 @@ StorageClass parsePrefixStorageClasses(ref TokenRange trange) {
 }
 
 
+void parsePostfixStorageClasses(ref TokenRange trange, ref StorageClass sc) {
+    if (trange.front.type == TokenType.Pure) {
+        sc.isPure = true;
+    }
+
+    if (trange.front.type == TokenType.Throws) {
+        sc.isThrows = true;
+    }
+
+    if (trange.front.type == TokenType.Shared) {
+        sc.qualifier = TypeQualifier.Shared;
+    }
+
+    switch (trange.front.type) with (TokenType) {
+        case Const:    sc.qualifier = sc.qualifier.add(TypeQualifier.Const);    break;
+        case ReadOnly: sc.qualifier = sc.qualifier.add(TypeQualifier.ReadOnly); break;
+        case Inout:    sc.qualifier = sc.qualifier.add(TypeQualifier.Inout);    break;
+        default:
+    }
+}
 
 
 
@@ -264,9 +277,7 @@ StorageClass parsePrefixStorageClasses(ref TokenRange trange) {
 
 
 
-
-
-VariableDeclaration parseVariable(ref TokenRange trange, Location loc, StorageClass sc, Name name) {
+VariableDeclaration parseVariable(ref TokenRange trange, Location loc, StorageClass sc, Name name, AstExpression[] attribs) {
     AstType type;
     if (trange.front.type == TokenType.Colon) {
         trange.popFront();
@@ -287,7 +298,7 @@ VariableDeclaration parseVariable(ref TokenRange trange, Location loc, StorageCl
 }
 
 
-private Declaration parseFunction(ref TokenRange trange, Location loc, StorageClass sc, Name name) {
+Declaration parseFunction(ref TokenRange trange, Location loc, StorageClass sc, Name name, AstExpression[] attribs) {
     bool isVariadic;
     
     // TODO: parse template params
@@ -299,25 +310,7 @@ private Declaration parseFunction(ref TokenRange trange, Location loc, StorageCl
         // TODO: parse constrain
     }
 
-    // storage class
-    if (trange.front.type == TokenType.Pure) {
-        sc.isPure = true;
-    }
-
-    if (trange.front.type == TokenType.Throws) {
-        sc.isThrows = true;
-    }
-
-    if (trange.front.type == TokenType.Shared) {
-        sc.qualifier = TypeQualifier.Shared;
-    }
-
-    switch (trange.front.type) with (TokenType) {
-        case Const:    sc.qualifier = sc.qualifier.add(TypeQualifier.Const);    break;
-        case ReadOnly: sc.qualifier = sc.qualifier.add(TypeQualifier.ReadOnly); break;
-        case Inout:    sc.qualifier = sc.qualifier.add(TypeQualifier.Inout);    break;
-        default:
-    }
+    trange.parsePostfixStorageClasses(sc);
 
     // return type
     AstType retType; // TODO: = AstType.getVoid();
@@ -327,15 +320,21 @@ private Declaration parseFunction(ref TokenRange trange, Location loc, StorageCl
     }
 
     auto block = trange.parseBlock();
-
-    return null;
+    loc.spanTo(trange.previous);
+    return new FunctionDeclaration(loc, sc, name, retType, params, isVariadic, block);
 }
 
 
-Declaration parseProperty(ref TokenRange trange, Location loc, StorageClass sc, Name name) {
-    trange.match(TokenType.MinusMore);
+Declaration parseProperty(ref TokenRange trange, Location loc, StorageClass sc, Name name, AstExpression[] attribs) {
+    trange.parsePostfixStorageClasses(sc);
 
-    return null; // TODO
+    trange.match(TokenType.MinusMore);
+    auto type = trange.parseType();
+
+    auto block = trange.parseBlock();
+
+    loc.spanTo(trange.previous);
+    return new PropertyDeclaration(loc, sc, name, type, block);
 }
 
 

@@ -34,6 +34,13 @@ main() {
     //writeln(\"Hello World!\");
 }
 
+prop -> Foo {
+    get {
+        return none;
+    }
+    set;
+}
+
 
 \0";
 
