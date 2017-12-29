@@ -35,6 +35,10 @@ struct TokenRange {
         t = getNextToken();
     }
 
+	inout(TokenRange) save() inout {
+		return inout(TokenRange)(t, index, previous, base, context, content);
+	}
+
     bool empty() const {
         return t.type == TokenType.End;
     }

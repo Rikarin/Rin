@@ -378,30 +378,13 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case Identifier: return trange.parseIdentifierExpression(trange.parseIdentifier());
         case Dot:        return trange.parseIdentifierExpression(trange.parseDotIdentifier());
         case Is:         return trange.parseIsExpression();
+        case Less:       return trange.parseHtmlTag();
         case True:       return new BooleanLiteral(loc, true);
         case False:      return new BooleanLiteral(loc, false);
         case Null:       return new NullLiteral(loc);
-        case IntegerLiteral: assert(false); // TODO
-        case StringLiteral: assert(false); // TODO
+        case IntegerLiteral:   assert(false); // TODO
+        case StringLiteral:    assert(false); // TODO
         case CharacterLiteral: assert(false); // TODO
-
-        case More: 
-            trange.popFront();
-
-            auto name = trange.front.name;
-            trange.match(Identifier);
-
-            // TODO: parse args
-
-            // TODO: we must parse body, if element is not closed by />
-            bool isClosed;
-            if (trange.front.type == Slash) {
-                trange.popFront();
-                isClosed = true;
-            }
-
-            trange.match(Less);
-            assert(false); // TODO: html stuff
 
         case OpenBracket: assert(false); // TODO: array expr
         case OpenBrace: assert(false); // TODO: delegate expr
@@ -654,4 +637,60 @@ AstExpression parseIdentifierExpression(ref TokenRange trange, Identifier identi
 
     loc.spanTo(trange.previous);
     return new IdentifierCallExpression(loc, identifier, args);
+}
+
+
+HtmlExpression parseHtmlTag(ref TokenRange trange) {
+    Location loc = trange.front.location;
+    trange.match(TokenType.Less);
+
+    auto identifier = trange.front.name;
+    trange.match(TokenType.Identifier);
+
+    // TODO: parse attribs
+
+    bool isClosed;
+    if (trange.front.type == TokenType.Slash) { // <identifier />
+        trange.popFront();
+        isClosed = true;
+    }
+
+    trange.match(TokenType.More);
+
+    AstExpression[] inner;
+    while (!isClosed) {
+        switch (trange.front.type) with(TokenType) {
+            case Less:
+                auto lookAhead = trange.save;
+                lookAhead.popFront();
+
+                if (lookAhead.front.type == Slash) {
+                    trange.popFront();
+                    trange.popFront();
+
+                    assert(trange.front.name == identifier, "Miss matching HTML tag");
+                    trange.match(Identifier);
+                    trange.match(More);
+
+                    isClosed = true;
+                    break;
+                }
+
+                inner ~= trange.parseHtmlTag();
+                break;
+
+            case Identifier: assert(false); // TODO
+
+            case OpenBrace:
+                assert(false); // TODO
+                //inner ~= trange.ParseStatement();
+                //trange.match(CloseBrace);
+                //break;
+
+            default:
+                assert(false);
+        }
+    }
+
+    return new HtmlExpression(loc, identifier, inner);
 }

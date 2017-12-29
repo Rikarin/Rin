@@ -27,10 +27,14 @@ main() {
 
     if (foo == bar) {
         for (i in array) {
-
         }
     }
 
+    return <html>
+        <div>
+            <img />
+        </div>
+    </html>;
     //writeln(\"Hello World!\");
 }
 

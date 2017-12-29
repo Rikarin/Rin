@@ -1,6 +1,7 @@
 module Ast.Expression;
 @safe:
 
+import Domain.Name;
 import Domain.Location;
 import Domain.Context;
 import Common.Node;
@@ -464,6 +465,25 @@ final class IsExpression : AstExpression {
 		super(location);
 
 		this.type = type;
+	}
+
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
+	}
+}
+
+
+// <html> tags
+final class HtmlExpression : AstExpression {
+	Name identifier;
+	// attribs
+	AstExpression[] inner;
+
+	this(Location location, Name identifier, AstExpression[] inner) {
+		super(location);
+
+		this.identifier = identifier;
+		this.inner      = inner;
 	}
 
 	override void accept(IVisitor visitor) {

@@ -243,7 +243,12 @@ class PrintVisitor : IVisitor {
     }
 
     void visit(ReturnStatement statement) {
-        print("return TODO");
+        print("return");
+        _space++;
+        if (statement.value) {
+            statement.value.accept(this);
+        }
+        _space--;
     }
     
     void visit(SwitchStatement statement) { 
@@ -272,6 +277,17 @@ class PrintVisitor : IVisitor {
     void visit(ValueTemplateArgument identifier) { }
     void visit(IdentifierTemplateArgument identifier) { }
     void visit(IsExpression expr) { }
+
+    void visit(HtmlExpression expr) {
+        print("HTML");
+        _space++;
+        print(expr.identifier.toString(_context));
+        foreach (x; expr.inner) {
+            x.accept(this);
+        }
+
+        _space--;
+    }
 
 
 

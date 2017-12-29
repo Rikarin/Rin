@@ -31,6 +31,7 @@ interface IVisitor {
     void visit(IdentifierCallExpression expr);
     void visit(Lambda expr);
     void visit(IsExpression expr);
+    void visit(HtmlExpression expr);
 
 
     // Declarations
