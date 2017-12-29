@@ -62,3 +62,48 @@ final class BooleanLiteral : CompileTimeExpression {
         //visitor.visit(this);
     }
 }
+
+
+final class IntegerLiteral : CompileTimeExpression {
+    ulong value;
+
+    this(Location location, ulong value, BuiltinType type) {
+        super(location, Type.get(type));
+
+        this.value = value;
+    }
+
+    override void accept(IVisitor visitor) {
+        //visitor.visit(this);
+    }
+}
+
+
+final class CharacterLiteral : CompileTimeExpression {
+    dchar value;
+
+    this(Location location, dchar value, BuiltinType type) {
+        super(location, Type.get(type));
+
+        this.value = value;
+    }
+
+    override void accept(IVisitor visitor) {
+        //visitor.visit(this);
+    }
+}
+
+
+final class StringLiteral : CompileTimeExpression {
+    string value;
+
+    this(Location location, string value) {
+        super(location, Type.get(BuiltinType.Char)); // TODO
+
+        this.value = value;
+    }
+
+    override void accept(IVisitor visitor) {
+        //visitor.visit(this);
+    }
+}

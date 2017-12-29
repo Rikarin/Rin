@@ -23,7 +23,12 @@ using System.IO;
 using System.Core.Test;
 
 main() {
-    var xxx: int = int(false);
+    var xxx: int = int(42);
+    var text = \"lorem ipsum dolor sit a met\";
+    
+    if (34 == 0x42 || 42 != 0b01110) {
+
+    }
 
     if (foo == false) {
         for (i in array) {

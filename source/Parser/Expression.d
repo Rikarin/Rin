@@ -5,6 +5,7 @@ import Tokens;
 import Lexer;
 import Domain.Name;
 import Domain.Location;
+import Domain.BuiltinType;
 
 import Ast.Type;
 import Ast.Expression;
@@ -378,19 +379,19 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case SharpFile: trange.popFront(); return new FileLiteral(loc);
         case SharpLine: trange.popFront(); return new LineLiteral(loc);
 
-        case Identifier: return trange.parseIdentifierExpression(trange.parseIdentifier());
-        case Dot:        return trange.parseIdentifierExpression(trange.parseDotIdentifier());
-        case Is:         return trange.parseIsExpression();
-        case Less:       return trange.parseHtmlTag();
-        case IntegerLiteral:   assert(false); // TODO
-        case StringLiteral:    assert(false); // TODO
-        case CharacterLiteral: assert(false); // TODO
+        case Identifier:       return trange.parseIdentifierExpression(trange.parseIdentifier());
+        case Dot:              return trange.parseIdentifierExpression(trange.parseDotIdentifier());
+        case Is:               return trange.parseIsExpression();
+        case Less:             return trange.parseHtmlTag();
+        case IntegerLiteral:   return trange.parseIntegerLiteral();
+        case StringLiteral:    return trange.parseStringLiteral();
+        case CharacterLiteral: return trange.parseCharacterLiteral();
 
         case OpenBracket: assert(false); // TODO: array expr
-        case OpenBrace: assert(false); // TODO: delegate expr
-        case OpenParen: assert(false); // TODO: tuple expr + something else
-        case Function: assert(false); // TODO
-        case Delegate: assert(false); // TODO
+        case OpenBrace:   assert(false); // TODO: delegate expr
+        case OpenParen:   assert(false); // TODO: tuple expr + something else
+        case Function:    assert(false); // TODO
+        case Delegate:    assert(false); // TODO
 
         case TypeOf: 
             trange.popFront();
@@ -706,4 +707,146 @@ HtmlExpression parseHtmlTag(ref TokenRange trange) {
     }
 
     return new HtmlExpression(loc, identifier, inner);
+}
+
+
+
+
+
+private StringLiteral parseStringLiteral(ref TokenRange trange) {
+    Location loc = trange.front.location;
+    auto str = trange.front.name;
+    trange.popFront();
+
+    return new StringLiteral(loc, str.toString(trange.context));
+}
+
+
+private CharacterLiteral parseCharacterLiteral(ref TokenRange trange) {
+    Location loc = trange.front.location;
+    auto str = trange.front.name.toString(trange.context);
+    assert(str.length == 1);
+
+    trange.popFront();
+    return new CharacterLiteral(loc, str[0], BuiltinType.Char);
+}
+
+
+private IntegerLiteral parseIntegerLiteral(ref TokenRange trange) {
+	Location loc = trange.front.location;
+	
+	auto strVal = trange.front.name.toString(trange.context);
+	assert(strVal.length > 0);
+	
+	trange.match(TokenType.IntegerLiteral);
+	
+	bool isUnsigned, isLong;
+	if (strVal.length > 1) {
+		switch (strVal[$ - 1]) {
+			case 'U':
+				isUnsigned = true;
+				
+				if (strVal[$ - 2] == 'L') {
+					isLong = true;
+					strVal = strVal[0 .. $ - 2];
+				} else {
+					strVal = strVal[0 .. $ - 1];
+				}
+				break;
+			
+			case 'L':
+				isLong = true;
+				
+				if (strVal[$ - 2] == 'U') {
+					isUnsigned = true;
+					strVal = strVal[0 .. $ - 2];
+				} else {
+					strVal = strVal[0 .. $ - 1];
+				}
+				break;
+			
+			default:
+		}
+	}
+	
+	ulong value;
+	
+	assert(strVal.length > 0);
+	if (strVal[0] != '0' || strVal.length < 3) {
+		goto ParseDec;
+	}
+	
+	switch (strVal[1]) {
+		case 'x':
+			value = strToHexInt(strVal[2 .. $]);
+			goto CreateLiteral;
+		
+		case 'b':
+			value = strToBinInt(strVal[2 .. $]);
+			goto CreateLiteral;
+		
+		default:
+	}
+	
+	ParseDec: value = strToDecInt(strVal);
+	CreateLiteral:
+	
+	auto type = isUnsigned
+		? ((isLong || value > uint.max) ? BuiltinType.Ulong : BuiltinType.Uint)
+		: ((isLong || value > int.max) ? BuiltinType.Long : BuiltinType.Int);
+	
+	return new IntegerLiteral(loc, value, type);
+}
+
+ulong strToDecInt(string s) {
+	ulong ret;
+	
+	for (uint i = 0; i < s.length; i++) {
+		if (s[i] == '_') continue;
+		
+		ret *= 10;
+		
+		auto d = s[i] - '0';
+		assert(d < 10, "Only digits are expected here");
+		ret += d;
+	}
+	
+	return ret;
+}
+
+ulong strToBinInt(string s) {
+	ulong ret;
+	
+	for (uint i = 0; i < s.length; i++) {
+		if (s[i] == '_') continue;
+		
+		ret <<= 1;
+		auto d = s[i] - '0';
+		assert(d < 2, "Only 0 and 1 are expected here");
+		ret |= d;
+	}
+	
+	return ret;
+}
+
+ulong strToHexInt(string s) {
+	ulong ret;
+	
+	for (uint i = 0; i < s.length; i++) {
+		if (s[i] == '_') continue;
+		
+		ret *= 16;
+		
+		auto d = s[i] - '0';
+		if (d < 10) {
+			ret += d;
+			continue;
+		}
+		
+		auto h = (s[i] | 0x20) - 'a' + 10;
+		assert(h - 10 < 6, "Only hex digits are expected here");
+		ret += h;
+	}
+	
+	return ret;
 }
