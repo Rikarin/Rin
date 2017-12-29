@@ -1,0 +1,8 @@
+sudo: false
+dist: trusty
+
+language: d
+
+d:
+ - ldc
+ 
