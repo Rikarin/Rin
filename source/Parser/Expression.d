@@ -9,6 +9,7 @@ import Domain.Location;
 import Ast.Type;
 import Ast.Expression;
 import Ast.Identifiers;
+import IR.Expression;
 
 import Parser.Type;
 import Parser.Utils;
@@ -377,9 +378,9 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case Identifier: return trange.parseIdentifierExpression(trange.parseIdentifier());
         case Dot:        return trange.parseIdentifierExpression(trange.parseDotIdentifier());
         case Is:         return trange.parseIsExpression();
-        case True: assert(false); // TODO
-        case False: assert(false); // TODO
-        case Null: assert(false); // TODO
+        case True:       return new BooleanLiteral(loc, true);
+        case False:      return new BooleanLiteral(loc, false);
+        case Null:       return new NullLiteral(loc);
         case IntegerLiteral: assert(false); // TODO
         case StringLiteral: assert(false); // TODO
         case CharacterLiteral: assert(false); // TODO
