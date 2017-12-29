@@ -23,12 +23,14 @@ using System.IO;
 using System.Core.Test;
 
 main() {
-    var xxx: int = test;
+    var xxx: int = int(false);
 
-    if (foo == bar) {
+    if (foo == false) {
         for (i in array) {
         }
     }
+
+    //foo();
 
     return <html>
         <div>

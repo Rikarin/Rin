@@ -4,6 +4,8 @@ module Parser.Identifiers;
 import Lexer;
 import Tokens;
 
+import Ast.Type;
+import Ast.Expression;
 import Ast.Identifiers;
 import Domain.Location;
 import Parser.Utils;
@@ -33,7 +35,7 @@ Identifier parseDotIdentifier(ref TokenRange trange) {
 
 
 // qualifier.identifier
-auto parseQualifierIdentifier(N)(ref TokenRange trange, Location loc, N ns) {
+auto parseQualifiedIdentifier(N)(ref TokenRange trange, Location loc, N ns) {
     auto name = trange.front.name;
     trange.match(TokenType.Identifier);
 
@@ -43,7 +45,7 @@ auto parseQualifierIdentifier(N)(ref TokenRange trange, Location loc, N ns) {
         alias QualifiedIdentifier = IdentifierDotIdentifier;
     } else static if (is(N : AstType)) {
         alias QualifiedIdentifier = TypeDotIdentifier;
-    } else static if (is(N : Expression)) {
+    } else static if (is(N : AstExpression)) {
         alias QualifiedIdentifier = ExpressionDotIdentifier;
     } else {
         static assert(false);

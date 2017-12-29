@@ -372,6 +372,9 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case Self:      trange.popFront(); return new SelfExpression(loc);
         case Super:     trange.popFront(); return new SuperExpression(loc);
         case Dollar:    trange.popFront(); return new DollarExpression(loc);
+        case True:      trange.popFront(); return new BooleanLiteral(loc, true);
+        case False:     trange.popFront(); return new BooleanLiteral(loc, false);
+        case Null:      trange.popFront(); return new NullLiteral(loc);
         case SharpFile: trange.popFront(); return new FileLiteral(loc);
         case SharpLine: trange.popFront(); return new LineLiteral(loc);
 
@@ -379,9 +382,6 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case Dot:        return trange.parseIdentifierExpression(trange.parseDotIdentifier());
         case Is:         return trange.parseIsExpression();
         case Less:       return trange.parseHtmlTag();
-        case True:       return new BooleanLiteral(loc, true);
-        case False:      return new BooleanLiteral(loc, false);
-        case Null:       return new NullLiteral(loc);
         case IntegerLiteral:   assert(false); // TODO
         case StringLiteral:    assert(false); // TODO
         case CharacterLiteral: assert(false); // TODO
@@ -429,10 +429,23 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case Mixin: assert(false); // TODO
 
         default:
-            // TODO
-    }
+            auto type = trange.parseType!(ParseMode.Reluctant)();
 
-    assert(false, "Reached unreachable code!");
+            switch (trange.front.type) {
+                case Dot:
+                    trange.popFront();
+                    return trange.parseIdentifierExpression(trange.parseQualifiedIdentifier(loc, type));
+
+                case OpenParen:
+                    auto args = trange.parseArguments!OpenParen();
+                    loc.spanTo(trange.previous);
+                    return new AstTypeCallExpression(loc, type, args);
+
+                default:
+            }
+
+            assert(false, "Reached unreachable code!");
+    }
 }
 
 
@@ -496,7 +509,7 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
                         assert(false, "Slicing cannot be conditional");
                     }
 
-                    assert(false, "TODO"); // TODO
+                    assert(false, "TODO"); // TODO: slice operator
                 }
 
                 auto args = trange.parseArguments();
@@ -515,7 +528,7 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
                         break;
 
                     default:
-                        assert(false, "WTF are you doing, man?");
+                        trange.match(CloseBracket);
                 }
                 break;
 
@@ -524,8 +537,8 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
             case QuestionMarkDot:
                 const isConditional = trange.front.type == QuestionMarkDot;
                 trange.popFront();
-                // TODO
-                // parse...(trange, trange.front.type == Dot);
+
+                expr = trange.parseIdentifierExpression(trange.parseQualifiedIdentifier(loc, expr));
                 break;
             }
 

@@ -11,7 +11,7 @@ class Type {
     // TODO
 
     static Type get(BuiltinType type) {
-        assert(false);
+        return new Type;
     }
 }
 
