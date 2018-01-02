@@ -375,6 +375,22 @@ BlockStatement parseBlock(ref TokenRange trange) {
 }
 
 
+BlockStatement parseBody(ref TokenRange trange) {
+    if (trange.front.type == TokenType.OpenBrace) {
+        return trange.parseBlock();
+    }
+
+    Location loc = trange.front.location;
+    trange.match(TokenType.EqualMore);
+
+    auto expr = trange.parseExpression();
+    trange.match(TokenType.Semicolon);
+
+    loc.spanTo(trange.previous);
+    return new BlockStatement(loc, [new ExpressionStatement(loc, expr)]);
+}
+
+
 Statement parseAssembly(ref TokenRange trange) {
     Location loc = trange.front.location;
 

@@ -69,8 +69,8 @@ Declaration parseDeclaration(ref TokenRange trange) {
 
     // Declarations without storage class support
     switch (trange.front.type) with (TokenType) {
-        case OpenParen: // Tuple
-            return trange.parseTuple();
+        case OpenParen: return trange.parseTuple();
+        case Using:     return trange.parseUsing();
 
         case Static: goto case; // static if
         case Version: goto case;
@@ -78,8 +78,6 @@ Declaration parseDeclaration(ref TokenRange trange) {
         //case Unsafe: goto case; // TODO: isn't this statement?
         case Mixin:
             assert(false, "TODO");
-
-        case Using: return trange.parseUsing();
 
         default:
     }
@@ -98,7 +96,7 @@ Declaration parseDeclaration(ref TokenRange trange) {
 
     auto sc = trange.parsePrefixStorageClasses();
     switch (trange.front.type) with (TokenType) {
-        case Identifier: // function, property or class's variable decl
+        case Identifier:
             auto name = trange.front.name;
             trange.popFront();
 
@@ -314,7 +312,7 @@ Declaration parseFunction(ref TokenRange trange, Location loc, StorageClass sc, 
         retType = trange.parseType();
     }
 
-    auto block = trange.parseBlock();
+    auto block = trange.parseBody();
     loc.spanTo(trange.previous);
     return new FunctionDeclaration(loc, sc, name, retType, params, isVariadic, block);
 }
@@ -326,7 +324,7 @@ Declaration parseProperty(ref TokenRange trange, Location loc, StorageClass sc, 
     trange.match(TokenType.MinusMore);
     auto type = trange.parseType();
 
-    auto block = trange.parseBlock();
+    auto block = trange.parseBody();
 
     loc.spanTo(trange.previous);
     return new PropertyDeclaration(loc, sc, name, type, block);

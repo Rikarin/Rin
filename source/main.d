@@ -45,6 +45,12 @@ main() {
     //writeln(\"Hello World!\");
 }
 
+test -> int => 42;
+
+bar() => \"string return\";
+
+
+
 prop -> Foo {
     get {
         return none;

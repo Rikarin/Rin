@@ -387,11 +387,28 @@ AstExpression parsePrimaryExpression(ref TokenRange trange) {
         case StringLiteral:    return trange.parseStringLiteral();
         case CharacterLiteral: return trange.parseCharacterLiteral();
 
-        case OpenBracket: assert(false); // TODO: array expr
-        case OpenBrace:   assert(false); // TODO: delegate expr
-        case OpenParen:   assert(false); // TODO: tuple expr + something else
-        case Function:    assert(false); // TODO
-        case Delegate:    assert(false); // TODO
+        case OpenBracket:
+            AstExpression[] keys;
+            AstExpression[] values;
+
+            do {
+                trange.popFront();
+                auto value = trange.parseAssignExpression();
+
+                if (trange.front.type == Colon) {
+                    trange.popFront();
+                    keys   ~= value;
+                    values ~= trange.parseAssignExpression();
+                } else {
+                    values ~= value;
+                }
+            } while (trange.front.type == Comma);
+
+            loc.spanTo(trange.previous);
+            trange.match(CloseBracket);
+            assert(false); // TODO: array expr
+
+        case OpenParen: assert(false); // TODO: tuple expr + something else
 
         case TypeOf: 
             trange.popFront();
@@ -595,7 +612,7 @@ private auto parseIsExpression(ref TokenRange trange) {
     }
 
     switch (trange.front.type) with (TokenType) {
-        case Struct, Union, Class, Interface, Enum, Function, Delegate,
+        case Struct, Union, Class, Interface, Enum,
             Super, Const, ReadOnly, Inout, Shared, Return:
             assert(false, "TODO"); // TODO:
 
@@ -708,9 +725,6 @@ HtmlExpression parseHtmlTag(ref TokenRange trange) {
 
     return new HtmlExpression(loc, identifier, inner);
 }
-
-
-
 
 
 private StringLiteral parseStringLiteral(ref TokenRange trange) {

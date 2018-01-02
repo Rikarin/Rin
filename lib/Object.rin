@@ -1,15 +1,13 @@
 namespace System;
 
-alias TODO = assert(false, "TODO");
-
 // Basic types
 alias string  = readonly(char)[];
 alias wstring = readonly(wchar)[];
 alias dstring = readonly(dchar)[];
 alias object  = Object;
 
-alias Action       = delegate();
-alias Predicate(T) = delegate(T) -> bool;
+alias Action       = () -> void;
+alias Predicate(T) = (T) -> bool;
 
 
 class Object {
@@ -31,5 +29,5 @@ equals(lhs: object, rhs: object) -> bool {
         return true;
     }
 
-    TODO;
+    throw new NotImplementedException();
 }
