@@ -41,6 +41,11 @@ interface IVisitor {
     void visit(VariableDeclaration decl);
     void visit(FunctionDeclaration decl);
     void visit(PropertyDeclaration decl);
+    void visit(StructDeclaration decl);
+    void visit(UnionDeclaration decl);
+    void visit(ClassDeclaration decl);
+    void visit(InterfaceDeclaration decl);
+    void visit(EnumDeclaration decl);
 
 
     // Statements

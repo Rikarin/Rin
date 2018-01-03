@@ -4,6 +4,7 @@ module Ast.Declaration;
 import Ast.Type;
 import Ast.Statement;
 import Ast.Expression;
+import Ast.Identifiers;
 
 import Domain.Location;
 import Domain.Context;
@@ -204,6 +205,87 @@ final class PropertyDeclaration : NamedDeclaration {
 
 		this.returnType = returnType;
 		this.block = block;
+	}
+
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
+	}
+}
+
+
+final class StructDeclaration : NamedDeclaration {
+	Declaration[] members;
+
+	this(Location location, StorageClass storageClass, Name name, Declaration[] members) {
+		super(location, storageClass, name);
+
+		this.members = members;
+	}
+
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
+	}
+}
+
+
+final class UnionDeclaration : NamedDeclaration {
+	Declaration[] members;
+
+	this(Location location, StorageClass storageClass, Name name, Declaration[] members) {
+		super(location, storageClass, name);
+
+		this.members = members;
+	}
+
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
+	}
+}
+
+
+final class ClassDeclaration : NamedDeclaration {
+	Identifier[] bases;
+	Declaration[] members;
+
+	this(Location location, StorageClass storageClass, Name name, Identifier[] bases, Declaration[] members) {
+		super(location, storageClass, name);
+
+		this.bases   = bases;
+		this.members = members;
+	}
+
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
+	}
+}
+
+
+final class InterfaceDeclaration : NamedDeclaration {
+	Identifier[] bases;
+	Declaration[] members;
+
+	this(Location location, StorageClass storageClass, Name name, Identifier[] bases, Declaration[] members) {
+		super(location, storageClass, name);
+
+		this.bases   = bases;
+		this.members = members;
+	}
+
+	override void accept(IVisitor visitor) {
+		visitor.visit(this);
+	}
+}
+
+
+final class EnumDeclaration : NamedDeclaration {
+	AstType type;
+	VariableDeclaration[] variables;
+
+	this(Location location, StorageClass storageClass, Name name, AstType type, VariableDeclaration[] variables) {
+		super(location, storageClass, name);
+
+		this.type      = type;
+		this.variables = variables;
 	}
 
 	override void accept(IVisitor visitor) {

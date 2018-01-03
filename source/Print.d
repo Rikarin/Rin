@@ -278,6 +278,26 @@ class PrintVisitor : IVisitor {
     void visit(IdentifierTemplateArgument identifier) { }
     void visit(IsExpression expr) { }
 
+    void visit(StructDeclaration decl) {
+
+    }
+
+    void visit(UnionDeclaration decl) {
+
+    }
+
+    void visit(ClassDeclaration decl) {
+
+    }
+
+    void visit(InterfaceDeclaration decl) {
+
+    }
+
+    void visit(EnumDeclaration decl) {
+
+    }
+
     void visit(HtmlExpression expr) {
         print("HTML");
         _space++;

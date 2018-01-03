@@ -47,7 +47,7 @@ main() {
 
 test -> int => 42;
 
-bar() => \"string return\";
+bar(test: string) -> string => \"string return\" ~ test;
 
 
 
