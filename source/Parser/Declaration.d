@@ -13,6 +13,7 @@ import Domain.Name;
 import Domain.Location;
 import Common.Qualifier;
 
+import Parser.Adt;
 import Parser.Type;
 import Parser.Utils;
 import Parser.Statement;
@@ -126,16 +127,16 @@ Declaration parseDeclaration(ref TokenRange trange) {
             trange.match(Self);
             return trange.parseFunction(loc, sc, BuiltinName!"__dtor", attribs);
         
-        case Alias: goto case;
+        case Alias:    goto case;
         case Unittest: goto case;
-        case Class: goto case;
-        case Struct: goto case;
-        case Enum: goto case;
-        case Interface: goto case;
-        case Template: goto case;
-        case Union: 
+        case Template:
             assert(false, "TODO");
 
+        case Class:     return trange.parseClass(sc);
+        case Interface: return trange.parseInterface(sc);
+        case Struct:    return trange.parseStruct(sc);
+        case Union:     return trange.parseUnion(sc);
+        case Enum:      return trange.parseEnum(sc);
         default:
     }
 

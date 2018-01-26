@@ -50,14 +50,14 @@ test -> int => 42;
 bar(test: string) -> string => \"string return\" ~ test;
 
 
-
-prop -> Foo {
-    get {
-        return none;
+class FooBar {
+    prop -> Foo {
+        get {
+            return none;
+        }
+        set;
     }
-    set;
 }
-
 
 \0";
 
