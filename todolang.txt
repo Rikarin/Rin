@@ -1,0 +1,47 @@
+miesto traits proste pouzit tridu Type, ktora sa bude dat CTFE.
+do Expression(T) sa bude dat ulozit expression tree lambdy, viz. C#
+tohle !( je jeden token, tj. template open paren?
+
+v classe, structe, ...
+redonly - nemoze zmenit aktualnu premenu, viz C#, ale moze volat neconst methody
+const - moze zmenit aktualnu premenu, ale nemoze volat neconst metody
+
+
+class Foo {
+	const _bar;
+
+	public Foo() {
+		_bar = 42;
+	}
+
+	public void change() {
+		_bar = 42; // it fine
+	}
+}
+
+
+class Foo {
+	readonly const _bar;
+
+	public Foo() {
+		_bar = 42;
+	}
+
+	public void change() {
+		_bar = 42; // error
+	}
+}
+
+
+protocols miesto interfaces
+extensions miesto xx(this Foo foo); nepouzivat UFCS
+
+
+func wishHappyBirthday(to celebrator: Named & Aged) {
+
+opitonal methods in protocol
+abstract classes are not needed
+
+willSet/didSet in properties
+
+immutable is shit, remove it. so inout is not needed anymore
